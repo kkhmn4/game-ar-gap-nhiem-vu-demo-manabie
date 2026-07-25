@@ -297,6 +297,16 @@ function Intro({
         <span className="intro-orb orb-b" />
         <span className="intro-orb orb-c" />
         <span className="scan-beam" />
+        
+        {/* Orbs extracted from v1 and v2 atlases scattered around for visual effect */}
+        <img src="/assets/orbs/v1_0.png" className="floating-orb float-1" alt="" />
+        <img src="/assets/orbs/v1_3.png" className="floating-orb float-2" alt="" />
+        <img src="/assets/orbs/v1_5.png" className="floating-orb float-3" alt="" />
+        <img src="/assets/orbs/v1_7.png" className="floating-orb float-4" alt="" />
+        <img src="/assets/orbs/v2_1.png" className="floating-orb float-5" alt="" />
+        <img src="/assets/orbs/v2_2.png" className="floating-orb float-6" alt="" />
+        <img src="/assets/orbs/v2_4.png" className="floating-orb float-7" alt="" />
+        <img src="/assets/orbs/v2_5.png" className="floating-orb float-8" alt="" />
       </div>
 
       <main className="launch-screen relative z-10 mx-auto min-h-full w-full max-w-[1500px] px-[var(--gap)] py-6">

@@ -230,6 +230,33 @@ body {
 @keyframes hero-camera { from{transform:scale(1.015) translate3d(-.5%,0,0)} to{transform:scale(1.07) translate3d(1.2%,-.8%,0)} }
 @keyframes grid-drift { to{background-position:72px 72px} }
 @keyframes orb-float { 0%,100%{transform:translate3d(0,0,0) rotate(-3deg)} 50%{transform:translate3d(18px,-28px,0) rotate(5deg)} }
+
+/* ------------------------------------------------------------------ */
+/* Artistic Floating Orbs                                             */
+/* ------------------------------------------------------------------ */
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 25px rgba(255,255,255,0.1);
+  pointer-events: none;
+  z-index: 1;
+  animation: float-artistic ease-in-out infinite alternate;
+}
+
+@keyframes float-artistic {
+  0% { transform: translateY(0) rotate(0deg) scale(1); filter: brightness(0.85); }
+  50% { transform: translateY(-40px) rotate(15deg) scale(1.05); filter: brightness(1.15) drop-shadow(0 0 15px rgba(0,216,154,0.3)); }
+  100% { transform: translateY(30px) rotate(-15deg) scale(0.95); filter: brightness(0.95); }
+}
+
+.float-1 { left: 4%; top: 12%; width: 130px; animation-duration: 18s; animation-delay: 0s; opacity: 0.8; }
+.float-2 { right: 6%; top: 18%; width: 100px; animation-duration: 22s; animation-delay: -5s; opacity: 0.7; }
+.float-3 { left: 8%; bottom: 12%; width: 110px; animation-duration: 16s; animation-delay: -2s; opacity: 0.85; }
+.float-4 { right: 5%; bottom: 15%; width: 140px; animation-duration: 19s; animation-delay: -8s; opacity: 0.75; }
+.float-5 { left: 22%; top: 3%; width: 75px; animation-duration: 14s; animation-delay: -12s; opacity: 0.6; }
+.float-6 { right: 28%; bottom: -2%; width: 95px; animation-duration: 25s; animation-delay: -15s; opacity: 0.65; }
+.float-7 { left: -3%; top: 48%; width: 120px; animation-duration: 20s; animation-delay: -7s; opacity: 0.8; }
+.float-8 { right: -3%; top: 52%; width: 115px; animation-duration: 17s; animation-delay: -11s; opacity: 0.75; }
 @keyframes scan-pass { 0%,18%{transform:translateY(-120%) rotate(-8deg);opacity:0} 35%{opacity:1} 65%,100%{transform:translateY(620%) rotate(-8deg);opacity:0} }
 .mission-chip {
   border: 1px solid color-mix(in oklab,var(--mint) 48%,transparent); background: rgba(3,18,39,.72);
