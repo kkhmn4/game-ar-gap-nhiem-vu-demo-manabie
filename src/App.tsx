@@ -372,25 +372,31 @@ function Intro({
             <div className="reactor-halo halo-two" />
             <div className="reactor-scan" />
 
-            {/* 6 Quả cầu 3D công việc (lấy trực tiếp từ game) chuyển động xoay quanh tâm AI Flow, không có chữ */}
+            {/* 6 Quả cầu 3D công việc chuyển động xoay quanh tâm AI Flow */}
             <div className="orbit-container">
               <div className="orb-task orb-khbd" title="Tạo kế hoạch bài dạy" style={{ '--angle': '0deg', '--dist': '210px', '--speed': '14s' } as React.CSSProperties}>
                 <div className="orb-sphere icon-khbd" />
+                <span className="orb-label">Tạo kế hoạch<br />bài dạy</span>
               </div>
               <div className="orb-task orb-slide" title="Tạo slide bài giảng" style={{ '--angle': '60deg', '--dist': '220px', '--speed': '16.5s' } as React.CSSProperties}>
                 <div className="orb-sphere icon-slide" />
+                <span className="orb-label">Tạo slide<br />bài giảng</span>
               </div>
               <div className="orb-task orb-phieu" title="Thiết kế phiếu học tập" style={{ '--angle': '120deg', '--dist': '200px', '--speed': '13.5s' } as React.CSSProperties}>
                 <div className="orb-sphere icon-phieu" />
+                <span className="orb-label">Thiết kế<br />phiếu học tập</span>
               </div>
               <div className="orb-task orb-btvn" title="Tạo bài tập về nhà" style={{ '--angle': '180deg', '--dist': '215px', '--speed': '15.5s' } as React.CSSProperties}>
                 <div className="orb-sphere icon-btvn" />
+                <span className="orb-label">Tạo bài tập<br />về nhà</span>
               </div>
               <div className="orb-task orb-dekt" title="Thiết kế đề kiểm tra" style={{ '--angle': '240deg', '--dist': '225px', '--speed': '17.5s' } as React.CSSProperties}>
                 <div className="orb-sphere icon-dekt" />
+                <span className="orb-label">Thiết kế<br />đề kiểm tra</span>
               </div>
               <div className="orb-task orb-phuhuynh" title="Giao tiếp với phụ huynh" style={{ '--angle': '300deg', '--dist': '205px', '--speed': '14.5s' } as React.CSSProperties}>
                 <div className="orb-sphere icon-phuhuynh" />
+                <span className="orb-label">Giao tiếp với<br />phụ huynh</span>
               </div>
             </div>
 
