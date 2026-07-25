@@ -410,11 +410,7 @@ function Intro({
               </div>
             </div>
 
-            <div className="reactor-core">
-              <span>CHẾ ĐỘ</span>
-              <strong>AI FLOW</strong>
-              <i>ĐANG CHỜ</i>
-            </div>
+
             <div className="reactor-platform">
               <span />
               <span />
