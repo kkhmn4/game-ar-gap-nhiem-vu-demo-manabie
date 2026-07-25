@@ -315,12 +315,11 @@ function Intro({
           <div className="launch-copy rise">
             <p className="launch-kicker flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[var(--mint)] shadow-[0_0_10px_var(--mint)]" />
-              TRÒ CHƠI KHỞI ĐỘNG: "NHANH TAY LẸ MẮT"
+              HOẠT ĐỘNG 01 · GẮP VIỆC GIAO AI
             </p>
             <h1>
-              Một cử chỉ.
-              <br />
-              <em>Sáu quyết định.</em>
+              TRÒ CHƠI KHỞI ĐỘNG
+              <em>"NHANH TAY LẸ MẮT"</em>
             </h1>
             <p className="launch-lead">
               Đọc tình huống. Gắp việc có thể giao cho AI. Để những việc cần con người tiếp tục rơi.
