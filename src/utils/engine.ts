@@ -14,6 +14,8 @@ export const PALETTE = {
   noise: '#FF6A3D',
   white: '#EEF2FF',
   muted: '#7D8BB8',
+  gold: '#F4BE4F',
+  cyan: '#32C8E6',
 };
 
 const FONT = '"Be Vietnam Pro", system-ui, sans-serif';
@@ -94,6 +96,38 @@ interface Burst {
   shards: { a: number; v: number }[];
 }
 
+interface Shockwave {
+  x: number;
+  y: number;
+  r: number;
+  maxR: number;
+  color: string;
+  life: number;
+  age: number;
+}
+
+interface BgParticle {
+  x: number;
+  y: number;
+  size: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  pulseSpeed: number;
+  color: string;
+}
+
+interface Confetti {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  rot: number;
+  vRot: number;
+  size: number;
+  color: string;
+}
+
 const GRAB_PAD = 26;
 
 export class GameEngine {
@@ -103,6 +137,9 @@ export class GameEngine {
   private height = 720;
   private balls: Ball[] = [];
   private bursts: Burst[] = [];
+  private shockwaves: Shockwave[] = [];
+  private bgParticles: BgParticle[] = [];
+  private confettiList: Confetti[] = [];
   private hands: HandInput[] = [];
   /** Trạng thái pinch khung trước, để phát hiện cạnh lên/xuống */
   private prevPinch: boolean[] = [];
@@ -142,14 +179,35 @@ export class GameEngine {
       isGameOver: false,
       isWin: false,
       handsVisible: 0,
-      phase: 'CALIBRATE', multiplier: 1, accuracy: 100, eventText: 'HIỆU CHỈNH HỆ THỐNG', powerReady: false, countdown: 3,
+      phase: 'CALIBRATE',
+      multiplier: 1,
+      accuracy: 100,
+      eventText: 'HIỆU CHỈNH HỆ THỐNG',
+      powerReady: false,
+      countdown: 3,
     };
     this.buildQueue();
+    this.initBgParticles();
+  }
+
+  private initBgParticles() {
+    const colors = [PALETTE.mint, PALETTE.brand, PALETTE.cyan, PALETTE.gold];
+    this.bgParticles = Array.from({ length: 35 }, () => ({
+      x: Math.random() * this.width,
+      y: Math.random() * this.height,
+      size: 1.5 + Math.random() * 3,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: -0.15 - Math.random() * 0.35,
+      alpha: 0.1 + Math.random() * 0.45,
+      pulseSpeed: 0.002 + Math.random() * 0.004,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    }));
   }
 
   resize(width: number, height: number) {
     this.width = width;
     this.height = height;
+    if (this.bgParticles.length === 0) this.initBgParticles();
   }
 
   updateHands(hands: HandInput[]) {
@@ -158,8 +216,7 @@ export class GameEngine {
   }
 
   // -------------------------------------------------------------------------
-  // Hàng đợi quả cầu: bảo đảm cả 6 nhiệm vụ cốt lõi CHẮC CHẮN xuất hiện,
-  // rải đều chứ không phó mặc cho ngẫu nhiên.
+  // Hàng đợi quả cầu
   // -------------------------------------------------------------------------
   private buildQueue() {
     const cores = shuffle([...CORE_TASKS]);
@@ -179,7 +236,6 @@ export class GameEngine {
 
   private takeNextTask(): TaskDef {
     if (this.queue.length) return this.queue.shift() as TaskDef;
-    // Hết hàng đợi: các quả cốt lõi chưa gắp được thả lại, nếu không thì thả nhiễu.
     const remaining = CORE_TASKS.filter((t) => !this.state.collected.some((c) => c.id === t.id));
     const onScreen = new Set(this.balls.filter((b) => !b.dead).map((b) => b.task.id));
     const pending = remaining.filter((t) => !onScreen.has(t.id));
@@ -213,7 +269,7 @@ export class GameEngine {
   // -------------------------------------------------------------------------
   // Giỏ: hình thang ở đáy giữa màn hình
   // -------------------------------------------------------------------------
-  private basket() {
+  basket() {
     const w = Math.min(this.width * 0.36, 460);
     const h = Math.min(this.height * 0.2, 170);
     return { x: (this.width - w) / 2, y: this.height - h - 12, w, h };
@@ -226,7 +282,12 @@ export class GameEngine {
 
   // -------------------------------------------------------------------------
   update(dt: number) {
-    if (this.state.isGameOver) return;
+    if (this.state.isGameOver) {
+      if (this.confettiList.length > 0) {
+        this.updateConfetti(dt);
+      }
+      return;
+    }
     const step = Math.max(0, Math.min(64, dt));
 
     if (this.hitStopMs > 0) {
@@ -271,21 +332,66 @@ export class GameEngine {
       this.spawn();
     }
 
+    this.updateBgParticles(step);
     this.handleHands();
     this.moveBalls(step);
     this.updateReach();
     this.ageBursts(step);
+    this.updateShockwaves(step);
 
     const allCollected = this.state.collected.length >= CORE_TASKS.length;
     if (!this.finished && (allCollected || this.state.timeLeftSec <= 0)) {
       this.finished = true;
       this.state.isGameOver = true;
       this.state.isWin = allCollected;
-      if (allCollected) audio.playWin();
-      else audio.playTimeUp();
+      if (allCollected) {
+        audio.playWin();
+        this.spawnConfetti();
+      } else {
+        audio.playTimeUp();
+      }
     }
 
     this.onUpdate({ ...this.state, collected: [...this.state.collected] });
+  }
+
+  private updateBgParticles(step: number) {
+    for (const p of this.bgParticles) {
+      p.x += p.vx * step;
+      p.y += p.vy * step;
+      p.alpha += Math.sin(this.elapsedMs * p.pulseSpeed) * 0.02;
+
+      if (p.y < -10) {
+        p.y = this.height + 10;
+        p.x = Math.random() * this.width;
+      }
+      if (p.x < -10) p.x = this.width + 10;
+      if (p.x > this.width + 10) p.x = -10;
+    }
+  }
+
+  private spawnConfetti() {
+    const colors = [PALETTE.mint, PALETTE.brand, PALETTE.gold, PALETTE.cyan, PALETTE.white, '#FF7EC5'];
+    this.confettiList = Array.from({ length: 90 }, () => ({
+      x: this.width / 2 + (Math.random() - 0.5) * 300,
+      y: this.height * 0.4 + (Math.random() - 0.5) * 100,
+      vx: (Math.random() - 0.5) * 14,
+      vy: -6 - Math.random() * 12,
+      rot: Math.random() * Math.PI * 2,
+      vRot: (Math.random() - 0.5) * 0.2,
+      size: 7 + Math.random() * 10,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    }));
+  }
+
+  private updateConfetti(step: number) {
+    for (const c of this.confettiList) {
+      c.x += c.vx;
+      c.y += c.vy;
+      c.vy += 0.25;
+      c.rot += c.vRot;
+    }
+    this.confettiList = this.confettiList.filter((c) => c.y < this.height + 50);
   }
 
   private handleHands() {
@@ -301,28 +407,27 @@ export class GameEngine {
       if (hand.isPinching) {
         const held = this.balls.find((b) => b.grabbedBy === index && !b.dead);
         if (held) {
-          // Bám mềm theo tay, không dính cứng — nhìn tự nhiên hơn
           held.x += (hand.x - held.x) * 0.45;
           held.y += (hand.y - held.y) * 0.45;
           held.vx = 0;
           held.vy = 0;
           held.trail.push({ x: held.x, y: held.y });
-          if (held.trail.length > 12) held.trail.shift();
+          if (held.trail.length > 14) held.trail.shift();
         }
       }
 
       this.prevPinch[index] = hand.isPinching;
     });
 
-    // Tay biến mất khỏi khung hình: nhả quả đang cầm
     for (let i = this.hands.length; i < this.prevPinch.length; i += 1) {
       if (this.prevPinch[i]) this.tryRelease(i);
       this.prevPinch[i] = false;
     }
   }
 
-  private tryGrab(hand: HandInput, handIndex: number) {
-    if (this.balls.some((b) => b.grabbedBy === handIndex && !b.dead)) return;
+  tryGrab(hand: HandInput | { x: number; y: number }, handIndex: number | string) {
+    const hIdx = typeof handIndex === 'number' ? handIndex : 0;
+    if (this.balls.some((b) => b.grabbedBy === hIdx && !b.dead)) return false;
 
     let best: Ball | null = null;
     let bestDist = Infinity;
@@ -336,22 +441,29 @@ export class GameEngine {
     }
 
     if (best) {
-      best.grabbedBy = handIndex;
+      best.grabbedBy = hIdx;
       audio.playGrab();
+      this.pushShockwave(best.x, best.y, PALETTE.cyan, 60);
+      return true;
     }
+    return false;
   }
 
-  private tryRelease(handIndex: number) {
-    const ball = this.balls.find((b) => b.grabbedBy === handIndex && !b.dead);
+  tryRelease(handIndex: number | string) {
+    const hIdx = typeof handIndex === 'number' ? handIndex : 0;
+    const ball = this.balls.find((b) => b.grabbedBy === hIdx && !b.dead);
     if (!ball) return;
     ball.grabbedBy = null;
     ball.trail = [];
 
     if (!this.isOverBasket(ball.x, ball.y)) {
-      // Thả ngoài giỏ: quả rơi tiếp bình thường
       ball.vy = this.cfg.fallSpeed;
       return;
     }
+
+    const bkt = this.basket();
+    const bx = bkt.x + bkt.w / 2;
+    const by = bkt.y + bkt.h / 2;
 
     if (ball.task.kind === 'CORE') {
       const already = this.state.collected.some((t) => t.id === ball.task.id);
@@ -366,16 +478,23 @@ export class GameEngine {
       this.state.score += (100 + (this.state.streak - 1) * 25) * this.state.multiplier * finalBoost;
       this.hitStopMs = this.state.streak >= 3 ? 82 : 48;
       this.successPulse = Math.min(1.25, .58 + this.state.streak * .12);
-      this.pushBurst(ball.x, ball.y, PALETTE.mint, `+${100 * this.state.multiplier * finalBoost} · COMBO ×${this.state.multiplier}`);
+      this.pushBurst(bx, by - 30, PALETTE.mint, `+${100 * this.state.multiplier * finalBoost} · COMBO ×${this.state.multiplier}`);
+      this.pushShockwave(bx, by, PALETTE.mint, 180);
       audio.playScore(this.state.streak);
-      if (this.state.streak === 4) { this.bonusTimeMs += 3000; audio.playPower(); this.pushBurst(ball.x, ball.y - 40, '#7DE8FF', 'AI FLOW · +3 GIÂY'); }
+      if (this.state.streak === 4) {
+        this.bonusTimeMs += 3000;
+        audio.playPower();
+        this.pushBurst(bx, by - 70, PALETTE.cyan, 'AI FLOW · +3 GIÂY');
+        this.pushShockwave(bx, by, PALETTE.gold, 260);
+      }
     } else {
       this.state.wrongDrops += 1;
       this.state.streak = 0;
       this.state.score = Math.max(0, this.state.score - 50);
-      this.pushBurst(ball.x, ball.y, PALETTE.noise, 'VIỆC CẦN NGƯỜI');
+      this.pushBurst(bx, by - 20, PALETTE.noise, 'VIỆC CẦN NGƯỜI');
+      this.pushShockwave(bx, by, PALETTE.noise, 120);
       audio.playReject();
-      this.shake = 14;
+      this.shake = 16;
     }
     ball.consumedAt = this.elapsedMs;
   }
@@ -386,7 +505,6 @@ export class GameEngine {
       if (ball.dead) continue;
 
       if (ball.consumedAt !== null) {
-        // Bay gọn vào lòng giỏ rồi biến mất
         const tx = basket.x + basket.w / 2;
         const ty = basket.y + basket.h * 0.55;
         ball.x += (tx - ball.x) * 0.2;
@@ -424,14 +542,25 @@ export class GameEngine {
   }
 
   private pushBurst(x: number, y: number, color: string, text: string) {
-    const shards = Array.from({ length: 10 }, (_, i) => ({
-      a: (Math.PI * 2 * i) / 10 + Math.random() * 0.4,
-      v: 0.6 + Math.random() * 0.8,
+    const shards = Array.from({ length: 12 }, (_, i) => ({
+      a: (Math.PI * 2 * i) / 12 + Math.random() * 0.3,
+      v: 0.7 + Math.random() * 0.9,
     }));
-    this.bursts.push({ x, y, age: 0, life: 900, color, text, shards });
+    this.bursts.push({ x, y, age: 0, life: 950, color, text, shards });
   }
 
-  /** Cập nhật độ "trong tầm với" của từng quả để vẽ vòng gợi ý gắp. */
+  private pushShockwave(x: number, y: number, color: string, maxR: number) {
+    this.shockwaves.push({ x, y, r: 10, maxR, color, life: 600, age: 0 });
+  }
+
+  private updateShockwaves(step: number) {
+    for (const sw of this.shockwaves) {
+      sw.age += step;
+      sw.r += (sw.maxR - sw.r) * 0.12;
+    }
+    this.shockwaves = this.shockwaves.filter((sw) => sw.age < sw.life);
+  }
+
   private updateReach() {
     for (const ball of this.balls) {
       if (ball.dead || ball.consumedAt !== null) continue;
@@ -462,67 +591,141 @@ export class GameEngine {
     const { width: w, height: h } = this;
 
     ctx.save();
-    if (this.shake > .2) { ctx.translate((Math.random()-.5)*this.shake, (Math.random()-.5)*this.shake); this.shake *= .86; }
-    const grad = ctx.createRadialGradient(w*.5,h*.7,20,w*.5,h*.5,Math.max(w,h));
+    if (this.shake > .2) {
+      ctx.translate((Math.random() - .5) * this.shake, (Math.random() - .5) * this.shake);
+      this.shake *= .86;
+    }
+    const grad = ctx.createRadialGradient(w * .5, h * .7, 20, w * .5, h * .5, Math.max(w, h));
     grad.addColorStop(0, PALETTE.bg);
     grad.addColorStop(1, PALETTE.bgSoft);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
+    this.drawBgParticles(ctx);
     this.drawAmbientGrid(ctx);
     this.drawBasket(ctx);
+    this.drawShockwaves(ctx);
     this.balls.forEach((ball) => this.drawBall(ctx, ball));
     this.drawHands(ctx);
     this.drawBursts(ctx);
     this.drawImpactOverlay(ctx);
     this.drawPhase(ctx);
+    this.drawConfetti(ctx);
+    ctx.restore();
+  }
+
+  private drawBgParticles(ctx: CanvasRenderingContext2D) {
+    ctx.save();
+    for (const p of this.bgParticles) {
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha));
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  private drawShockwaves(ctx: CanvasRenderingContext2D) {
+    ctx.save();
+    for (const sw of this.shockwaves) {
+      const progress = sw.age / sw.life;
+      ctx.globalAlpha = (1 - progress) * 0.75;
+      ctx.strokeStyle = sw.color;
+      ctx.shadowColor = sw.color;
+      ctx.shadowBlur = 12;
+      ctx.lineWidth = 3.5 * (1 - progress);
+      ctx.beginPath();
+      ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  private drawConfetti(ctx: CanvasRenderingContext2D) {
+    if (this.confettiList.length === 0) return;
+    ctx.save();
+    for (const c of this.confettiList) {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.rot);
+      ctx.fillStyle = c.color;
+      ctx.shadowColor = c.color;
+      ctx.shadowBlur = 8;
+      ctx.fillRect(-c.size / 2, -c.size / 4, c.size, c.size / 2);
+      ctx.restore();
+    }
     ctx.restore();
   }
 
   private drawPhase(ctx: CanvasRenderingContext2D) {
     if (this.state.countdown > 0) {
       ctx.save();
-      ctx.fillStyle = 'rgba(5,10,28,.66)'; ctx.fillRect(0, 0, this.width, this.height);
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = PALETTE.mint; ctx.shadowBlur = 42;
-      ctx.fillStyle = PALETTE.white; ctx.font = `900 ${Math.min(180, this.width * .16)}px ${MONO}`;
+      ctx.fillStyle = 'rgba(5,10,28,.66)';
+      ctx.fillRect(0, 0, this.width, this.height);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = PALETTE.mint;
+      ctx.shadowBlur = 42;
+      ctx.fillStyle = PALETTE.white;
+      ctx.font = `900 ${Math.min(180, this.width * .16)}px ${MONO}`;
       ctx.fillText(String(this.state.countdown), this.width / 2, this.height / 2);
-      ctx.shadowBlur = 0; ctx.fillStyle = PALETTE.mint; ctx.font = `800 16px ${FONT}`;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = PALETTE.mint;
+      ctx.font = `800 16px ${FONT}`;
       ctx.fillText('SẴN SÀNG GẮP NHIỆM VỤ', this.width / 2, this.height / 2 + 105);
       ctx.restore();
       return;
     }
     if (this.state.phase === 'FINAL') {
-      const pulse = .1 + Math.sin(this.elapsedMs/120)*.035;
-      ctx.fillStyle = `rgba(255,106,61,${pulse})`; ctx.fillRect(0,0,this.width,this.height);
-      ctx.strokeStyle = 'rgba(255,106,61,.75)'; ctx.lineWidth = 6; ctx.strokeRect(3,3,this.width-6,this.height-6);
+      const pulse = .1 + Math.sin(this.elapsedMs / 120) * .035;
+      ctx.fillStyle = `rgba(255,106,61,${pulse})`;
+      ctx.fillRect(0, 0, this.width, this.height);
+      ctx.strokeStyle = 'rgba(255,106,61,.75)';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(3, 3, this.width - 6, this.height - 6);
     }
-    ctx.fillStyle = 'rgba(5,10,28,.72)'; ctx.fillRect(this.width/2-160,18,320,34);
+    ctx.fillStyle = 'rgba(5,10,28,.72)';
+    ctx.fillRect(this.width / 2 - 160, 18, 320, 34);
     ctx.fillStyle = this.state.phase === 'FINAL' ? PALETTE.noise : PALETTE.mint;
-    ctx.font = `800 14px ${FONT}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(this.state.eventText, this.width/2,35);
+    ctx.font = `800 14px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.state.eventText, this.width / 2, 35);
   }
 
   private drawImpactOverlay(ctx: CanvasRenderingContext2D) {
     if (this.successPulse <= 0) return;
     const p = this.successPulse;
-    const cx = this.width / 2; const cy = this.height * .74;
+    const cx = this.width / 2;
+    const cy = this.height * .74;
     ctx.save();
     const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, this.width * .48);
     glow.addColorStop(0, `rgba(0,216,154,${Math.min(.2, p * .16)})`);
-    glow.addColorStop(.35, `rgba(76,109,240,${Math.min(.12, p * .09)})`); glow.addColorStop(1, 'rgba(5,10,28,0)');
-    ctx.fillStyle = glow; ctx.fillRect(0, 0, this.width, this.height);
-    ctx.strokeStyle = `rgba(238,242,255,${Math.min(.65, p * .55)})`; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx, cy, (1.25 - p) * this.width * .34 + 32, 0, Math.PI * 2); ctx.stroke();
-    if (p > .72) { ctx.globalAlpha = (p - .72) * .28; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, this.width, this.height); }
+    glow.addColorStop(.35, `rgba(76,109,240,${Math.min(.12, p * .09)})`);
+    glow.addColorStop(1, 'rgba(5,10,28,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, this.width, this.height);
+    ctx.strokeStyle = `rgba(238,242,255,${Math.min(.65, p * .55)})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, (1.25 - p) * this.width * .34 + 32, 0, Math.PI * 2);
+    ctx.stroke();
+    if (p > .72) {
+      ctx.globalAlpha = (p - .72) * .28;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, this.width, this.height);
+    }
     ctx.restore();
   }
 
-  /** Lưới chấm rất mờ — cho mắt một mốc chiều sâu, không tranh chú ý với quả cầu. */
   private drawAmbientGrid(ctx: CanvasRenderingContext2D) {
     const spacing = 46;
     const drift = (this.elapsedMs / 90) % spacing;
     ctx.save();
-    ctx.fillStyle = 'rgba(124, 139, 184, 0.10)';
+    ctx.fillStyle = 'rgba(124, 139, 184, 0.12)';
     for (let y = -spacing + drift; y < this.height; y += spacing) {
       for (let x = 0; x < this.width; x += spacing) {
         ctx.fillRect(x, y, 1.5, 1.5);
@@ -531,14 +734,9 @@ export class GameEngine {
     ctx.restore();
   }
 
-  /**
-   * Giỏ vẽ như một khay thật: mức chứa dâng lên theo số nhiệm vụ đã gắp.
-   * Con số ở đây là phụ — bảng điểm phía trên mới là chỗ đọc chính.
-   */
   private drawBasket(ctx: CanvasRenderingContext2D) {
     const b = this.basket();
     const filled = this.state.collected.length;
-    const ratio = filled / CORE_TASKS.length;
     ctx.save();
     const cx = b.x + b.w / 2;
     const pulse = (Math.sin(this.elapsedMs / 360) + 1) / 2;
@@ -548,54 +746,90 @@ export class GameEngine {
       const x = cx - size / 2;
       const y = this.height - size - 4;
       const aura = ctx.createRadialGradient(cx, b.y + b.h * .58, 0, cx, b.y + b.h * .58, size * .62);
-      aura.addColorStop(0, `rgba(76,109,240,${.18 + pulse * .08})`); aura.addColorStop(.55, 'rgba(0,216,154,.08)'); aura.addColorStop(1, 'rgba(5,10,28,0)');
-      ctx.fillStyle = aura; ctx.fillRect(x - 45, y - 45, size + 90, size + 90);
-      ctx.shadowColor = '#6D8BFF'; ctx.shadowBlur = 18 + pulse * 14;
-      ctx.drawImage(this.collectorImage, x, y, size, size); ctx.shadowBlur = 0;
+      aura.addColorStop(0, `rgba(76,109,240,${.22 + pulse * .12})`);
+      aura.addColorStop(.55, 'rgba(0,216,154,.12)');
+      aura.addColorStop(1, 'rgba(5,10,28,0)');
+      ctx.fillStyle = aura;
+      ctx.fillRect(x - 45, y - 45, size + 90, size + 90);
+      ctx.shadowColor = '#6D8BFF';
+      ctx.shadowBlur = 22 + pulse * 18;
+      ctx.drawImage(this.collectorImage, x, y, size, size);
+      ctx.shadowBlur = 0;
 
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = PALETTE.white; ctx.font = `900 ${Math.round(b.h * .22)}px ${MONO}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = PALETTE.white;
+      ctx.font = `900 ${Math.round(b.h * .22)}px ${MONO}`;
       ctx.fillText(`${filled}/${CORE_TASKS.length}`, cx, b.y + b.h * .53);
-      ctx.fillStyle = 'rgba(238,242,255,.82)'; ctx.font = `800 ${Math.round(b.h * .085)}px ${FONT}`;
-      ctx.letterSpacing = '.16em'; ctx.fillText('KHO NHIỆM VỤ', cx, b.y + b.h * .72); ctx.letterSpacing = '0px';
+      ctx.fillStyle = 'rgba(238,242,255,.92)';
+      ctx.font = `800 ${Math.round(b.h * .085)}px ${FONT}`;
+      ctx.letterSpacing = '.16em';
+      ctx.fillText('KHO NHIỆM VỤ', cx, b.y + b.h * .72);
+      ctx.letterSpacing = '0px';
       ctx.restore();
       return;
     }
 
-    // Cột ánh sáng hút nhiệm vụ xuống cổng.
+    // Cột ánh sáng hút nhiệm vụ
     const beam = ctx.createLinearGradient(0, b.y - b.h * .7, 0, b.y + b.h);
-    beam.addColorStop(0, 'rgba(76,109,240,0)'); beam.addColorStop(.55, 'rgba(76,109,240,.09)'); beam.addColorStop(1, 'rgba(0,216,154,.25)');
-    ctx.fillStyle = beam; ctx.beginPath();
-    ctx.moveTo(cx - b.w * .22, b.y - b.h * .62); ctx.lineTo(cx + b.w * .22, b.y - b.h * .62);
-    ctx.lineTo(cx + b.w * .44, b.y + b.h * .36); ctx.lineTo(cx - b.w * .44, b.y + b.h * .36); ctx.closePath(); ctx.fill();
+    beam.addColorStop(0, 'rgba(76,109,240,0)');
+    beam.addColorStop(.55, 'rgba(76,109,240,.12)');
+    beam.addColorStop(1, 'rgba(0,216,154,.32)');
+    ctx.fillStyle = beam;
+    ctx.beginPath();
+    ctx.moveTo(cx - b.w * .22, b.y - b.h * .62);
+    ctx.lineTo(cx + b.w * .22, b.y - b.h * .62);
+    ctx.lineTo(cx + b.w * .44, b.y + b.h * .36);
+    ctx.lineTo(cx - b.w * .44, b.y + b.h * .36);
+    ctx.closePath();
+    ctx.fill();
 
-    // Đế hologram nhiều tầng.
-    ctx.shadowColor = PALETTE.mint; ctx.shadowBlur = 18 + pulse * 16;
+    // Đế hologram
+    ctx.shadowColor = PALETTE.mint;
+    ctx.shadowBlur = 18 + pulse * 16;
     for (let i = 2; i >= 0; i -= 1) {
-      ctx.beginPath(); ctx.ellipse(cx, b.y + b.h * (.72 + i * .06), b.w * (.46 - i * .035), b.h * (.23 - i * .025), 0, 0, Math.PI * 2);
-      ctx.fillStyle = i === 0 ? 'rgba(8,22,52,.94)' : `rgba(76,109,240,${.08 + i * .04})`; ctx.fill();
-      ctx.strokeStyle = i === 0 ? PALETTE.mint : 'rgba(109,139,255,.55)'; ctx.lineWidth = i === 0 ? 3 : 1.5; ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(cx, b.y + b.h * (.72 + i * .06), b.w * (.46 - i * .035), b.h * (.23 - i * .025), 0, 0, Math.PI * 2);
+      ctx.fillStyle = i === 0 ? 'rgba(8,22,52,.94)' : `rgba(76,109,240,${.08 + i * .04})`;
+      ctx.fill();
+      ctx.strokeStyle = i === 0 ? PALETTE.mint : 'rgba(109,139,255,.55)';
+      ctx.lineWidth = i === 0 ? 3 : 1.5;
+      ctx.stroke();
     }
     ctx.shadowBlur = 0;
 
-    // Vòng quét xoay tạo cảm giác cổng đang hoạt động.
-    ctx.save(); ctx.translate(cx, b.y + b.h * .7); ctx.rotate(this.elapsedMs / 2400);
-    ctx.strokeStyle = 'rgba(238,242,255,.58)'; ctx.lineWidth = 2; ctx.setLineDash([b.w * .13, b.w * .07]);
-    ctx.beginPath(); ctx.ellipse(0, 0, b.w * .37, b.h * .16, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+    // Vòng quét xoay
+    ctx.save();
+    ctx.translate(cx, b.y + b.h * .7);
+    ctx.rotate(this.elapsedMs / 2400);
+    ctx.strokeStyle = 'rgba(238,242,255,.58)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([b.w * .13, b.w * .07]);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, b.w * .37, b.h * .16, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
 
-    // Sáu lõi tiến độ — rõ hơn mức chất lỏng cũ.
-    const segW = b.w * .09; const gap = b.w * .025; const total = CORE_TASKS.length * segW + 5 * gap;
+    // Sáu lõi tiến độ
+    const segW = b.w * .09;
+    const gap = b.w * .025;
+    const total = CORE_TASKS.length * segW + 5 * gap;
     for (let i = 0; i < CORE_TASKS.length; i += 1) {
       const x = cx - total / 2 + i * (segW + gap);
-      ctx.beginPath(); ctx.roundRect(x, b.y + b.h * .82, segW, 6, 3);
-      ctx.fillStyle = i < filled ? PALETTE.mint : 'rgba(125,139,184,.25)'; ctx.fill();
-      if (i < filled) { ctx.shadowColor = PALETTE.mint; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0; }
+      ctx.beginPath();
+      ctx.roundRect(x, b.y + b.h * .82, segW, 6, 3);
+      ctx.fillStyle = i < filled ? PALETTE.mint : 'rgba(125,139,184,.25)';
+      ctx.fill();
+      if (i < filled) {
+        ctx.shadowColor = PALETTE.mint;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
     }
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    // Nhãn có dấu tiếng Việt: dùng bộ chữ hiển thị, KHÔNG dùng mono
-    // (JetBrains Mono không có subset tiếng Việt).
     ctx.fillStyle = PALETTE.mint;
     ctx.font = `800 ${Math.round(b.h * 0.12)}px ${FONT}`;
     ctx.letterSpacing = '0.18em';
@@ -624,8 +858,8 @@ export class GameEngine {
       ball.trail.forEach((point, i) => {
         if (i === 0) return;
         const prev = ball.trail[i - 1];
-        ctx.globalAlpha = (i / ball.trail.length) * 0.32;
-        ctx.lineWidth = (i / ball.trail.length) * ball.r * 0.85;
+        ctx.globalAlpha = (i / ball.trail.length) * 0.42;
+        ctx.lineWidth = (i / ball.trail.length) * ball.r * 0.95;
         ctx.beginPath();
         ctx.moveTo(prev.x, prev.y);
         ctx.lineTo(point.x, point.y);
@@ -637,29 +871,44 @@ export class GameEngine {
     ctx.save();
     ctx.translate(ball.x, ball.y + wobble);
 
-    // Vòng gợi ý: hiện dần khi tay lại gần, cho biết quả này gắp được
+    // Vòng gợi ý
     if (ball.reach > 0.04 && !held) {
       ctx.save();
-      ctx.globalAlpha = ball.reach * 0.9;
+      ctx.globalAlpha = ball.reach * 0.95;
       ctx.strokeStyle = accent;
-      ctx.lineWidth = 2;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 14;
+      ctx.lineWidth = 2.5;
       ctx.setLineDash([7, 9]);
       ctx.lineDashOffset = -this.elapsedMs / 26;
       ctx.beginPath();
-      ctx.arc(0, 0, ball.r + 14 - ball.reach * 6, 0, Math.PI * 2);
+      ctx.arc(0, 0, ball.r + 15 - ball.reach * 6, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
 
     if (held) {
       ctx.shadowColor = accent;
-      ctx.shadowBlur = 34;
+      ctx.shadowBlur = 40;
     }
 
-    ctx.beginPath(); ctx.arc(0, 0, ball.r, 0, Math.PI * 2);
-    const orb = ctx.createRadialGradient(-ball.r*.28,-ball.r*.34,4,0,0,ball.r);
-    orb.addColorStop(0,'rgba(255,255,255,.96)'); orb.addColorStop(.12,accent); orb.addColorStop(1,'#101936');
-    ctx.fillStyle = orb; ctx.fill();
+    // Outer glow aura
+    ctx.save();
+    ctx.globalAlpha = held ? 0.35 : 0.15;
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.arc(0, 0, ball.r + 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, ball.r, 0, Math.PI * 2);
+    const orb = ctx.createRadialGradient(-ball.r * .28, -ball.r * .34, 4, 0, 0, ball.r);
+    orb.addColorStop(0, 'rgba(255,255,255,.96)');
+    orb.addColorStop(.14, accent);
+    orb.addColorStop(1, '#0c142d');
+    ctx.fillStyle = orb;
+    ctx.fill();
     ctx.shadowBlur = 0;
 
     if (this.iconAtlas.complete && this.iconAtlas.naturalWidth > 0) {
@@ -668,26 +917,28 @@ export class GameEngine {
       const col = taskIndex % 4;
       const row = Math.floor(taskIndex / 4);
       ctx.save();
-      ctx.beginPath(); ctx.arc(0, -ball.r * .22, ball.r * .72, 0, Math.PI * 2); ctx.clip();
+      ctx.beginPath();
+      ctx.arc(0, -ball.r * .22, ball.r * .72, 0, Math.PI * 2);
+      ctx.clip();
       ctx.drawImage(this.iconAtlas, col * cellW, row * cellH, cellW, cellH, -ball.r * .76, -ball.r * .98, ball.r * 1.52, ball.r * 1.52);
       ctx.restore();
     }
 
-    // Vành sáng phía trên — tạo khối mà không cần đổ bóng nặng
+    // Vành sáng phía trên
     ctx.beginPath();
     ctx.arc(0, 0, ball.r - 3, Math.PI * 1.12, Math.PI * 1.88);
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+    ctx.lineWidth = 3.5;
     ctx.lineCap = 'round';
     ctx.stroke();
 
     ctx.beginPath();
     ctx.arc(0, 0, ball.r, 0, Math.PI * 2);
-    ctx.strokeStyle = held ? PALETTE.white : 'rgba(255,255,255,0.22)';
+    ctx.strokeStyle = held ? PALETTE.white : 'rgba(255,255,255,0.28)';
     ctx.lineWidth = held ? 4 : 1.5;
     ctx.stroke();
 
-    // Nhãn nhiệm vụ, tự xuống dòng theo bề rộng quả
+    // Nhãn nhiệm vụ
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -697,9 +948,13 @@ export class GameEngine {
     const lines = wrapText(ctx, ball.task.label, ball.r * 1.52).slice(0, 3);
     const lineHeight = fontSize * 1.18;
     const panelH = Math.max(ball.r * .52, lines.length * lineHeight + 10);
-    ctx.fillStyle = 'rgba(5,10,28,.9)';
-    ctx.beginPath(); ctx.roundRect(-ball.r * .84, ball.r - panelH - 5, ball.r * 1.68, panelH, 10); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = 'rgba(5,10,28,.92)';
+    ctx.beginPath();
+    ctx.roundRect(-ball.r * .84, ball.r - panelH - 5, ball.r * 1.68, panelH, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.22)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
     ctx.fillStyle = '#FFFFFF';
     const startY = ball.r - panelH / 2 - ((lines.length - 1) * lineHeight) / 2 - 5;
     lines.forEach((line, i) => ctx.fillText(line, 0, startY + i * lineHeight));
@@ -710,14 +965,15 @@ export class GameEngine {
   private drawHands(ctx: CanvasRenderingContext2D) {
     this.hands.forEach((hand) => {
       const on = hand.isPinching;
-      const color = on ? PALETTE.mint : 'rgba(238,242,255,0.62)';
+      const color = on ? PALETTE.mint : 'rgba(238,242,255,0.72)';
 
       ctx.save();
       ctx.lineCap = 'round';
 
-      // Nối hai đầu ngón — chính là dấu chụm dùng xuyên suốt giao diện
       ctx.strokeStyle = color;
-      ctx.lineWidth = on ? 4 : 2;
+      ctx.lineWidth = on ? 4.5 : 2;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = on ? 16 : 6;
       ctx.beginPath();
       ctx.moveTo(hand.ix, hand.iy);
       ctx.lineTo(hand.tx, hand.ty);
@@ -725,17 +981,16 @@ export class GameEngine {
 
       [[hand.ix, hand.iy], [hand.tx, hand.ty]].forEach(([px, py]) => {
         ctx.beginPath();
-        ctx.arc(px, py, on ? 9 : 7, 0, Math.PI * 2);
+        ctx.arc(px, py, on ? 10 : 7.5, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
       });
 
-      // Vòng con trỏ: khép lại khi chụm
       ctx.beginPath();
-      ctx.arc(hand.x, hand.y, on ? 15 : 26, 0, Math.PI * 2);
-      ctx.strokeStyle = on ? PALETTE.mint : 'rgba(238,242,255,0.24)';
-      ctx.lineWidth = 2;
-      if (!on) ctx.setLineDash([5, 8]);
+      ctx.arc(hand.x, hand.y, on ? 16 : 28, 0, Math.PI * 2);
+      ctx.strokeStyle = on ? PALETTE.mint : 'rgba(238,242,255,0.32)';
+      ctx.lineWidth = 2.5;
+      if (!on) ctx.setLineDash([6, 8]);
       ctx.stroke();
       ctx.restore();
     });
@@ -748,20 +1003,22 @@ export class GameEngine {
 
       ctx.save();
       ctx.globalAlpha = 1 - t;
-      ctx.translate(burst.x, burst.y - ease * 54);
+      ctx.translate(burst.x, burst.y - ease * 58);
 
       ctx.beginPath();
-      ctx.arc(0, 0, 24 + ease * 78, 0, Math.PI * 2);
+      ctx.arc(0, 0, 26 + ease * 84, 0, Math.PI * 2);
       ctx.strokeStyle = burst.color;
-      ctx.lineWidth = 3 * (1 - t);
+      ctx.shadowColor = burst.color;
+      ctx.shadowBlur = 18;
+      ctx.lineWidth = 3.5 * (1 - t);
       ctx.stroke();
 
       ctx.strokeStyle = burst.color;
       ctx.lineWidth = 2.5 * (1 - t);
       ctx.lineCap = 'round';
       burst.shards.forEach((shard) => {
-        const inner = 26 + ease * 56 * shard.v;
-        const outer = inner + 14 * (1 - t);
+        const inner = 28 + ease * 60 * shard.v;
+        const outer = inner + 16 * (1 - t);
         ctx.beginPath();
         ctx.moveTo(Math.cos(shard.a) * inner, Math.sin(shard.a) * inner);
         ctx.lineTo(Math.cos(shard.a) * outer, Math.sin(shard.a) * outer);
@@ -769,10 +1026,11 @@ export class GameEngine {
       });
 
       ctx.fillStyle = burst.color;
-      ctx.font = `800 19px ${FONT}`;
+      ctx.font = `800 20px ${FONT}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(burst.text, 0, -46);
+      ctx.shadowBlur = 14;
+      ctx.fillText(burst.text, 0, -48);
       ctx.restore();
     });
   }
