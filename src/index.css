@@ -130,29 +130,44 @@ body {
 }
 
 .orb-sphere {
-  width: 58px;
-  height: 58px;
+  position: relative;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.95), var(--orb-color, var(--mint)) 42%, #0a1432 88%);
-  box-shadow: 0 0 28px var(--orb-color, var(--mint)), inset 0 0 14px rgba(255, 255, 255, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background-image: url('/assets/mission-icon-atlas-v2.png');
+  background-size: 400% 400%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 32px var(--orb-color, var(--mint)), inset 0 0 16px rgba(255, 255, 255, 0.6);
   animation: orb-pulse 2.8s ease-in-out infinite alternate;
+  isolation: isolate;
 }
 
-.orb-label {
-  margin-top: 5px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(5, 10, 28, 0.92);
-  border: 1.5px solid var(--orb-color, var(--mint));
-  color: var(--chalk);
-  font-family: var(--display);
-  font-size: 0.6rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+.orb-sphere::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.6), transparent 60%);
+  pointer-events: none;
 }
+
+.orb-sphere::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px dashed var(--orb-color, var(--mint));
+  opacity: 0.7;
+  animation: reactor-turn 10s linear infinite;
+  pointer-events: none;
+}
+
+.icon-khbd { background-position: 0% 0%; }
+.icon-slide { background-position: 33.333% 0%; }
+.icon-phieu { background-position: 66.666% 0%; }
+.icon-btvn { background-position: 100% 0%; }
+.icon-dekt { background-position: 0% 33.333%; }
+.icon-phuhuynh { background-position: 33.333% 33.333%; }
 
 .orb-khbd { --orb-color: #00d89a; }
 .orb-slide { --orb-color: #4c6df0; }
