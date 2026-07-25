@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Game } from './components/Game';
 import { audio } from './utils/audio';
-import { CORE_TASKS, Difficulty, GameState, NOISE_TASKS, TaskDef } from './utils/engine';
-import { DEBRIEF_LINE } from './data/tasks';
+import { CORE_TASKS, Difficulty, GameState, TaskDef } from './utils/engine';
 
 type Screen = 'intro' | 'playing' | 'debrief';
 
@@ -10,13 +9,6 @@ const SPEEDS: { key: Difficulty; name: string; seconds: number; desc: string }[]
   { key: 'easy', name: 'Thong thả', seconds: 120, desc: 'Phù hợp làm quen' },
   { key: 'normal', name: 'Chuẩn', seconds: 90, desc: 'Khuyên dùng demo' },
   { key: 'hard', name: 'Nhanh', seconds: 70, desc: 'Thử thách cao' },
-];
-
-const STEPS = [
-  'Đưa bàn tay vào khung hình cho tới khi thấy vòng tròn trắng.',
-  'Chụm ngón cái với ngón trỏ ngay trên quả cầu để gắp.',
-  'Giữ nguyên tay chụm, kéo quả cầu xuống giỏ ở đáy màn hình.',
-  'Mở tay ra để thả quả vào giỏ.',
 ];
 
 const EMPTY: GameState = {
@@ -195,7 +187,6 @@ function Scoreboard({
   }, [state.collected]);
 
   const low = state.timeLeftSec <= 10;
-  const timerRatio = Math.max(0, Math.min(1, state.timeLeftSec / 90));
 
   return (
     <header className={`game-hud shrink-0 ${state.streak >= 3 ? 'hud-hot' : ''} ${state.phase === 'FINAL' ? 'hud-final' : ''}`}>
@@ -418,7 +409,7 @@ function Intro({
 }
 
 /* ------------------------------------------------------------------ */
-/* Màn tổng kết — Count-Up, Rank Badge, & Celebration                 */
+/* Màn tổng kết — 3D Visual Cards & Pedagogical Debrief               */
 /* ------------------------------------------------------------------ */
 
 function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }) {
@@ -505,25 +496,62 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           </div>
         )}
 
+        {/* Dual 3D Graphic Cards — Pedagogical Role Separation */}
+        <div className="rise mt-10 grid gap-6 md:grid-cols-2" style={{ animationDelay: '240ms' }}>
+          {/* Card 1: AI Assistant */}
+          <div className="group relative overflow-hidden rounded-2xl border border-[var(--mint)]/35 bg-gradient-to-b from-[rgba(0,216,154,0.12)] to-[rgba(5,10,28,0.7)] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-300 hover:border-[var(--mint)]/60 hover:shadow-[0_15px_45px_rgba(0,216,154,0.2)]">
+            <div className="relative h-56 w-full overflow-hidden rounded-xl bg-black/40 border border-white/10 mb-5">
+              <img
+                src="/assets/debrief_ai_assistant_3d.png"
+                alt="AI Tối ưu Hồ sơ & Giáo án"
+                className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-transparent to-transparent" />
+            </div>
+            <h3 className="text-xl font-extrabold uppercase text-[var(--mint)] tracking-wider">
+              AI Đồng Hành & Tối Ưu Hồ Sơ
+            </h3>
+            <p className="mt-2.5 text-base leading-relaxed text-[var(--chalk)]/90 font-medium">
+              Các công việc tạo lập hồ sơ, giáo án, phiếu học tập và đề kiểm tra — AI có thể hỗ trợ xử lý tự động hóa nhanh chóng và chính xác.
+            </p>
+          </div>
+
+          {/* Card 2: Teacher Inspiring */}
+          <div className="group relative overflow-hidden rounded-2xl border border-[var(--brand)]/40 bg-gradient-to-b from-[rgba(76,109,240,0.14)] to-[rgba(5,10,28,0.7)] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-300 hover:border-[var(--brand)]/70 hover:shadow-[0_15px_45px_rgba(76,109,240,0.25)]">
+            <div className="relative h-56 w-full overflow-hidden rounded-xl bg-black/40 border border-white/10 mb-5">
+              <img
+                src="/assets/debrief_teacher_inspiring_3d.png"
+                alt="Thầy Cô Truyền Cảm Hứng"
+                className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-transparent to-transparent" />
+            </div>
+            <h3 className="text-xl font-extrabold uppercase text-[var(--chalk)] tracking-wider">
+              Thầy Cô Dẫn Dắt & Truyền Cảm Hứng
+            </h3>
+            <p className="mt-2.5 text-base leading-relaxed text-[var(--chalk)]/90 font-medium">
+              Sự kết nối, thấu hiểu, cảm xúc và tương tác trực tiếp với từng học sinh — chính thầy cô luôn là trung tâm kiến tạo lớp học hạnh phúc.
+            </p>
+          </div>
+        </div>
+
+        {/* Discussion Hook Banner */}
         <section
-          className="rise mt-10 rounded-2xl border border-[var(--mint)]/40 bg-[var(--mint)]/10 p-8 shadow-[0_10px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl"
-          style={{ animationDelay: '240ms' }}
+          className="rise mt-8 rounded-2xl border border-[var(--mint)]/50 bg-gradient-to-r from-[rgba(0,216,154,0.18)] via-[rgba(76,109,240,0.12)] to-[rgba(5,10,28,0.8)] p-7 shadow-[0_12px_45px_rgba(0,216,154,0.15)] backdrop-blur-xl"
+          style={{ animationDelay: '280ms' }}
         >
-          <p className="t-eyebrow flex items-center gap-2 text-[var(--mint)]">
-            <span className="h-2 w-2 rounded-full bg-[var(--mint)] animate-ping" />
-            NGƯỜI DẪN ĐỌC TO
-          </p>
-          <p className="mt-4 text-[clamp(1.2rem,2.3vw,1.9rem)] font-bold leading-[1.55] text-[var(--chalk)]">
-            {DEBRIEF_LINE}
-          </p>
-          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-[var(--mint)]/40 to-transparent" />
-          <p className="t-eyebrow mb-3 text-[var(--dim)]">CÂU HỎI CHUYỂN TIẾP</p>
-          <p className="text-[clamp(1.1rem,2vw,1.6rem)] font-bold leading-[1.55] text-[var(--mint)]">
-            Sáu việc này, mỗi tuần thầy cô làm bao nhiêu lần? Làm sao để làm nhanh nhất mà vẫn chính xác nhất?
+          <div className="flex items-center gap-3">
+            <span className="flex h-3 w-3 rounded-full bg-[var(--mint)] shadow-[0_0_12px_var(--mint)] animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--mint)]">
+              THẢO LUẬN & MỞ ĐẦU BÀI HỌC
+            </span>
+          </div>
+          <p className="mt-3.5 text-[clamp(1.15rem,2.1vw,1.65rem)] font-bold leading-[1.55] text-[var(--chalk)]">
+            Mỗi tuần thầy cô đang dành bao nhiêu thời gian cho các công việc hồ sơ này? Hãy cùng khám phá giải pháp tự động hóa giúp thầy cô tối ưu 80% thời gian ngay sau đây!
           </p>
         </section>
 
-        <div className="rise mt-8 flex justify-center" style={{ animationDelay: '280ms' }}>
+        <div className="rise mt-8 flex justify-center" style={{ animationDelay: '320ms' }}>
           <button
             onClick={onReplay}
             className="pinch-host group flex items-center justify-center gap-4 rounded-2xl border border-[var(--mint)] bg-[var(--mint)]/15 px-10 py-5 text-lg font-extrabold text-[var(--chalk)] shadow-[0_0_30px_rgba(0,216,154,0.2)] transition-all duration-300 hover:scale-105 hover:bg-[var(--mint)] hover:text-[#032117] hover:shadow-[0_0_50px_rgba(0,216,154,0.4)]"
