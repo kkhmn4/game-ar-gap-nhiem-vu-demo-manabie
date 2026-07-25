@@ -38,7 +38,3 @@ export const NOISE_TASKS: TaskDef[] = [
 
 export const ALL_TASKS: TaskDef[] = [...CORE_TASKS, ...NOISE_TASKS];
 
-/** Câu chốt sau khi chơi — dùng để dẫn sang hoạt động NotebookLM. */
-export const DEBRIEF_LINE =
-  'Sáu quả trong giỏ đều là việc tạo ra một sản phẩm giấy tờ — đó là loại việc AI làm được. ' +
-  'Những quả rơi ra ngoài đều là việc cần mặt người. AI không làm thay được.';

@@ -565,7 +565,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             </span>
           </div>
           <p className="mt-3.5 text-[clamp(1.15rem,2.1vw,1.65rem)] font-bold leading-[1.55] text-[var(--chalk)]">
-            Mỗi tuần thầy cô đang dành bao nhiêu thời gian cho các công việc hồ sơ này? Hãy cùng khám phá giải pháp tự động hóa giúp thầy cô tối ưu 80% thời gian ngay sau đây!
+            Sáu việc này, mỗi tuần thầy cô làm bao nhiêu lần? Làm sao để làm nhanh nhất mà vẫn chính xác nhất?
           </p>
         </section>
 
