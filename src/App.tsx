@@ -315,7 +315,7 @@ function Intro({
           <div className="launch-copy rise">
             <p className="launch-kicker flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[var(--mint)] shadow-[0_0_10px_var(--mint)]" />
-              TRÒ CHƠI PHÂN LOẠI NHIỆM VỤ AI
+              TRÒ CHƠI KHỞI ĐỘNG: "NHANH TAY LẸ MẮT"
             </p>
             <h1>
               Một cử chỉ.
