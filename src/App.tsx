@@ -371,10 +371,35 @@ function Intro({
             <div className="reactor-halo halo-one" />
             <div className="reactor-halo halo-two" />
             <div className="reactor-scan" />
-            <div className="mission-tile tile-a" />
-            <div className="mission-tile tile-b" />
-            <div className="mission-tile tile-c" />
-            <div className="mission-tile tile-d" />
+
+            {/* 6 Quả cầu công việc chuyển động xoay quanh tâm AI Flow */}
+            <div className="orbit-container">
+              <div className="orb-task orb-khbd" style={{ '--angle': '0deg', '--dist': '200px', '--speed': '14s' } as React.CSSProperties}>
+                <span className="orb-sphere" />
+                <span className="orb-label">KHBD</span>
+              </div>
+              <div className="orb-task orb-slide" style={{ '--angle': '60deg', '--dist': '210px', '--speed': '16s' } as React.CSSProperties}>
+                <span className="orb-sphere" />
+                <span className="orb-label">SLIDE</span>
+              </div>
+              <div className="orb-task orb-phieu" style={{ '--angle': '120deg', '--dist': '195px', '--speed': '13.5s' } as React.CSSProperties}>
+                <span className="orb-sphere" />
+                <span className="orb-label">PHIẾU</span>
+              </div>
+              <div className="orb-task orb-btvn" style={{ '--angle': '180deg', '--dist': '205px', '--speed': '15.5s' } as React.CSSProperties}>
+                <span className="orb-sphere" />
+                <span className="orb-label">BTVN</span>
+              </div>
+              <div className="orb-task orb-dekt" style={{ '--angle': '240deg', '--dist': '215px', '--speed': '17s' } as React.CSSProperties}>
+                <span className="orb-sphere" />
+                <span className="orb-label">ĐỀ KT</span>
+              </div>
+              <div className="orb-task orb-phuhuynh" style={{ '--angle': '300deg', '--dist': '200px', '--speed': '14.5s' } as React.CSSProperties}>
+                <span className="orb-sphere" />
+                <span className="orb-label">PHỤ HUYNH</span>
+              </div>
+            </div>
+
             <div className="reactor-core">
               <span>CHẾ ĐỘ</span>
               <strong>AI FLOW</strong>
