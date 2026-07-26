@@ -334,7 +334,7 @@ function Intro({
         {/* Unboxed Open Hero Layout */}
         <section className="launch-hero-vibrant my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Hero Main Copy (Left 7 Columns) */}
-          <div className="lg:col-span-7 flex flex-col items-start gap-6 text-left">
+          <div className="lg:col-span-7 flex flex-col items-start gap-6 text-left relative z-20">
             <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-black tracking-widest uppercase backdrop-blur-md shadow-lg shadow-violet-900/30">
               <span className="text-amber-400 text-sm">⚡</span>
               HOẠT ĐỘNG 01 · GẮP VIỆC GIAO AI

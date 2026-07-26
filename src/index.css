@@ -330,18 +330,18 @@ body {
   100% { transform: translate(-5px, 20px) rotate(-10deg) scale(0.95); filter: brightness(0.95) saturate(1.1); }
 }
 
-.float-1 { left: 2%; top: 8%; width: 140px; animation-duration: 22s; animation-delay: 0s; opacity: 0.95; }
-.float-2 { right: 3%; top: 15%; width: 120px; animation-duration: 26s; animation-delay: -5s; opacity: 0.9; }
-.float-3 { left: 6%; bottom: 8%; width: 130px; animation-duration: 20s; animation-delay: -12s; opacity: 1; }
-.float-4 { right: 4%; bottom: 12%; width: 150px; animation-duration: 24s; animation-delay: -8s; opacity: 0.95; }
-.float-5 { left: 25%; top: -2%; width: 90px; animation-duration: 18s; animation-delay: -15s; opacity: 0.85; }
-.float-6 { right: 28%; bottom: -5%; width: 105px; animation-duration: 28s; animation-delay: -3s; opacity: 0.85; }
-.float-7 { left: -4%; top: 45%; width: 125px; animation-duration: 23s; animation-delay: -7s; opacity: 0.9; }
-.float-8 { right: -5%; top: 50%; width: 135px; animation-duration: 21s; animation-delay: -11s; opacity: 0.95; }
-.float-9 { left: 15%; top: 35%; width: 85px; animation-duration: 19s; animation-delay: -9s; opacity: 0.8; z-index: -1; filter: blur(2px); }
-.float-10 { right: 18%; bottom: 35%; width: 95px; animation-duration: 25s; animation-delay: -14s; opacity: 0.75; z-index: -1; filter: blur(2px); }
-.float-11 { left: 40%; bottom: -6%; width: 110px; animation-duration: 27s; animation-delay: -20s; opacity: 0.85; }
-.float-12 { right: 40%; top: -4%; width: 100px; animation-duration: 22s; animation-delay: -2s; opacity: 0.9; }
+.float-1 { left: -3%; top: 2%; width: 95px; animation-duration: 22s; animation-delay: 0s; opacity: 0.65; }
+.float-2 { right: -2%; top: 8%; width: 95px; animation-duration: 26s; animation-delay: -5s; opacity: 0.65; }
+.float-3 { left: -2%; bottom: 2%; width: 95px; animation-duration: 20s; animation-delay: -12s; opacity: 0.7; }
+.float-4 { right: -3%; bottom: 6%; width: 105px; animation-duration: 24s; animation-delay: -8s; opacity: 0.7; }
+.float-5 { left: 16%; top: -5%; width: 65px; animation-duration: 18s; animation-delay: -15s; opacity: 0.55; }
+.float-6 { right: 20%; bottom: -6%; width: 75px; animation-duration: 28s; animation-delay: -3s; opacity: 0.55; }
+.float-7 { left: -7%; top: 45%; width: 85px; animation-duration: 23s; animation-delay: -7s; opacity: 0.6; }
+.float-8 { right: -7%; top: 52%; width: 90px; animation-duration: 21s; animation-delay: -11s; opacity: 0.65; }
+.float-9 { left: 10%; top: 28%; width: 60px; animation-duration: 19s; animation-delay: -9s; opacity: 0.4; z-index: -1; filter: blur(3px); }
+.float-10 { right: 12%; bottom: 28%; width: 70px; animation-duration: 25s; animation-delay: -14s; opacity: 0.4; z-index: -1; filter: blur(3px); }
+.float-11 { left: 35%; bottom: -8%; width: 80px; animation-duration: 27s; animation-delay: -20s; opacity: 0.5; }
+.float-12 { right: 35%; top: -6%; width: 75px; animation-duration: 22s; animation-delay: -2s; opacity: 0.55; }
 @keyframes scan-pass { 0%,18%{transform:translateY(-120%) rotate(-8deg);opacity:0} 35%{opacity:1} 65%,100%{transform:translateY(620%) rotate(-8deg);opacity:0} }
 .mission-chip {
   border: 1px solid color-mix(in oklab,var(--mint) 48%,transparent); background: rgba(3,18,39,.72);
