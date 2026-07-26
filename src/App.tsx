@@ -332,7 +332,10 @@ function Intro({
             </p>
             <h1>
               TRÒ CHƠI KHỞI ĐỘNG
-              <em className="text-glow-mint">"NHANH TAY LẸ MẮT"</em>
+              <em className="text-glow-mint">
+                "NHANH TAY<br />
+                LẸ MẮT"
+              </em>
             </h1>
             <p className="launch-lead">
               Đọc tình huống. Gắp việc có thể giao cho AI. Để những việc cần con người tiếp tục rơi.
@@ -380,27 +383,6 @@ function Intro({
               <button onClick={() => launch(true)} className="launch-secondary outline-btn">
                 Chơi thử bằng chuột
               </button>
-            </div>
-          </div>
-
-          {/* Right Column: Holographic Pedestal / Data Core */}
-          <div className="hologram-core rise" aria-hidden="true">
-            <div className="core-rings">
-              <div className="ring ring-1" />
-              <div className="ring ring-2" />
-              <div className="ring ring-3" />
-            </div>
-            <div className="core-cylinder">
-              <div className="cylinder-beam" />
-              <div className="cylinder-particles" />
-            </div>
-            <div className="core-base">
-              <div className="base-plate" />
-              <div className="base-glow" />
-            </div>
-            <div className="core-floating-ui">
-              <span>HỆ THỐNG PHÂN TÍCH NHIỆM VỤ</span>
-              <strong>SẴN SÀNG</strong>
             </div>
           </div>
         </section>
