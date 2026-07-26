@@ -323,75 +323,85 @@ function Intro({
         </nav>
 
         <section className="launch-hero">
-          <div className="launch-copy rise">
+          {/* Left Column: Glass Dashboard */}
+          <div className="launch-copy rise glass-panel">
+            <div className="panel-glow" />
             <p className="launch-kicker flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[var(--mint)] shadow-[0_0_10px_var(--mint)]" />
+              <span className="pulse-dot" />
               HOẠT ĐỘNG 01 · GẮP VIỆC GIAO AI
             </p>
             <h1>
               TRÒ CHƠI KHỞI ĐỘNG
-              <em>"NHANH TAY LẸ MẮT"</em>
+              <em className="text-glow-mint">"NHANH TAY LẸ MẮT"</em>
             </h1>
             <p className="launch-lead">
               Đọc tình huống. Gắp việc có thể giao cho AI. Để những việc cần con người tiếp tục rơi.
             </p>
 
-            <div className="launch-metrics">
-              <div>
-                <b>06</b>
-                <span>MỤC TIÊU</span>
+            <div className="launch-metrics-grid">
+              <div className="metric-widget">
+                <div className="metric-value">06</div>
+                <div className="metric-label">MỤC TIÊU</div>
               </div>
-              <div>
-                <b>×4</b>
-                <span>COMBO TỐI ĐA</span>
+              <div className="metric-widget">
+                <div className="metric-value">×4</div>
+                <div className="metric-label">COMBO MAX</div>
               </div>
-              <div>
-                <b>+3s</b>
-                <span>AI FLOW</span>
+              <div className="metric-widget">
+                <div className="metric-value text-glow-mint">+3s</div>
+                <div className="metric-label">AI FLOW</div>
               </div>
             </div>
 
             <div className="launch-difficulty">
-              <span>CHỌN NHỊP</span>
-              {SPEEDS.map((s) => (
-                <button
-                  key={s.key}
-                  onClick={() => onDifficulty(s.key)}
-                  aria-pressed={difficulty === s.key}
-                  title={s.desc}
-                >
-                  {s.name}
-                  <small>{s.seconds}s</small>
-                </button>
-              ))}
+              <span className="diff-label">TỐC ĐỘ RƠI</span>
+              <div className="segmented-control">
+                {SPEEDS.map((s) => (
+                  <button
+                    key={s.key}
+                    onClick={() => onDifficulty(s.key)}
+                    aria-pressed={difficulty === s.key}
+                    title={s.desc}
+                    className="segment-btn"
+                  >
+                    <span className="segment-name">{s.name}</span>
+                    <span className="segment-val">{s.seconds}s</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="launch-actions">
-              <button onClick={() => launch(false)} className="launch-primary">
+              <button onClick={() => launch(false)} className="launch-primary glowing-btn">
                 <PinchMark />
-                <span>Vào đấu trường</span>
-                <b>CAMERA →</b>
+                <span className="btn-text">Vào đấu trường</span>
+                <b className="btn-arrow">CAMERA →</b>
               </button>
-              <button onClick={() => launch(true)} className="launch-secondary">
+              <button onClick={() => launch(true)} className="launch-secondary outline-btn">
                 Chơi thử bằng chuột
               </button>
             </div>
           </div>
 
-          <div className="mission-reactor rise" aria-label="Mô phỏng cổng nhiệm vụ">
-            <div className="reactor-halo halo-one" />
-            <div className="reactor-halo halo-two" />
-            <div className="reactor-scan" />
-
-
-
-
-            <div className="reactor-platform">
-              <span />
-              <span />
-              <span />
+          {/* Right Column: Holographic Pedestal / Data Core */}
+          <div className="hologram-core rise" aria-hidden="true">
+            <div className="core-rings">
+              <div className="ring ring-1" />
+              <div className="ring ring-2" />
+              <div className="ring ring-3" />
             </div>
-            <p>GẮP · ĐỌC · QUYẾT ĐỊNH</p>
+            <div className="core-cylinder">
+              <div className="cylinder-beam" />
+              <div className="cylinder-particles" />
+            </div>
+            <div className="core-base">
+              <div className="base-plate" />
+              <div className="base-glow" />
+            </div>
+            <div className="core-floating-ui">
+              <span>HỆ THỐNG PHÂN TÍCH NHIỆM VỤ</span>
+              <strong>SẴN SÀNG</strong>
+            </div>
           </div>
         </section>
 
