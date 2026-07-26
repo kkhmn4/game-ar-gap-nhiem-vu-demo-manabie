@@ -333,8 +333,8 @@ function Intro({
             <h1>
               TRÒ CHƠI KHỞI ĐỘNG
               <em className="text-glow-mint">
-                "NHANH TAY<br />
-                LẸ MẮT"
+                <span>"NHANH TAY</span>
+                <span>LẸ MẮT"</span>
               </em>
             </h1>
             <p className="launch-lead">

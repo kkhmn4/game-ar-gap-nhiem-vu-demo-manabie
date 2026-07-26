@@ -75,17 +75,17 @@ body {
 .launch-status i { display:inline-block; width:8px; height:8px; margin-right:.6rem; border-radius:50%; background:var(--mint); box-shadow:0 0 15px var(--mint); animation:status-blink 1.4s ease-in-out infinite; }
 .launch-code { text-align:right; color:var(--dim); padding-right: 2rem; }
 
-.launch-hero { flex:1; display:grid; grid-template-columns: minmax(500px, 1fr) minmax(540px, 1.2fr); align-items:center; gap:clamp(3rem,6vw,8rem); padding:clamp(3rem,8vh,6rem) 0 3rem; }
+.launch-hero { flex:1; display:grid; grid-template-columns: minmax(320px, 780px); justify-content: center; align-items:center; padding:clamp(2rem,6vh,4rem) 0 2rem; }
 
 /* Dashboard Glass Panel */
-.glass-panel { position: relative; background: rgba(10, 15, 35, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 3rem; backdrop-filter: blur(24px); box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05); overflow: hidden; }
+.glass-panel { position: relative; background: rgba(10, 15, 35, 0.45); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: clamp(2rem, 4vw, 3rem); backdrop-filter: blur(24px); box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05); overflow: hidden; }
 .panel-glow { position: absolute; inset: 0; background: radial-gradient(circle at 10% 10%, rgba(0, 216, 154, 0.1), transparent 50%); pointer-events: none; }
 
 .launch-kicker { margin:0 0 1.5rem; color:var(--mint); font-size:.75rem; font-weight:900; letter-spacing:.25em; text-shadow: 0 0 10px rgba(0,216,154,.3); }
 .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 12px var(--mint); animation: status-blink 2s infinite; }
 
-.launch-copy h1 { margin:0; font-size:clamp(2.8rem, 4.8vw, 5rem); font-weight:900; line-height:1.15; letter-spacing:-.02em; text-transform:uppercase; color:var(--chalk); }
-.text-glow-mint { display:block; margin-top:0.2em; color:#fff; font-style:normal; font-size:clamp(3.6rem, 6.2vw, 6.8rem); text-shadow: 0 0 30px rgba(0,216,154,.5), 0 0 60px rgba(0,216,154,.2); background: linear-gradient(135deg, #fff 0%, var(--mint) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(0,216,154,0.4)); }
+.launch-copy h1 { margin:0; font-size:clamp(2.2rem, 3.8vw, 3.8rem); font-weight:900; line-height:1.15; letter-spacing:-.02em; text-transform:uppercase; color:var(--chalk); }
+.text-glow-mint { display:flex; flex-direction:column; margin-top:0.2em; color:#fff; font-style:normal; font-size:clamp(2.8rem, 5vw, 5.2rem); line-height:1.1; white-space:nowrap; text-shadow: 0 0 30px rgba(0,216,154,.5), 0 0 60px rgba(0,216,154,.2); background: linear-gradient(135deg, #fff 0%, var(--mint) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(0,216,154,0.4)); }
 
 .launch-lead { max-width: 90%; margin: 2rem 0; color: #a1b0d8; font-size: clamp(1.1rem, 1.3vw, 1.35rem); line-height: 1.7; font-weight: 500; }
 
