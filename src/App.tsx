@@ -340,14 +340,14 @@ function Intro({
               HOẠT ĐỘNG 01 · GẮP VIỆC GIAO AI
             </div>
 
-            <h1 className="flex flex-col gap-2 font-black tracking-tight text-white uppercase text-left">
-              <span className="text-2xl sm:text-3xl md:text-4xl text-slate-300 font-bold tracking-normal opacity-90">
+            <h1 className="flex flex-col gap-4 font-black tracking-tight text-white uppercase text-left">
+              <span className="text-2xl sm:text-3xl md:text-4xl text-slate-300 font-bold tracking-normal opacity-90 pb-1">
                 TRÒ CHƠI KHỞI ĐỘNG
               </span>
-              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight pb-1 bg-gradient-to-r from-white via-cyan-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]">
+              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-snug py-1 bg-gradient-to-r from-white via-cyan-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]">
                 "NHANH TAY
               </span>
-              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight pb-3 bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
+              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-snug pt-1 pb-4 bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
                 LẸ MẮT"
               </span>
             </h1>
