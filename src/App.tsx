@@ -374,40 +374,49 @@ function Intro({
           </div>
 
           {/* 3D Task Showcase Stage (Right 5 Columns) */}
-          <div className="lg:col-span-5 relative flex items-center justify-center min-h-[380px]">
+          <div className="lg:col-span-5 relative flex items-center justify-center min-h-[420px]">
+            {/* Ambient AI Core Glow */}
             <div className="stage-glow-orb" />
+            <div className="ai-core-rings" />
+
+            {/* Central Glowing AI Engine Badge */}
+            <div className="absolute z-0 flex flex-col items-center justify-center w-40 h-40 rounded-full bg-slate-950/80 border border-emerald-500/40 shadow-[0_0_50px_rgba(16,185,129,0.3)] backdrop-blur-2xl animate-pulse">
+              <span className="text-3xl">🤖</span>
+              <span className="text-[10px] font-black tracking-widest text-emerald-400 uppercase mt-1">AI FLOW CORE</span>
+              <span className="text-[9px] font-bold text-slate-400">ĐANG HOẠT ĐỘNG</span>
+            </div>
             
-            {/* Curated Task Badges Showcase */}
-            <div className="task-showcase-grid grid grid-cols-2 gap-4 w-full max-w-md relative z-10">
-              <div className="showcase-card showcase-1 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-emerald-500/30 backdrop-blur-xl shadow-xl shadow-emerald-950/40">
-                <img src="/assets/orbs/v1_0.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+            {/* Curated Task Badges Orbit Showcase */}
+            <div className="task-showcase-grid grid grid-cols-2 gap-5 w-full max-w-md relative z-10">
+              <div className="showcase-card showcase-1 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-emerald-500/40 backdrop-blur-2xl shadow-2xl shadow-emerald-950/50 hover:border-emerald-400 transition-all">
+                <img src="/assets/orbs/v1_0.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-white">Soạn kế hoạch bài dạy</span>
-                  <span className="text-[10px] font-semibold text-emerald-400">Giao AI xử lý ⚡</span>
+                  <span className="text-xs font-black text-white">Soạn KHBD</span>
+                  <span className="text-[10px] font-extrabold text-emerald-400">Giao AI ⚡</span>
                 </div>
               </div>
 
-              <div className="showcase-card showcase-2 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-indigo-500/30 backdrop-blur-xl shadow-xl shadow-indigo-950/40">
-                <img src="/assets/orbs/v1_3.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+              <div className="showcase-card showcase-2 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-indigo-500/40 backdrop-blur-2xl shadow-2xl shadow-indigo-950/50 hover:border-indigo-400 transition-all">
+                <img src="/assets/orbs/v1_3.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-white">Thiết kế Slide giảng dạy</span>
-                  <span className="text-[10px] font-semibold text-indigo-400">Giao AI xử lý ⚡</span>
+                  <span className="text-xs font-black text-white">Slide Giảng Dạy</span>
+                  <span className="text-[10px] font-extrabold text-indigo-400">Giao AI ⚡</span>
                 </div>
               </div>
 
-              <div className="showcase-card showcase-3 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-cyan-500/30 backdrop-blur-xl shadow-xl shadow-cyan-950/40">
-                <img src="/assets/orbs/v1_5.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+              <div className="showcase-card showcase-3 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-cyan-500/40 backdrop-blur-2xl shadow-2xl shadow-cyan-950/50 hover:border-cyan-400 transition-all">
+                <img src="/assets/orbs/v1_5.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-white">Tạo phiếu bài tập</span>
-                  <span className="text-[10px] font-semibold text-cyan-400">Giao AI xử lý ⚡</span>
+                  <span className="text-xs font-black text-white">Phiếu Bài Tập</span>
+                  <span className="text-[10px] font-extrabold text-cyan-400">Giao AI ⚡</span>
                 </div>
               </div>
 
-              <div className="showcase-card showcase-4 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-amber-500/30 backdrop-blur-xl shadow-xl shadow-amber-950/40">
-                <img src="/assets/orbs/v2_1.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+              <div className="showcase-card showcase-4 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-amber-500/40 backdrop-blur-2xl shadow-2xl shadow-amber-950/50 hover:border-amber-400 transition-all">
+                <img src="/assets/orbs/v2_1.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
                 <div className="flex flex-col text-left">
-                  <span className="text-xs font-bold text-white">Tạo đề kiểm tra</span>
-                  <span className="text-[10px] font-semibold text-amber-400">Giao AI xử lý ⚡</span>
+                  <span className="text-xs font-black text-white">Tạo Đề Kiểm Tra</span>
+                  <span className="text-[10px] font-extrabold text-amber-400">Giao AI ⚡</span>
                 </div>
               </div>
             </div>

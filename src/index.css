@@ -68,17 +68,20 @@ body {
 .ambient-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #06B6D4 0%, transparent 70%); animation: ambient-float 20s ease-in-out infinite alternate-reverse; }
 
 /* 3D Showcase Stage Effects */
-.stage-glow-orb { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, rgba(99,102,241,0.15) 50%, transparent 70%); filter: blur(40px); z-index: 1; animation: glow-pulse 4s ease-in-out infinite alternate; }
+.stage-glow-orb { position: absolute; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.25) 0%, rgba(99,102,241,0.2) 50%, transparent 70%); filter: blur(40px); z-index: 0; animation: glow-pulse 4s ease-in-out infinite alternate; }
 
-.showcase-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-.showcase-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+.ai-core-rings { position: absolute; width: 260px; height: 260px; border-radius: 50%; border: 1px dashed rgba(16,185,129,0.4); animation: ring-spin 20s linear infinite; pointer-events: none; z-index: 0; }
+.ai-core-rings::before { content: ''; position: absolute; inset: -20px; border-radius: 50%; border: 1px solid rgba(99,102,241,0.3); animation: ring-spin 14s linear infinite reverse; }
+
+.showcase-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+.showcase-card:hover { transform: translateY(-8px) scale(1.05); box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 30px rgba(16,185,129,0.3); }
 .showcase-1 { animation: showcase-float 6s ease-in-out infinite alternate; }
 .showcase-2 { animation: showcase-float 7s ease-in-out 1s infinite alternate; }
 .showcase-3 { animation: showcase-float 6.5s ease-in-out 2s infinite alternate; }
 .showcase-4 { animation: showcase-float 7.5s ease-in-out 0.5s infinite alternate; }
 
 @keyframes ambient-float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.15); } }
-@keyframes showcase-float { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+@keyframes showcase-float { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); } }
 
 /* ------------------------------------------------------------------ */
 /* Premium Launch Screen (Glassmorphism + Neon Dashboard)             */
