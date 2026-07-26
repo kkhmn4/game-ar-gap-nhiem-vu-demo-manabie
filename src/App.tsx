@@ -286,209 +286,141 @@ function Intro({
   };
 
   return (
-    <div className={`intro-shell h-full overflow-y-auto ${launching ? 'is-launching' : ''}`}>
+    <div className={`entry-stage ${launching ? 'is-launching' : ''}`}>
       <div className="launch-wipe" aria-hidden="true">
         <span>ĐỒNG BỘ ĐẤU TRƯỜNG</span>
       </div>
-      
-      {/* Dynamic Ambient Background Lights */}
-      <div className="ambient-light-leak ambient-1" aria-hidden="true" />
-      <div className="ambient-light-leak ambient-2" aria-hidden="true" />
-      <div className="intro-grid" aria-hidden="true" />
-      
-      {/* Ambient 3D Task Orbs Background Layer */}
-      <div className="intro-atmosphere" aria-hidden="true">
-        <span className="scan-beam" />
-        <img src="/assets/orbs/v1_0.png" className="floating-orb float-1" alt="" />
-        <img src="/assets/orbs/v1_3.png" className="floating-orb float-2" alt="" />
-        <img src="/assets/orbs/v1_5.png" className="floating-orb float-3" alt="" />
-        <img src="/assets/orbs/v1_7.png" className="floating-orb float-4" alt="" />
-        <img src="/assets/orbs/v2_1.png" className="floating-orb float-5" alt="" />
-        <img src="/assets/orbs/v2_2.png" className="floating-orb float-6" alt="" />
-        <img src="/assets/orbs/v2_4.png" className="floating-orb float-7" alt="" />
-        <img src="/assets/orbs/v2_5.png" className="floating-orb float-8" alt="" />
+
+      <div className="entry-backdrop" aria-hidden="true">
+        <span className="entry-horizon" />
+        <span className="entry-scanline" />
+        <span className="entry-glow entry-glow-a" />
+        <span className="entry-glow entry-glow-b" />
       </div>
 
-      <main className="launch-screen relative z-10 mx-auto min-h-full w-full max-w-[1400px] px-6 py-6 flex flex-col justify-between">
-        {/* Floating Glass Navbar */}
-        <nav className="launch-nav-glass flex items-center justify-between px-8 py-4 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
-          <div className="launch-brand flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-emerald-400 p-[1px] flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center">
-                <PinchMark live />
-              </div>
-            </div>
-            <span className="font-extrabold tracking-widest text-white text-sm">MANABIE LAB</span>
+      <main className="entry-frame">
+        <header className="entry-header">
+          <div className="entry-brand">
+            <PinchMark live />
+            <span>MANABIE</span>
+            <i>AI LAB</i>
           </div>
-          
-          <div className="launch-status-pill flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            CAMERA AR SẴN SÀNG
-          </div>
-          
-          <div className="launch-code text-xs font-mono font-bold tracking-widest text-slate-400">
-            SESSION 01 / AR WORKSHOP
-          </div>
-        </nav>
+          <div className="entry-system"><b /> CAMERA AR SẴN SÀNG</div>
+          <div className="entry-mission-id">NHIỆM VỤ / 01</div>
+        </header>
 
-        {/* Unboxed Open Hero Layout */}
-        <section className="launch-hero-vibrant my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Hero Main Copy (Left 7 Columns) */}
-          <div className="lg:col-span-7 flex flex-col items-start gap-6 text-left relative z-20">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-black tracking-widest uppercase backdrop-blur-md shadow-lg shadow-violet-900/30">
-              <span className="text-amber-400 text-sm">⚡</span>
-              HOẠT ĐỘNG 01 · GẮP VIỆC GIAO AI
-            </div>
-
-            <h1 className="flex flex-col gap-4 font-black tracking-tight text-white uppercase text-left">
-              <span className="text-2xl sm:text-3xl md:text-4xl text-slate-300 font-bold tracking-normal opacity-90 pb-1">
-                TRÒ CHƠI KHỞI ĐỘNG
-              </span>
-              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-snug py-1 bg-gradient-to-r from-white via-cyan-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]">
-                "NHANH TAY
-              </span>
-              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-snug pt-1 pb-4 bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
-                LẸ MẮT"
-              </span>
+        <section className="entry-hero">
+          <div className="entry-copy">
+            <p className="entry-kicker"><span>HOẠT ĐỘNG MỞ ĐẦU</span> GẮP VIỆC — GIAO AI</p>
+            <h1 className="entry-title">
+              <span>GẮP ĐÚNG</span>
+              <span>VIỆC.</span>
+              <span className="is-outline">GIAO ĐÚNG</span>
+              <span className="is-outline">AI.</span>
             </h1>
-
-            <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl font-medium">
-              Đọc tình huống. <strong className="text-cyan-300 font-bold">Gắp việc có thể giao cho AI</strong>. Để những việc cần trái tim và trí tuệ con người tiếp tục rơi.
+            <p className="entry-lead">
+              Đọc nhanh từng tình huống. Gắp những việc AI có thể hỗ trợ và đưa vào cổng nhiệm vụ.
             </p>
 
-            {/* Metrics Widgets Row */}
-            <div className="grid grid-cols-3 gap-4 w-full max-w-lg pt-2">
-              <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md flex flex-col items-center justify-center gap-1 group hover:border-cyan-400/40 transition-all">
-                <span className="text-2xl font-black text-white font-mono group-hover:scale-110 transition-transform">06</span>
-                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">MỤC TIÊU</span>
+            <div className="entry-rule">
+              <span className="entry-rule-icon" aria-hidden="true">⌁</span>
+              <div>
+                <b>QUY TẮC NHẬN DIỆN</b>
+                <p>Việc tạo ra tài liệu số → có thể giao AI</p>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md flex flex-col items-center justify-center gap-1 group hover:border-amber-400/40 transition-all">
-                <span className="text-2xl font-black text-amber-400 font-mono group-hover:scale-110 transition-transform">×4</span>
-                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">COMBO MAX</span>
-              </div>
-              <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md flex flex-col items-center justify-center gap-1 group hover:border-emerald-400/40 transition-all">
-                <span className="text-2xl font-black text-emerald-400 font-mono group-hover:scale-110 transition-transform">+3s</span>
-                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">AI FLOW</span>
-              </div>
+              <strong>06</strong>
+              <small>MỤC TIÊU</small>
+            </div>
+
+            <div className="entry-metrics" aria-label="Thông số trò chơi">
+              <div><span>THỜI LƯỢNG</span><b>{SPEEDS.find((s) => s.key === difficulty)?.seconds ?? 90}<i>s</i></b></div>
+              <div><span>COMBO TỐI ĐA</span><b>×4</b></div>
+              <div><span>THƯỞNG AI FLOW</span><b>+3<i>s</i></b></div>
             </div>
           </div>
 
-          {/* 3D Task Showcase Stage (Right 5 Columns) */}
-          <div className="lg:col-span-5 relative flex items-center justify-center min-h-[420px]">
-            {/* Ambient AI Core Glow */}
-            <div className="stage-glow-orb" />
-            <div className="ai-core-rings" />
-
-            {/* Central Glowing AI Engine Badge */}
-            <div className="absolute z-0 flex flex-col items-center justify-center w-40 h-40 rounded-full bg-slate-950/80 border border-emerald-500/40 shadow-[0_0_50px_rgba(16,185,129,0.3)] backdrop-blur-2xl animate-pulse">
-              <span className="text-3xl">🤖</span>
-              <span className="text-[10px] font-black tracking-widest text-emerald-400 uppercase mt-1">AI FLOW CORE</span>
-              <span className="text-[9px] font-bold text-slate-400">ĐANG HOẠT ĐỘNG</span>
+          <div className="entry-visual" aria-label="Mô phỏng cổng gắp nhiệm vụ AI">
+            <div className="entry-pinch-demo" aria-hidden="true">
+              <span className="entry-finger entry-finger-a" />
+              <span className="entry-finger entry-finger-b" />
+              <i>CHỤM ĐỂ GẮP</i>
             </div>
-            
-            {/* Curated Task Badges Orbit Showcase */}
-            <div className="task-showcase-grid grid grid-cols-2 gap-5 w-full max-w-md relative z-10">
-              <div className="showcase-card showcase-1 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-emerald-500/40 backdrop-blur-2xl shadow-2xl shadow-emerald-950/50 hover:border-emerald-400 transition-all">
-                <img src="/assets/orbs/v1_0.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-black text-white">Soạn KHBD</span>
-                  <span className="text-[10px] font-extrabold text-emerald-400">Giao AI ⚡</span>
-                </div>
-              </div>
 
-              <div className="showcase-card showcase-2 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-indigo-500/40 backdrop-blur-2xl shadow-2xl shadow-indigo-950/50 hover:border-indigo-400 transition-all">
-                <img src="/assets/orbs/v1_3.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-black text-white">Slide Giảng Dạy</span>
-                  <span className="text-[10px] font-extrabold text-indigo-400">Giao AI ⚡</span>
-                </div>
-              </div>
+            <div className="entry-orbit entry-orbit-outer" aria-hidden="true" />
+            <div className="entry-orbit entry-orbit-mid" aria-hidden="true" />
+            <div className="entry-orbit entry-orbit-inner" aria-hidden="true" />
+            <span className="entry-vector vector-a" aria-hidden="true" />
+            <span className="entry-vector vector-b" aria-hidden="true" />
 
-              <div className="showcase-card showcase-3 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-cyan-500/40 backdrop-blur-2xl shadow-2xl shadow-cyan-950/50 hover:border-cyan-400 transition-all">
-                <img src="/assets/orbs/v1_5.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-black text-white">Phiếu Bài Tập</span>
-                  <span className="text-[10px] font-extrabold text-cyan-400">Giao AI ⚡</span>
-                </div>
-              </div>
-
-              <div className="showcase-card showcase-4 flex items-center gap-3 p-4 rounded-2xl bg-slate-900/75 border border-amber-500/40 backdrop-blur-2xl shadow-2xl shadow-amber-950/50 hover:border-amber-400 transition-all">
-                <img src="/assets/orbs/v2_1.png" className="w-12 h-12 rounded-full border border-white/40 shadow-lg" alt="" />
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-black text-white">Tạo Đề Kiểm Tra</span>
-                  <span className="text-[10px] font-extrabold text-amber-400">Giao AI ⚡</span>
-                </div>
-              </div>
+            <div className="entry-task task-a">
+              <img src="/assets/orbs/v1_0.png" alt="" />
+              <span>KHBD</span>
             </div>
+            <div className="entry-task task-b">
+              <img src="/assets/orbs/v1_3.png" alt="" />
+              <span>SLIDE</span>
+            </div>
+            <div className="entry-task task-c">
+              <img src="/assets/orbs/v1_5.png" alt="" />
+              <span>PHIẾU HỌC TẬP</span>
+            </div>
+            <div className="entry-task task-d">
+              <img src="/assets/orbs/v2_1.png" alt="" />
+              <span>ĐỀ KIỂM TRA</span>
+            </div>
+
+            <div className="entry-core">
+              <span className="entry-core-index">AI / 01</span>
+              <img src="/assets/mission-collector-v1.png" alt="" />
+              <strong>CỔNG<br />NHIỆM VỤ</strong>
+              <i>ĐANG CHỜ</i>
+            </div>
+            <p className="entry-visual-caption">GẮP <i /> ĐỌC <i /> QUYẾT ĐỊNH</p>
           </div>
         </section>
 
-        {/* Floating Game Console Dock */}
-        <div className="game-console-dock w-full max-w-4xl mx-auto p-4 rounded-3xl bg-slate-900/70 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/80 flex flex-col md:flex-row items-center justify-between gap-4 relative z-20">
-          {/* Difficulty Segmented Selector */}
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <span className="text-xs font-black tracking-widest text-slate-400 uppercase px-2 hidden sm:inline">TỐC ĐỘ:</span>
-            <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/5 w-full md:w-auto">
-              {SPEEDS.map((s) => (
+        <section className="entry-command" aria-label="Thiết lập và bắt đầu trò chơi">
+          <div className="entry-speed">
+            <span>CHỌN NHỊP</span>
+            <div>
+              {SPEEDS.map((speed) => (
                 <button
-                  key={s.key}
-                  onClick={() => onDifficulty(s.key)}
-                  aria-pressed={difficulty === s.key}
-                  className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
-                    difficulty === s.key
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/30 scale-105'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
+                  key={speed.key}
+                  onClick={() => onDifficulty(speed.key)}
+                  aria-pressed={difficulty === speed.key}
                 >
-                  {s.name} ({s.seconds}s)
+                  <b>{speed.name}</b>
+                  <i>{speed.seconds}s</i>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Action Launch Buttons */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <button
-              onClick={() => launch(false)}
-              className="flex-1 md:flex-none px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
-            >
-              <span className="absolute inset-0 w-full h-full bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          <div className="entry-actions">
+            <button className="entry-primary pinch-host" onClick={() => launch(false)}>
               <PinchMark />
-              <span>VÀO ĐẤU TRƯỜNG (CAMERA AR)</span>
+              <span>BẮT ĐẦU BẰNG CAMERA AR</span>
+              <i>↗</i>
             </button>
-            <button
-              onClick={() => launch(true)}
-              className="px-5 py-3.5 rounded-2xl bg-slate-800/80 border border-white/10 text-slate-300 hover:text-white hover:bg-slate-700/80 font-bold text-xs transition-all whitespace-nowrap"
-            >
+            <button className="entry-secondary" onClick={() => launch(true)}>
               Chơi bằng chuột
+              <span>DỰ PHÒNG</span>
             </button>
           </div>
-        </div>
+        </section>
 
-        {/* Footer Steps */}
-        <footer className="launch-steps-v2 flex items-center justify-center gap-8 py-4 text-xs font-bold text-slate-400">
-          <span className="flex items-center gap-2">
-            <b className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">01</b>
-            Đưa tay vào camera
-          </span>
-          <span className="w-8 h-[1px] bg-slate-800" />
-          <span className="flex items-center gap-2">
-            <b className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-mono">02</b>
-            Chụm ngón tay để gắp
-          </span>
-          <span className="w-8 h-[1px] bg-slate-800" />
-          <span className="flex items-center gap-2">
-            <b className="w-6 h-6 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-[10px] font-mono">03</b>
-            Thả vào cổng AI
-          </span>
+        <footer className="entry-footer">
+          <span><b>01</b> Đưa tay vào khung hình</span>
+          <i />
+          <span><b>02</b> Chụm ngón trên nhiệm vụ</span>
+          <i />
+          <span><b>03</b> Kéo và thả vào cổng AI</span>
         </footer>
       </main>
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Màn tổng kết — 3D Visual Cards & Pedagogical Debrief               */
 /* ------------------------------------------------------------------ */
 
 function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }) {

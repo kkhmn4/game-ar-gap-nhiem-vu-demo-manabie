@@ -4,20 +4,50 @@ from playwright.sync_api import sync_playwright
 out = Path("qa-output")
 out.mkdir(exist_ok=True)
 errors = []
+failed_resources = []
+failed_requests = []
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
+    chrome = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+    launch_options = {"headless": True}
+    if chrome.exists():
+        launch_options["executable_path"] = str(chrome)
+    browser = p.chromium.launch(**launch_options)
     page = browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
-    page.on("console", lambda msg: errors.append(f"console:{msg.type}:{msg.text}") if msg.type == "error" else None)
+    page.on("console", lambda msg: errors.append(f"console:{msg.type}:{msg.text}:{msg.location}") if msg.type == "error" else None)
     page.on("pageerror", lambda exc: errors.append(f"page:{exc}"))
+    page.on("response", lambda response: failed_resources.append(f"{response.status}:{response.url}") if response.status >= 400 else None)
+    page.on("requestfailed", lambda request: failed_requests.append(f"{request.url}:{request.failure}"))
     page.goto("http://127.0.0.1:4173", wait_until="networkidle")
     page.screenshot(path=str(out / "intro-live.png"), full_page=False)
-    motion = page.locator(".intro-art").evaluate("el => getComputedStyle(el).animationName")
-    orbs = page.locator(".intro-orb").count()
-    page.get_by_role("button", name="Chơi thử bằng chuột").click()
+    motion = page.locator(".entry-scanline").evaluate("el => getComputedStyle(el).animationName")
+    orbs = page.locator(".entry-task").count()
+    no_horizontal_overflow = page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    hard_button = page.locator(".entry-speed button").nth(2)
+    hard_button.click()
+    hard_selected = hard_button.get_attribute("aria-pressed")
+
+    mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
+    mobile.goto("http://127.0.0.1:4173", wait_until="networkidle")
+    mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
+    mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    mobile.close()
+
+    page.get_by_role("button", name="Chơi bằng chuột").click()
     page.wait_for_timeout(4200)
     page.screenshot(path=str(out / "game-live.png"), full_page=False)
     canvas = page.locator("canvas").count()
     hud = page.locator(".game-hud").count()
-    print({"intro_animation": motion, "animated_orbs": orbs, "canvas": canvas, "hud": hud, "errors": errors})
+    print({
+        "intro_animation": motion,
+        "animated_tasks": orbs,
+        "desktop_no_horizontal_overflow": no_horizontal_overflow,
+        "mobile_no_horizontal_overflow": mobile_overflow,
+        "hard_selected": hard_selected,
+        "canvas": canvas,
+        "hud": hud,
+        "errors": errors,
+        "failed_resources": failed_resources,
+        "failed_requests": failed_requests,
+    })
     browser.close()
