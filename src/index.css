@@ -55,15 +55,12 @@ body {
   overscroll-behavior: none;
 }
 
-.intro-shell { position: relative; isolation: isolate; background: #0b1a45; }
+.intro-shell { position: relative; isolation: isolate; background: #06102b; }
 .intro-art {
   position: fixed; inset: 0; z-index: -3;
-  background: linear-gradient(90deg, rgba(5,10,28,.7) 0%, rgba(5,10,28,.5) 39%, rgba(5,10,28,.1) 72%, rgba(5,10,28,.3) 100%),
-    url('/assets/mission-arena-v2.png') center/cover no-repeat;
-  filter: saturate(1.2) contrast(1.1) brightness(1.2);
-  animation: hero-camera 18s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 50% -20%, #17387d 0%, #0b1a45 40%, #04091a 100%);
 }
-.intro-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 69% 62%, transparent 0 20%, rgba(4,9,25,.3) 72%); }
+.intro-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, transparent 0 30%, rgba(4,9,25,.5) 100%); }
 
 /* Mission launch screen — cấu trúc sân khấu, không còn dùng ảnh nền như poster. */
 .launch-screen { display:flex; flex-direction:column; }

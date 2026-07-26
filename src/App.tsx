@@ -293,9 +293,6 @@ function Intro({
       <div className="intro-art" aria-hidden="true" />
       <div className="intro-grid" aria-hidden="true" />
       <div className="intro-atmosphere" aria-hidden="true">
-        <span className="intro-orb orb-a" />
-        <span className="intro-orb orb-b" />
-        <span className="intro-orb orb-c" />
         <span className="scan-beam" />
         
         {/* Orbs extracted from v1 and v2 atlases scattered around for visual effect */}
