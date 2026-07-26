@@ -290,12 +290,15 @@ function Intro({
       <div className="launch-wipe" aria-hidden="true">
         <span>ĐỒNG BỘ ĐẤU TRƯỜNG</span>
       </div>
-      <div className="intro-art" aria-hidden="true" />
+      
+      {/* Dynamic Ambient Background Lights */}
+      <div className="ambient-light-leak ambient-1" aria-hidden="true" />
+      <div className="ambient-light-leak ambient-2" aria-hidden="true" />
       <div className="intro-grid" aria-hidden="true" />
+      
+      {/* Ambient 3D Task Orbs Background Layer */}
       <div className="intro-atmosphere" aria-hidden="true">
         <span className="scan-beam" />
-        
-        {/* Orbs extracted from v1 and v2 atlases scattered around for visual effect */}
         <img src="/assets/orbs/v1_0.png" className="floating-orb float-1" alt="" />
         <img src="/assets/orbs/v1_3.png" className="floating-orb float-2" alt="" />
         <img src="/assets/orbs/v1_5.png" className="floating-orb float-3" alt="" />
@@ -304,100 +307,170 @@ function Intro({
         <img src="/assets/orbs/v2_2.png" className="floating-orb float-6" alt="" />
         <img src="/assets/orbs/v2_4.png" className="floating-orb float-7" alt="" />
         <img src="/assets/orbs/v2_5.png" className="floating-orb float-8" alt="" />
-        <img src="/assets/orbs/v1_1.png" className="floating-orb float-9" alt="" />
-        <img src="/assets/orbs/v1_4.png" className="floating-orb float-10" alt="" />
-        <img src="/assets/orbs/v2_0.png" className="floating-orb float-11" alt="" />
-        <img src="/assets/orbs/v2_3.png" className="floating-orb float-12" alt="" />
       </div>
 
-      <main className="launch-screen relative z-10 mx-auto min-h-full w-full max-w-[1500px] px-[var(--gap)] py-6">
-        <nav className="launch-nav rise">
-          <div className="launch-brand">
-            <PinchMark live />
-            <span>MANABIE LAB</span>
+      <main className="launch-screen relative z-10 mx-auto min-h-full w-full max-w-[1400px] px-6 py-6 flex flex-col justify-between">
+        {/* Floating Glass Navbar */}
+        <nav className="launch-nav-glass flex items-center justify-between px-8 py-4 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
+          <div className="launch-brand flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-emerald-400 p-[1px] flex items-center justify-center shadow-lg shadow-violet-500/20">
+              <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center">
+                <PinchMark live />
+              </div>
+            </div>
+            <span className="font-extrabold tracking-widest text-white text-sm">MANABIE LAB</span>
           </div>
-          <div className="launch-status">
-            <i /> CAMERA AR SẴN SÀNG
+          
+          <div className="launch-status-pill flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            CAMERA AR SẴN SÀNG
           </div>
-          <div className="launch-code">MISSION / 01</div>
+          
+          <div className="launch-code text-xs font-mono font-bold tracking-widest text-slate-400">
+            SESSION 01 / AR WORKSHOP
+          </div>
         </nav>
 
-        <section className="launch-hero">
-          {/* Left Column: Glass Dashboard */}
-          <div className="launch-copy rise glass-panel">
-            <div className="panel-glow" />
-            <p className="launch-kicker flex items-center gap-2">
-              <span className="pulse-dot" />
+        {/* Unboxed Open Hero Layout */}
+        <section className="launch-hero-vibrant my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Hero Main Copy (Left 7 Columns) */}
+          <div className="lg:col-span-7 flex flex-col items-start gap-6 text-left">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-violet-500/15 border border-violet-400/30 text-violet-300 text-xs font-black tracking-widest uppercase backdrop-blur-md shadow-lg shadow-violet-900/30">
+              <span className="text-amber-400 text-sm">⚡</span>
               HOẠT ĐỘNG 01 · GẮP VIỆC GIAO AI
-            </p>
-            <h1>
-              TRÒ CHƠI KHỞI ĐỘNG
-              <em className="text-glow-mint">
-                <span>"NHANH TAY</span>
-                <span>LẸ MẮT"</span>
-              </em>
+            </div>
+
+            <h1 className="flex flex-col gap-2 font-black tracking-tight text-white uppercase text-left">
+              <span className="text-2xl sm:text-3xl md:text-4xl text-slate-300 font-bold tracking-normal opacity-90">
+                TRÒ CHƠI KHỞI ĐỘNG
+              </span>
+              <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-none bg-gradient-to-r from-white via-cyan-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]">
+                "NHANH TAY
+              </span>
+              <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-none bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
+                LẸ MẮT"
+              </span>
             </h1>
-            <p className="launch-lead">
-              Đọc tình huống. Gắp việc có thể giao cho AI. Để những việc cần con người tiếp tục rơi.
+
+            <p className="text-slate-300 text-base sm:text-lg leading-relaxed max-w-xl font-medium">
+              Đọc tình huống. <strong className="text-cyan-300 font-bold">Gắp việc có thể giao cho AI</strong>. Để những việc cần trái tim và trí tuệ con người tiếp tục rơi.
             </p>
 
-            <div className="launch-metrics-grid">
-              <div className="metric-widget">
-                <div className="metric-value">06</div>
-                <div className="metric-label">MỤC TIÊU</div>
+            {/* Metrics Widgets Row */}
+            <div className="grid grid-cols-3 gap-4 w-full max-w-lg pt-2">
+              <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md flex flex-col items-center justify-center gap-1 group hover:border-cyan-400/40 transition-all">
+                <span className="text-2xl font-black text-white font-mono group-hover:scale-110 transition-transform">06</span>
+                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">MỤC TIÊU</span>
               </div>
-              <div className="metric-widget">
-                <div className="metric-value">×4</div>
-                <div className="metric-label">COMBO MAX</div>
+              <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md flex flex-col items-center justify-center gap-1 group hover:border-amber-400/40 transition-all">
+                <span className="text-2xl font-black text-amber-400 font-mono group-hover:scale-110 transition-transform">×4</span>
+                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">COMBO MAX</span>
               </div>
-              <div className="metric-widget">
-                <div className="metric-value text-glow-mint">+3s</div>
-                <div className="metric-label">AI FLOW</div>
-              </div>
-            </div>
-
-            <div className="launch-difficulty">
-              <span className="diff-label">TỐC ĐỘ RƠI</span>
-              <div className="segmented-control">
-                {SPEEDS.map((s) => (
-                  <button
-                    key={s.key}
-                    onClick={() => onDifficulty(s.key)}
-                    aria-pressed={difficulty === s.key}
-                    title={s.desc}
-                    className="segment-btn"
-                  >
-                    <span className="segment-name">{s.name}</span>
-                    <span className="segment-val">{s.seconds}s</span>
-                  </button>
-                ))}
+              <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-md flex flex-col items-center justify-center gap-1 group hover:border-emerald-400/40 transition-all">
+                <span className="text-2xl font-black text-emerald-400 font-mono group-hover:scale-110 transition-transform">+3s</span>
+                <span className="text-[10px] font-extrabold tracking-widest text-slate-400 uppercase">AI FLOW</span>
               </div>
             </div>
+          </div>
 
-            <div className="launch-actions">
-              <button onClick={() => launch(false)} className="launch-primary glowing-btn">
-                <PinchMark />
-                <span className="btn-text">Vào đấu trường</span>
-                <b className="btn-arrow">CAMERA →</b>
-              </button>
-              <button onClick={() => launch(true)} className="launch-secondary outline-btn">
-                Chơi thử bằng chuột
-              </button>
+          {/* 3D Task Showcase Stage (Right 5 Columns) */}
+          <div className="lg:col-span-5 relative flex items-center justify-center min-h-[380px]">
+            <div className="stage-glow-orb" />
+            
+            {/* Curated Task Badges Showcase */}
+            <div className="task-showcase-grid grid grid-cols-2 gap-4 w-full max-w-md relative z-10">
+              <div className="showcase-card showcase-1 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-emerald-500/30 backdrop-blur-xl shadow-xl shadow-emerald-950/40">
+                <img src="/assets/orbs/v1_0.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-white">Soạn kế hoạch bài dạy</span>
+                  <span className="text-[10px] font-semibold text-emerald-400">Giao AI xử lý ⚡</span>
+                </div>
+              </div>
+
+              <div className="showcase-card showcase-2 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-indigo-500/30 backdrop-blur-xl shadow-xl shadow-indigo-950/40">
+                <img src="/assets/orbs/v1_3.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-white">Thiết kế Slide giảng dạy</span>
+                  <span className="text-[10px] font-semibold text-indigo-400">Giao AI xử lý ⚡</span>
+                </div>
+              </div>
+
+              <div className="showcase-card showcase-3 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-cyan-500/30 backdrop-blur-xl shadow-xl shadow-cyan-950/40">
+                <img src="/assets/orbs/v1_5.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-white">Tạo phiếu bài tập</span>
+                  <span className="text-[10px] font-semibold text-cyan-400">Giao AI xử lý ⚡</span>
+                </div>
+              </div>
+
+              <div className="showcase-card showcase-4 flex items-center gap-3 p-3.5 rounded-2xl bg-slate-900/60 border border-amber-500/30 backdrop-blur-xl shadow-xl shadow-amber-950/40">
+                <img src="/assets/orbs/v2_1.png" className="w-12 h-12 rounded-full border border-white/30 shadow-md" alt="" />
+                <div className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-white">Tạo đề kiểm tra</span>
+                  <span className="text-[10px] font-semibold text-amber-400">Giao AI xử lý ⚡</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <footer className="launch-steps rise">
-          <span>
-            <b>01</b> Đưa tay vào khung
+        {/* Floating Game Console Dock */}
+        <div className="game-console-dock w-full max-w-4xl mx-auto p-4 rounded-3xl bg-slate-900/70 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/80 flex flex-col md:flex-row items-center justify-between gap-4 relative z-20">
+          {/* Difficulty Segmented Selector */}
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <span className="text-xs font-black tracking-widest text-slate-400 uppercase px-2 hidden sm:inline">TỐC ĐỘ:</span>
+            <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/5 w-full md:w-auto">
+              {SPEEDS.map((s) => (
+                <button
+                  key={s.key}
+                  onClick={() => onDifficulty(s.key)}
+                  aria-pressed={difficulty === s.key}
+                  className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+                    difficulty === s.key
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-lg shadow-emerald-500/30 scale-105'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {s.name} ({s.seconds}s)
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Launch Buttons */}
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <button
+              onClick={() => launch(false)}
+              className="flex-1 md:flex-none px-8 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+            >
+              <span className="absolute inset-0 w-full h-full bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <PinchMark />
+              <span>VÀO ĐẤU TRƯỜNG (CAMERA AR)</span>
+            </button>
+            <button
+              onClick={() => launch(true)}
+              className="px-5 py-3.5 rounded-2xl bg-slate-800/80 border border-white/10 text-slate-300 hover:text-white hover:bg-slate-700/80 font-bold text-xs transition-all whitespace-nowrap"
+            >
+              Chơi bằng chuột
+            </button>
+          </div>
+        </div>
+
+        {/* Footer Steps */}
+        <footer className="launch-steps-v2 flex items-center justify-center gap-8 py-4 text-xs font-bold text-slate-400">
+          <span className="flex items-center gap-2">
+            <b className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">01</b>
+            Đưa tay vào camera
           </span>
-          <i />
-          <span>
-            <b>02</b> Chụm ngón để gắp
+          <span className="w-8 h-[1px] bg-slate-800" />
+          <span className="flex items-center gap-2">
+            <b className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[10px] font-mono">02</b>
+            Chụm ngón tay để gắp
           </span>
-          <i />
-          <span>
-            <b>03</b> Thả vào cổng
+          <span className="w-8 h-[1px] bg-slate-800" />
+          <span className="flex items-center gap-2">
+            <b className="w-6 h-6 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-[10px] font-mono">03</b>
+            Thả vào cổng AI
           </span>
         </footer>
       </main>
