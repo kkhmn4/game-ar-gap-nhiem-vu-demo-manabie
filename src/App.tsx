@@ -344,10 +344,10 @@ function Intro({
               <span className="text-2xl sm:text-3xl md:text-4xl text-slate-300 font-bold tracking-normal opacity-90">
                 TRÒ CHƠI KHỞI ĐỘNG
               </span>
-              <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-none bg-gradient-to-r from-white via-cyan-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]">
+              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight pb-1 bg-gradient-to-r from-white via-cyan-200 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(6,182,212,0.4)]">
                 "NHANH TAY
               </span>
-              <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-none bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
+              <span className="inline-block text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight pb-3 bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(16,185,129,0.4)]">
                 LẸ MẮT"
               </span>
             </h1>
