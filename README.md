@@ -14,8 +14,8 @@ camera và nhận diện tay MediaPipe, thay toàn bộ cơ chế chơi từ *ng
 
 Trò chơi không phải để giải trí. Nó tạo ra **tiêu chí phân loại công việc**:
 
-- **Quả xanh — 6 nhiệm vụ cốt lõi:** đều là việc tạo ra một sản phẩm giấy tờ. AI làm được.
-- **Quả cam — nhiễu:** đều là việc cần mặt người hoặc việc vặt. AI không làm thay được.
+- **Quả xanh — 6 nhiệm vụ cốt lõi:** đều là đầu ra số AI có thể hỗ trợ tạo bản nháp. Giáo viên phải kiểm tra và quyết định bản cuối.
+- **Quả cam — nhiễu:** đều cần hiện diện, thấu cảm, phán đoán nghề nghiệp hoặc thao tác vật lý. AI không làm thay và không chịu trách nhiệm thay con người.
 
 Sáu nhiệm vụ gắp được vào giỏ chính là **sáu nhiệm vụ chia cho sáu nhóm** ở hoạt
 động NotebookLM ngay sau đó. Không có bước chuyển gượng ép.

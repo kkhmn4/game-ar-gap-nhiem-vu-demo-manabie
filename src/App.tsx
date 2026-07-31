@@ -319,14 +319,14 @@ function Intro({
               <span className="is-outline">AI.</span>
             </h1>
             <p className="entry-lead">
-              Đọc nhanh từng tình huống. Gắp những việc AI có thể hỗ trợ và đưa vào cổng nhiệm vụ.
+              Đọc nhanh từng tình huống. Gắp những việc AI có thể hỗ trợ tạo bản nháp và đưa vào cổng nhiệm vụ.
             </p>
 
             <div className="entry-rule">
               <span className="entry-rule-icon" aria-hidden="true">⌁</span>
               <div>
                 <b>QUY TẮC NHẬN DIỆN</b>
-                <p>Việc tạo ra tài liệu số → có thể giao AI</p>
+                <p>AI tạo bản nháp số → giáo viên kiểm tra và quyết định</p>
               </div>
               <strong>06</strong>
               <small>MỤC TIÊU</small>
@@ -523,7 +523,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               AI Đồng Hành & Tối Ưu Hồ Sơ
             </h3>
             <p className="mt-2.5 text-base leading-relaxed text-[var(--chalk)]/90 font-medium">
-              Các công việc tạo lập hồ sơ, giáo án, phiếu học tập và đề kiểm tra — AI có thể hỗ trợ xử lý tự động hóa nhanh chóng và chính xác.
+              AI có thể hỗ trợ tạo bản nháp hồ sơ, giáo án, phiếu học tập và đề kiểm tra. Giáo viên kiểm tra mục tiêu, độ chính xác, dữ liệu riêng tư và quyết định bản cuối.
             </p>
           </div>
 
@@ -541,7 +541,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               Thầy Cô Dẫn Dắt & Truyền Cảm Hứng
             </h3>
             <p className="mt-2.5 text-base leading-relaxed text-[var(--chalk)]/90 font-medium">
-              Sự kết nối, thấu hiểu, cảm xúc và tương tác trực tiếp với từng học sinh — chính thầy cô luôn là trung tâm kiến tạo lớp học hạnh phúc.
+              Thầy cô trực tiếp quan sát, thấu hiểu, xử lý tình huống và giao tiếp với học sinh, phụ huynh; đồng thời chịu trách nhiệm chuyên môn cho mọi sản phẩm dùng trong lớp học.
             </p>
           </div>
         </div>
@@ -558,7 +558,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             </span>
           </div>
           <p className="mt-3.5 text-[clamp(1.15rem,2.1vw,1.65rem)] font-bold leading-[1.55] text-[var(--chalk)]">
-            Sáu việc này, mỗi tuần thầy cô làm bao nhiêu lần? Làm sao để làm nhanh nhất mà vẫn chính xác nhất?
+            Sáu việc này, AI nên hỗ trợ đến bước nào? Thầy cô cần kiểm tra điều gì trước khi sử dụng với học sinh và phụ huynh?
           </p>
         </section>
 

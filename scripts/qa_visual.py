@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -6,6 +7,13 @@ out.mkdir(exist_ok=True)
 errors = []
 failed_resources = []
 failed_requests = []
+
+engine_source = Path("src/utils/engine.ts").read_text(encoding="utf-8")
+fall_scale_match = re.search(r"const FALL_SPEED_SCALE = ([0-9.]+);", engine_source)
+fall_scale = float(fall_scale_match.group(1)) if fall_scale_match else None
+assert fall_scale == 0.35, f"Unexpected fall speed scale: {fall_scale}"
+assert engine_source.count("fallSpeed:") == 4, "All three modes must define fallSpeed"
+assert engine_source.count("fallSpeed: 0.") == 3, "All three modes must use the shared scale"
 
 with sync_playwright() as p:
     chrome = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -23,9 +31,12 @@ with sync_playwright() as p:
     motion = page.locator(".entry-scanline").evaluate("el => getComputedStyle(el).animationName")
     orbs = page.locator(".entry-task").count()
     no_horizontal_overflow = page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
-    hard_button = page.locator(".entry-speed button").nth(2)
-    hard_button.click()
-    hard_selected = hard_button.get_attribute("aria-pressed")
+    selected_modes = []
+    speed_buttons = page.locator(".entry-speed button")
+    for index, mode in enumerate(("easy", "normal", "hard")):
+        button = speed_buttons.nth(index)
+        button.click()
+        selected_modes.append((mode, button.get_attribute("aria-pressed")))
 
     mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
     mobile.goto("http://127.0.0.1:4173", wait_until="networkidle")
@@ -34,7 +45,9 @@ with sync_playwright() as p:
     mobile.close()
 
     page.get_by_role("button", name="Chơi bằng chuột").click()
-    page.wait_for_timeout(4200)
+    # Qua hiệu ứng chuyển màn + đếm ngược, rồi để nhiều nhiệm vụ rơi đủ xa
+    # nhằm kiểm tra trực quan nhịp rơi, mật độ và khả năng đọc nhãn.
+    page.wait_for_timeout(9000)
     page.screenshot(path=str(out / "game-live.png"), full_page=False)
     canvas = page.locator("canvas").count()
     hud = page.locator(".game-hud").count()
@@ -43,7 +56,8 @@ with sync_playwright() as p:
         "animated_tasks": orbs,
         "desktop_no_horizontal_overflow": no_horizontal_overflow,
         "mobile_no_horizontal_overflow": mobile_overflow,
-        "hard_selected": hard_selected,
+        "fall_speed_scale": fall_scale,
+        "selected_modes": selected_modes,
         "canvas": canvas,
         "hud": hud,
         "errors": errors,

@@ -30,10 +30,14 @@ interface DifficultyConfig {
   durationSec: number;
 }
 
+/** Đã giảm 30%, nay giảm thêm 50%: còn 35% nhịp gốc; không đổi nhịp sinh bóng. */
+const FALL_SPEED_SCALE = 0.35;
+const FALL_ACCELERATION = 0.00004 * FALL_SPEED_SCALE;
+
 const DIFFICULTY: Record<Difficulty, DifficultyConfig> = {
-  easy: { spawnEveryMs: 1500, fallSpeed: 0.030, noiseRatio: 0.35, durationSec: 120 },
-  normal: { spawnEveryMs: 1150, fallSpeed: 0.045, noiseRatio: 0.45, durationSec: 90 },
-  hard: { spawnEveryMs: 850, fallSpeed: 0.062, noiseRatio: 0.55, durationSec: 70 },
+  easy: { spawnEveryMs: 1500, fallSpeed: 0.030 * FALL_SPEED_SCALE, noiseRatio: 0.35, durationSec: 120 },
+  normal: { spawnEveryMs: 1150, fallSpeed: 0.045 * FALL_SPEED_SCALE, noiseRatio: 0.45, durationSec: 90 },
+  hard: { spawnEveryMs: 850, fallSpeed: 0.062 * FALL_SPEED_SCALE, noiseRatio: 0.55, durationSec: 70 },
 };
 
 /** Đầu vào một bàn tay — giữ nguyên hình dạng của earth-defender-ar để tái dùng lớp camera. */
@@ -518,7 +522,7 @@ export class GameEngine {
 
       ball.x += ball.vx * step;
       ball.y += ball.vy * step;
-      ball.vy += 0.00004 * step;
+      ball.vy += FALL_ACCELERATION * step;
 
       if (ball.x < ball.r) {
         ball.x = ball.r;
