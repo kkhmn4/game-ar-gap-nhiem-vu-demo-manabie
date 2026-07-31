@@ -33,6 +33,12 @@ interface DifficultyConfig {
 /** Đã giảm 30%, nay giảm thêm 50%: còn 35% nhịp gốc; không đổi nhịp sinh bóng. */
 const FALL_SPEED_SCALE = 0.35;
 const FALL_ACCELERATION = 0.00004 * FALL_SPEED_SCALE;
+const BASE_FRAME_MS = 1000 / 60;
+
+/** Giữ cùng cảm giác easing ở mọi tần số quét và với mọi physics sub-step. */
+function frameDamping(perFrameAmount: number, dt: number) {
+  return 1 - Math.pow(1 - perFrameAmount, dt / BASE_FRAME_MS);
+}
 
 const DIFFICULTY: Record<Difficulty, DifficultyConfig> = {
   easy: { spawnEveryMs: 1500, fallSpeed: 0.030 * FALL_SPEED_SCALE, noiseRatio: 0.35, durationSec: 120 },
@@ -337,9 +343,9 @@ export class GameEngine {
     }
 
     this.updateBgParticles(step);
-    this.handleHands();
+    this.handleHands(step);
     this.moveBalls(step);
-    this.updateReach();
+    this.updateReach(step);
     this.ageBursts(step);
     this.updateShockwaves(step);
 
@@ -398,7 +404,8 @@ export class GameEngine {
     this.confettiList = this.confettiList.filter((c) => c.y < this.height + 50);
   }
 
-  private handleHands() {
+  private handleHands(step: number) {
+    const follow = frameDamping(0.45, step);
     this.hands.forEach((hand, index) => {
       const wasPinching = this.prevPinch[index] ?? false;
 
@@ -411,8 +418,8 @@ export class GameEngine {
       if (hand.isPinching) {
         const held = this.balls.find((b) => b.grabbedBy === index && !b.dead);
         if (held) {
-          held.x += (hand.x - held.x) * 0.45;
-          held.y += (hand.y - held.y) * 0.45;
+          held.x += (hand.x - held.x) * follow;
+          held.y += (hand.y - held.y) * follow;
           held.vx = 0;
           held.vy = 0;
           held.trail.push({ x: held.x, y: held.y });
@@ -505,15 +512,17 @@ export class GameEngine {
 
   private moveBalls(step: number) {
     const basket = this.basket();
+    const collectEase = frameDamping(0.2, step);
+    const collectScale = Math.pow(0.94, step / BASE_FRAME_MS);
     for (const ball of this.balls) {
       if (ball.dead) continue;
 
       if (ball.consumedAt !== null) {
         const tx = basket.x + basket.w / 2;
         const ty = basket.y + basket.h * 0.55;
-        ball.x += (tx - ball.x) * 0.2;
-        ball.y += (ty - ball.y) * 0.2;
-        ball.r *= 0.94;
+        ball.x += (tx - ball.x) * collectEase;
+        ball.y += (ty - ball.y) * collectEase;
+        ball.r *= collectScale;
         if (ball.r < 12) ball.dead = true;
         continue;
       }
@@ -558,14 +567,16 @@ export class GameEngine {
   }
 
   private updateShockwaves(step: number) {
+    const expand = frameDamping(0.12, step);
     for (const sw of this.shockwaves) {
       sw.age += step;
-      sw.r += (sw.maxR - sw.r) * 0.12;
+      sw.r += (sw.maxR - sw.r) * expand;
     }
     this.shockwaves = this.shockwaves.filter((sw) => sw.age < sw.life);
   }
 
-  private updateReach() {
+  private updateReach(step: number) {
+    const ease = frameDamping(0.25, step);
     for (const ball of this.balls) {
       if (ball.dead || ball.consumedAt !== null) continue;
       if (ball.grabbedBy !== null) {
@@ -577,7 +588,7 @@ export class GameEngine {
         const d = Math.hypot(ball.x - hand.x, ball.y - hand.y);
         near = Math.max(near, 1 - Math.min(1, d / (ball.r + GRAB_PAD + 70)));
       }
-      ball.reach += (near - ball.reach) * 0.25;
+      ball.reach += (near - ball.reach) * ease;
     }
   }
 
@@ -852,7 +863,8 @@ export class GameEngine {
     const taskIndex = Math.max(0, ALL_TASKS.findIndex((task) => task.id === ball.task.id));
     const accents = ['#6D8BFF', '#AF7CFF', '#32C8E6', '#FF8A5B', '#F4BE4F', '#4ED6AD', '#F178B6'];
     const accent = accents[taskIndex % accents.length];
-    const wobble = Math.sin(this.elapsedMs / 420 + ball.seed) * 3;
+    const driftX = Math.sin(this.elapsedMs / 720 + ball.seed) * 1.6;
+    const driftY = Math.sin(this.elapsedMs / 980 + ball.seed * 1.3) * 0.8;
 
     // Vệt kéo khi đang cầm
     if (held && ball.trail.length > 1) {
@@ -873,7 +885,7 @@ export class GameEngine {
     }
 
     ctx.save();
-    ctx.translate(ball.x, ball.y + wobble);
+    ctx.translate(ball.x + driftX, ball.y + driftY);
 
     // Vòng gợi ý
     if (ball.reach > 0.04 && !held) {

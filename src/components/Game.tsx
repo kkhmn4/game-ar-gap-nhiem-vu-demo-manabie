@@ -5,6 +5,9 @@ import { Difficulty, GameEngine, GameState, HandInput } from '../utils/engine';
 import { audio } from '../utils/audio';
 
 const CANVAS_RENDER_SCALE = 0.62;
+const MAX_FRAME_DELTA_MS = 50;
+const MAX_PHYSICS_STEP_MS = 1000 / 120;
+const UI_STATE_PUBLISH_INTERVAL_MS = 80;
 /** Ngưỡng chụm ngón. Rộng hơn bản bắn của earth-defender-ar vì thao tác gắp cần dung sai lớn hơn. */
 const PINCH_DISTANCE = 42;
 const MAX_HANDS = 2;
@@ -29,6 +32,11 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const mouseRef = useRef({ x: 0, y: 0, down: false, inside: false });
   const finishedRef = useRef(false);
+  const onGameOverRef = useRef(onGameOver);
+  const onStateUpdateRef = useRef(onStateUpdate);
+
+  onGameOverRef.current = onGameOver;
+  onStateUpdateRef.current = onStateUpdate;
 
   const [isLoading, setIsLoading] = useState(!demoMode);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -36,13 +44,32 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
 
   useEffect(() => {
     let active = true;
+    let lastPublishedAt = -Infinity;
+    let lastPublishedState: GameState | null = null;
     finishedRef.current = false;
 
     engineRef.current = new GameEngine((state) => {
-      onStateUpdate(state);
+      const now = performance.now();
+      const priorityUpdate = !lastPublishedState
+        || state.score !== lastPublishedState.score
+        || state.collected.length !== lastPublishedState.collected.length
+        || state.wrongDrops !== lastPublishedState.wrongDrops
+        || state.missedCore !== lastPublishedState.missedCore
+        || state.streak !== lastPublishedState.streak
+        || state.phase !== lastPublishedState.phase
+        || state.countdown !== lastPublishedState.countdown
+        || state.isGameOver !== lastPublishedState.isGameOver;
+
+      // Canvas vẫn chạy theo requestAnimationFrame; chỉ giảm nhịp đồng bộ HUD React
+      // để tránh render giao diện cạnh tranh thời gian với chuyển động của quả cầu.
+      if (priorityUpdate || now - lastPublishedAt >= UI_STATE_PUBLISH_INTERVAL_MS) {
+        lastPublishedAt = now;
+        lastPublishedState = state;
+        onStateUpdateRef.current(state);
+      }
       if (state.isGameOver && !finishedRef.current) {
         finishedRef.current = true;
-        onGameOver(state);
+        onGameOverRef.current(state);
       }
     }, { difficulty });
 
@@ -128,7 +155,7 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       const engine = engineRef.current;
       if (!canvas || !container || !engine) return;
 
-      const dt = currentTime - lastTime;
+      const frameDt = Math.max(0, Math.min(MAX_FRAME_DELTA_MS, currentTime - lastTime));
       lastTime = currentTime;
 
       const targetWidth = Math.max(1, Math.floor(container.clientWidth * CANVAS_RENDER_SCALE));
@@ -146,7 +173,14 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
 
       const hands = demoMode || cameraError ? getMouseInputs() : getCameraInputs(canvas);
       engine.updateHands(hands);
-      engine.update(dt);
+      // Chia khung hình chậm thành các bước nhỏ để trọng lực và quỹ đạo không bị
+      // nhảy xa khi FPS dao động; canvas vẫn chỉ vẽ một lần cho mỗi frame màn hình.
+      let remainingDt = frameDt;
+      while (remainingDt > 0) {
+        const physicsDt = Math.min(MAX_PHYSICS_STEP_MS, remainingDt);
+        engine.update(physicsDt);
+        remainingDt -= physicsDt;
+      }
       engine.draw(ctx);
 
       requestRef.current = requestAnimationFrame(loop);

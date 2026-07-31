@@ -9,11 +9,15 @@ failed_resources = []
 failed_requests = []
 
 engine_source = Path("src/utils/engine.ts").read_text(encoding="utf-8")
+game_source = Path("src/components/Game.tsx").read_text(encoding="utf-8")
 fall_scale_match = re.search(r"const FALL_SPEED_SCALE = ([0-9.]+);", engine_source)
 fall_scale = float(fall_scale_match.group(1)) if fall_scale_match else None
 assert fall_scale == 0.35, f"Unexpected fall speed scale: {fall_scale}"
 assert engine_source.count("fallSpeed:") == 4, "All three modes must define fallSpeed"
 assert engine_source.count("fallSpeed: 0.") == 3, "All three modes must use the shared scale"
+assert "frameDamping" in engine_source, "Ball easing must be time-based"
+assert "const MAX_PHYSICS_STEP_MS = 1000 / 120" in game_source, "Physics must use short sub-steps"
+assert "UI_STATE_PUBLISH_INTERVAL_MS" in game_source, "HUD updates must be throttled away from canvas FPS"
 
 with sync_playwright() as p:
     chrome = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -44,10 +48,36 @@ with sync_playwright() as p:
     mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     mobile.close()
 
+    page.bring_to_front()
     page.get_by_role("button", name="Chơi bằng chuột").click()
     # Qua hiệu ứng chuyển màn + đếm ngược, rồi để nhiều nhiệm vụ rơi đủ xa
     # nhằm kiểm tra trực quan nhịp rơi, mật độ và khả năng đọc nhãn.
     page.wait_for_timeout(9000)
+    frame_stats = page.evaluate("""
+        () => new Promise((resolve) => {
+            const deltas = [];
+            let previous = performance.now();
+            const started = previous;
+            const sample = (now) => {
+                deltas.push(now - previous);
+                previous = now;
+                if (now - started < 1800) {
+                    requestAnimationFrame(sample);
+                    return;
+                }
+                const sorted = deltas.slice(1).sort((a, b) => a - b);
+                const average = sorted.reduce((sum, value) => sum + value, 0) / sorted.length;
+                resolve({
+                    samples: sorted.length,
+                    average_ms: Number(average.toFixed(2)),
+                    p95_ms: Number(sorted[Math.floor(sorted.length * .95)].toFixed(2)),
+                    max_ms: Number(sorted[sorted.length - 1].toFixed(2)),
+                });
+            };
+            requestAnimationFrame(sample);
+        })
+    """)
+    assert frame_stats["samples"] >= 30, f"Too few animation samples: {frame_stats}"
     page.screenshot(path=str(out / "game-live.png"), full_page=False)
     canvas = page.locator("canvas").count()
     hud = page.locator(".game-hud").count()
@@ -57,6 +87,7 @@ with sync_playwright() as p:
         "desktop_no_horizontal_overflow": no_horizontal_overflow,
         "mobile_no_horizontal_overflow": mobile_overflow,
         "fall_speed_scale": fall_scale,
+        "frame_stats": frame_stats,
         "selected_modes": selected_modes,
         "canvas": canvas,
         "hud": hud,
