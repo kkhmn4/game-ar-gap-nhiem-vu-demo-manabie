@@ -341,7 +341,7 @@ function Intro({
               <span className="is-accent">GIAO AI</span>
             </h1>
             <p className="workshop-lead">
-              Phân loại 12 công việc để tìm đúng 6 việc trí tuệ nhân tạo có thể hỗ trợ nhà giáo dựng bản nháp.
+              Phân loại 12 công việc để tìm đúng 6 việc trí tuệ nhân tạo có thể hỗ trợ quý thầy cô dựng bản nháp.
             </p>
 
             <div className="workshop-rule" aria-label="Quy tắc phân loại">
@@ -351,7 +351,7 @@ function Intro({
               </article>
               <i aria-hidden="true">/</i>
               <article className="is-teacher">
-                <span>GIỮ LẠI CHO NHÀ GIÁO</span>
+                <span>GIỮ LẠI CHO QUÝ THẦY CÔ</span>
                 <strong>Cần hiện diện, thấu cảm hoặc thao tác vật lí</strong>
               </article>
             </div>
@@ -433,7 +433,7 @@ function Intro({
           <span><b>02</b> Chụm để gắp</span>
           <i />
           <span><b>03</b> Thả đúng cổng AI</span>
-          <em>Nhà giáo quan sát và cùng gọi tên nhóm việc</em>
+          <em>Quý thầy cô quan sát và cùng gọi tên nhóm việc</em>
         </footer>
       </main>
     </div>
@@ -486,7 +486,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
     const section = root?.querySelector<HTMLElement>(`#${id}`);
     if (!root || !section) return;
 
-    setMorphTarget(id === 'debrief-role' ? 'AI HỖ TRỢ → NHÀ GIÁO QUYẾT ĐỊNH' : 'CHỐT THÔNG ĐIỆP');
+    setMorphTarget(id === 'debrief-role' ? 'AI HỖ TRỢ → QUÝ THẦY CÔ QUYẾT ĐỊNH' : 'CHỐT THÔNG ĐIỆP');
     window.setTimeout(() => setMorphTarget(null), 1180);
 
     // Compute the destination from the current viewport instead of relying on
@@ -623,14 +623,14 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             </div>
           </header>
 
-          <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và nhà giáo">
+          <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và quý thầy cô">
             <figure className="is-ai" data-reveal data-motion="image-left">
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
-              <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Nhà giáo cần đọc lại và quyết định bản cuối.</p></figcaption>
+              <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Quý thầy cô cần đọc lại và quyết định bản cuối.</p></figcaption>
             </figure>
             <figure className="is-teacher" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
-              <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Nhà giáo trực tiếp dẫn dắt lớp học" />
-              <figcaption><span>NHÀ GIÁO GIỮ LẠI</span><strong>Việc cần hiện diện, cần thấu cảm</strong><p>Hoặc cần thao tác vật lí.</p></figcaption>
+              <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Quý thầy cô trực tiếp dẫn dắt lớp học" />
+              <figcaption><span>QUÝ THẦY CÔ GIỮ LẠI</span><strong>Việc cần hiện diện, cần thấu cảm</strong><p>Hoặc cần thao tác vật lí.</p></figcaption>
             </figure>
           </div>
 
@@ -645,7 +645,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <span className="debrief-confetti" aria-hidden="true">
               {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
             </span>
-            <img src={BRAND_MASCOTS.nurture} alt="Mascot Manabie chăm sóc mầm cây, biểu tượng cho trách nhiệm của nhà giáo" />
+            <img src={BRAND_MASCOTS.nurture} alt="Mascot Manabie chăm sóc mầm cây, biểu tượng cho trách nhiệm của quý thầy cô" />
           </div>
 
           <div className="debrief-close-copy">
@@ -654,10 +654,10 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               className="debrief-close-kinetic"
               data-reveal
               data-motion="close-kinetic"
-              aria-label="Việc khó chưa chắc là việc nhà giáo giữ lại. Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp. Nhà giáo quyết định bản cuối."
+              aria-label="Việc khó chưa chắc là việc quý thầy cô giữ lại. Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp. Quý thầy cô quyết định bản cuối và cần chịu trách nhiệm về kết quả cuối cùng."
             >
               <div className="close-beat close-beat-one" aria-hidden="true">
-                VIỆC KHÓ CHƯA CHẮC LÀ<br /><strong>VIỆC NHÀ GIÁO GIỮ LẠI</strong>
+                VIỆC KHÓ CHƯA CHẮC LÀ<br /><strong>VIỆC QUÝ THẦY CÔ GIỮ LẠI</strong>
               </div>
               <div className="close-beat close-beat-two" aria-hidden="true">
                 RANH GIỚI KHÔNG NẰM Ở VIỆC<br /><strong><i>KHÓ</i> HAY <i>DỄ</i></strong>
@@ -668,15 +668,15 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               <div className="close-beat close-beat-four" aria-hidden="true">
                 <strong>TRÍ TUỆ NHÂN TẠO DỰNG BẢN NHÁP</strong>
                 <i>→</i>
-                <b>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI</b>
+                <b>QUÝ THẦY CÔ QUYẾT ĐỊNH BẢN CUỐI</b>
               </div>
               <blockquote className="debrief-quote close-lock">
                 <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
                 <p>“Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng.”</p>
                 <div className="close-lock-points">
                   <strong className="is-ai">Trí tuệ nhân tạo dựng bản nháp.</strong>
-                  <strong className="is-teacher">Nhà giáo quyết định bản cuối.</strong>
-                  <strong className="is-responsibility">Nhà giáo chịu trách nhiệm về kết quả cuối cùng.</strong>
+                  <strong className="is-teacher">Quý thầy cô quyết định bản cuối.</strong>
+                  <strong className="is-responsibility">Quý thầy cô cần chịu trách nhiệm về kết quả cuối cùng.</strong>
                 </div>
               </blockquote>
             </div>
@@ -684,11 +684,11 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <footer className="debrief-next" data-reveal data-motion="rise-card">
               <div>
                 <span>TIẾP THEO · PHẦN 1.2</span>
-                <strong>Mở bản sao Phiếu học tập số 1 mang tên quý thầy cô</strong>
+                <strong>Mở Phiếu học tập số 1 trên Google Classroom</strong>
                 <p><b>Câu hỏi 1.</b> Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</p>
-                <p>Ghi câu trả lời theo trí nhớ của mình rồi đối chiếu với phần chốt của báo cáo viên.</p>
+                <p>Ghi câu trả lời theo suy nghĩ của quý thầy cô, sau đó đối chiếu với phần chốt của báo cáo viên.</p>
                 <ol aria-label="Thứ tự thao tác ở phần 1.2">
-                  <li>Mở mục 1.2</li><li>Mở bản sao phiếu</li><li>Ghi câu trả lời</li><li>Nộp bài</li>
+                  <li>Mở mục 1.2</li><li>Mở Phiếu học tập số 1</li><li>Ghi câu trả lời</li><li>Nộp bài</li>
                 </ol>
               </div>
               <button onClick={onReplay}><span>↻</span> Chơi lại</button>

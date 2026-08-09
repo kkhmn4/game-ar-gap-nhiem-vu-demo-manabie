@@ -27,7 +27,7 @@ export const CORE_TASKS: TaskDef[] = [
 
 /**
  * Sáu quả nhiễu: việc cần hiện diện, cần thấu cảm hoặc cần thao tác vật lí.
- * Trí tuệ nhân tạo có thể gợi ý nhưng không làm thay và không chịu trách nhiệm thay nhà giáo.
+ * Trí tuệ nhân tạo có thể gợi ý nhưng không làm thay và không chịu trách nhiệm thay quý thầy cô.
  * Đủ 06 quả cam và 06 quả xanh thành 12 quả — đúng số nêu ở mục c của hoạt động 1.
  * iconIndex ghi rõ từng mục vì danh sách đã bớt hai việc; nếu để trống thì biểu tượng
  * tính theo vị trí trong ALL_TASKS và cả sáu quả sẽ đổi hình.

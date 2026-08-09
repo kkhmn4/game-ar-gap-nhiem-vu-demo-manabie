@@ -2004,11 +2004,22 @@ button {
 .debrief-v3 .debrief-portraits figure.is-ai { border-color: rgba(1,201,141,.48); }
 .debrief-v3 .debrief-portraits figure.is-teacher { border-color: rgba(128,148,255,.46); }
 .debrief-v3 .debrief-portraits img { min-height: 0; object-position: center 42%; }
-.debrief-v3 .debrief-portraits figure::after { background: linear-gradient(to top, rgba(4,8,23,.99) 0%, rgba(4,8,23,.72) 21%, rgba(4,8,23,.08) 62%, transparent 76%); }
-.debrief-v3 .debrief-portraits figcaption { right: 1.25rem; bottom: 1.15rem; left: 1.25rem; }
-.debrief-v3 .debrief-portraits figcaption span { max-width: 94%; font-size: .62rem; line-height: 1.4; }
-.debrief-v3 .debrief-portraits figcaption strong { font-size: clamp(1rem, 1.25vw, 1.35rem); line-height: 1.3; }
-.debrief-v3 .debrief-portraits figcaption p { margin: .38rem 0 0; color: #b7c2df; font-size: .75rem; font-weight: 620; line-height: 1.4; }
+.debrief-v3 .debrief-portraits figure::after { background: linear-gradient(to top, rgba(4,8,23,.995) 0%, rgba(4,8,23,.9) 28%, rgba(4,8,23,.24) 62%, transparent 78%); }
+.debrief-v3 .debrief-portraits figcaption {
+  right: 1.45rem;
+  bottom: 1.35rem;
+  left: 1.45rem;
+  padding: 1rem 1.1rem;
+  border-left: 4px solid rgba(1,201,141,.82);
+  border-radius: 0 14px 14px 0;
+  background: linear-gradient(90deg, rgba(3,10,29,.9), rgba(3,10,29,.56) 72%, transparent);
+  text-shadow: 0 2px 12px rgba(0,0,0,.88);
+  backdrop-filter: blur(3px);
+}
+.debrief-v3 .debrief-portraits .is-teacher figcaption { border-left-color: rgba(243,201,105,.88); }
+.debrief-v3 .debrief-portraits figcaption span { max-width: 96%; margin-bottom: .42rem; font-size: clamp(.82rem, .92vw, 1rem); line-height: 1.25; letter-spacing: .11em; }
+.debrief-v3 .debrief-portraits figcaption strong { max-width: 94%; font-size: clamp(1.38rem, 1.75vw, 2rem); line-height: 1.22; letter-spacing: -.02em; }
+.debrief-v3 .debrief-portraits figcaption p { max-width: 94%; margin: .52rem 0 0; color: #eef2ff; font-size: clamp(1rem, 1.15vw, 1.28rem); font-weight: 760; line-height: 1.35; }
 .debrief-v3 .debrief-portraits .is-ai figcaption span { color: var(--manabie-green); }
 .debrief-v3 .debrief-portraits .is-teacher figcaption span { color: var(--manabie-blue-light); }
 
@@ -2089,13 +2100,13 @@ button {
 .debrief-close .debrief-quote .close-lock-points .is-ai { color: var(--manabie-green); border-color: rgba(1,201,141,.28); }
 .debrief-close .debrief-quote .close-lock-points .is-teacher { color: var(--mascot-orange); border-color: rgba(243,201,105,.28); }
 .debrief-close .debrief-quote .close-lock-points .is-responsibility { color: #f5f7ff; border-color: rgba(128,148,255,.35); background: rgba(60,90,210,.14); }
-.debrief-close .debrief-next { min-height: 92px; margin-top: 1rem; padding: 1rem 1rem 1rem 1.2rem; border-color: rgba(128,148,255,.4); background: rgba(60,90,210,.1); }
+.debrief-close .debrief-next { min-height: 136px; margin-top: 1rem; padding: 1.15rem 1.2rem 1.15rem 1.35rem; border-color: rgba(128,148,255,.48); background: linear-gradient(110deg, rgba(60,90,210,.18), rgba(5,12,34,.82)); }
 .debrief-close .debrief-next div span { color: var(--manabie-blue-light); }
-.debrief-close .debrief-next div strong { font-size: clamp(.82rem, 1vw, 1rem); }
-.debrief-close .debrief-next div p { margin: .3rem 0 0; color: #b6c1df; font-size: clamp(.65rem, .75vw, .76rem); font-weight: 600; line-height: 1.45; }
+.debrief-close .debrief-next div strong { font-size: clamp(1.08rem, 1.32vw, 1.42rem); line-height: 1.3; }
+.debrief-close .debrief-next div p { margin: .42rem 0 0; color: #dbe3fa; font-size: clamp(.82rem, .92vw, 1rem); font-weight: 650; line-height: 1.5; }
 .debrief-close .debrief-next div p b { color: #edf1ff; }
 .debrief-close .debrief-next ol { display: flex; flex-wrap: wrap; gap: .36rem; margin: .55rem 0 0; padding: 0; list-style: none; counter-reset: next-step; }
-.debrief-close .debrief-next li { counter-increment: next-step; display: inline-flex; align-items: center; gap: .28rem; color: #dce4fb; font-size: .61rem; font-weight: 800; letter-spacing: .02em; }
+.debrief-close .debrief-next li { counter-increment: next-step; display: inline-flex; align-items: center; gap: .34rem; color: #edf2ff; font-size: clamp(.7rem, .78vw, .84rem); font-weight: 850; letter-spacing: .015em; }
 .debrief-close .debrief-next li::before { content: counter(next-step); display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border-radius: 50%; color: #051327; background: var(--manabie-green); font: 900 .53rem/1 var(--data); }
 .debrief-close .debrief-next li:not(:last-child)::after { content: '→'; margin-left: .12rem; color: var(--mascot-orange); }
 .debrief-close .debrief-next.is-visible { animation-delay: 5.2s; }
