@@ -419,19 +419,6 @@ function Intro({
               Phân loại 12 công việc để tìm đúng 6 việc trí tuệ nhân tạo có thể hỗ trợ quý thầy cô dựng bản nháp.
             </p>
 
-            <div className="workshop-rule lux-card" aria-label="Quy tắc phân loại">
-              <span className="lux-border" aria-hidden="true" />
-              <article className="is-ai">
-                <span>GẮP VÀO CỔNG AI</span>
-                <strong>Kết quả là bản nháp số</strong>
-              </article>
-              <i aria-hidden="true">/</i>
-              <article className="is-teacher">
-                <span>GIỮ LẠI CHO QUÝ THẦY CÔ</span>
-                <strong>Cần hiện diện, thấu cảm hoặc thao tác vật lí</strong>
-              </article>
-            </div>
-
             <div className="workshop-settings">
               <div className="workshop-speed">
                 <img className="workshop-speed-mascot lux-image" src={BRAND_MASCOTS.time} alt="" aria-hidden="true" />
@@ -486,23 +473,6 @@ function Intro({
               </figcaption>
             </figure>
 
-            <div className="workshop-missions" aria-label="Sáu sản phẩm sẽ được khám phá">
-              {CORE_TASKS.map((task, index) => {
-                const icon = task.iconIndex ?? index;
-                return (
-                    <div className="workshop-mission lux-card" key={task.id}>
-                    <span className="lux-border" aria-hidden="true" />
-                    <span
-                      className="workshop-mission-icon"
-                      style={{ backgroundPosition: `${(icon % 4) * 33.333}% ${Math.floor(icon / 4) * 33.333}%` }}
-                      aria-hidden="true"
-                    />
-                    <b>{String(index + 1).padStart(2, '0')}</b>
-                    <span>{task.short}</span>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </section>
 
@@ -665,13 +635,14 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               className="debrief-result-sequence lux-card"
               data-reveal
               data-motion="result-kinetic"
-              aria-label="06 việc vừa gắp được chính là 06 việc của 180 phút sắp tới"
+              aria-label="Trong 180 phút sắp tới, quý thầy cô sẽ thực hành 06 việc vừa gắp được"
             >
               <span className="lux-border" aria-hidden="true" />
-              <span className="result-beat result-beat-one" aria-hidden="true">06 VIỆC VỪA GẮP ĐƯỢC</span>
-              <span className="result-beat result-beat-two" aria-hidden="true">CHÍNH LÀ 06 VIỆC CỦA 180 PHÚT SẮP TỚI</span>
+              <span className="result-beat result-beat-one" aria-hidden="true">QUÝ THẦY CÔ VỪA GẮP ĐÚNG 06 VIỆC</span>
+              <span className="result-beat result-beat-two" aria-hidden="true">TRONG 180 PHÚT SẮP TỚI,<br />QUÝ THẦY CÔ SẼ THỰC HÀNH 06 VIỆC NÀY</span>
               <strong className="result-lock" aria-hidden="true">
-                <b>06 VIỆC VỪA GẮP ĐƯỢC</b><i>·</i><span>180 PHÚT SẮP TỚI</span>
+                <b>TRONG 180 PHÚT SẮP TỚI</b>
+                <span>QUÝ THẦY CÔ SẼ THỰC HÀNH 06 VIỆC VỪA GẮP ĐƯỢC</span>
               </strong>
             </div>
 

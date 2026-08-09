@@ -1249,6 +1249,76 @@ button {
 .workshop-mission:nth-child(6)::after { animation-delay: 3.24s; }
 .workshop-footer { animation-delay: 2.58s; animation-duration: .82s; }
 
+/* Opening composition after removing the duplicated rule and mission strip. */
+.app-pointer-stage[data-screen='intro'] .pointer-mascot { display: none; }
+.workshop-hero {
+  grid-template-columns: minmax(440px, .7fr) minmax(720px, 1.3fr);
+  gap: clamp(2.5rem, 4.6vw, 6.2rem);
+  padding-block: clamp(1.7rem, 3.5vh, 3.2rem);
+}
+.workshop-copy { max-width: 650px; }
+.workshop-lead {
+  max-width: 610px;
+  margin: 1.55rem 0 0;
+  font-size: clamp(1.02rem, 1.12vw, 1.28rem);
+}
+.workshop-settings {
+  max-width: 650px;
+  margin-top: clamp(1.7rem, 3.2vh, 2.5rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(128,148,255,.2);
+}
+.workshop-speed { gap: .85rem; }
+.workshop-speed-mascot { width: 52px; height: 52px; }
+.workshop-speed > div { flex: 1; }
+.workshop-speed button { min-width: 0; flex: 1; }
+.workshop-actions { margin-top: 1.05rem; }
+.workshop-primary { min-height: 64px; }
+.workshop-secondary { min-width: 170px; }
+.workshop-visual { width: 100%; }
+.workshop-arena {
+  width: 100%;
+  height: min(64vh, 650px);
+  min-height: 470px;
+  aspect-ratio: auto;
+}
+.workshop-coach { top: 18px; left: 18px; }
+.workshop-settings { animation-delay: 1.62s; }
+.workshop-footer { animation-delay: 2.18s; }
+
+.result-lock {
+  flex-direction: column;
+  gap: .42rem;
+  letter-spacing: 0;
+}
+.result-lock b {
+  font-size: clamp(.72rem, 1vw, 1rem);
+  letter-spacing: .14em;
+}
+.result-lock span {
+  max-width: 920px;
+  font-size: clamp(1rem, 1.55vw, 1.65rem);
+  font-weight: 950;
+  line-height: 1.28;
+  letter-spacing: -.015em;
+}
+
+@media (max-width: 1180px) {
+  .workshop-hero { grid-template-columns: 1fr; gap: 2.2rem; }
+  .workshop-copy { max-width: 760px; }
+  .workshop-settings { max-width: 720px; }
+  .workshop-visual { width: min(100%, 1040px); margin-inline: auto; }
+  .workshop-arena { height: auto; min-height: 0; aspect-ratio: 16 / 9; }
+}
+
+@media (max-width: 720px) {
+  .workshop-hero { gap: 1.5rem; }
+  .workshop-lead { margin-top: 1.1rem; }
+  .workshop-settings { margin-top: 1.35rem; padding-top: 1rem; }
+  .workshop-speed-mascot { display: none; }
+  .workshop-coach { top: 10px; left: 10px; }
+}
+
 /* ================================================================== */
 /* LUXURY HOVER LANGUAGE + DEBRIEF CHAPTER 03                         */
 /* ================================================================== */
