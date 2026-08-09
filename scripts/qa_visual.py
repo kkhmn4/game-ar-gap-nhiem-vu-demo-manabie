@@ -35,6 +35,7 @@ assert "CHỐT LẦN 1 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC" in app_source
 assert "CHÍNH LÀ 06 VIỆC CỦA 180 PHÚT SẮP TỚI" in app_source
 assert "Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?" in app_source
 assert "Mở mục 1.2" in app_source and "Nộp bài" in app_source
+assert "clip-path: inset(-.3em 100% -.24em -.08em)" in css_source, "Opening wipe must preserve Vietnamese diacritics"
 
 with sync_playwright() as p:
     chrome = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")

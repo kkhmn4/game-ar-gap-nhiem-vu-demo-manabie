@@ -2303,9 +2303,11 @@ button {
 .workshop-footer { animation: ppt-fade-up .7s cubic-bezier(.22,1,.36,1) 1.18s both; }
 
 @keyframes ppt-intro-header { from { opacity: 0; transform: translateY(-28px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes ppt-intro-kicker { from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-18px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); } }
-@keyframes ppt-intro-title-left { from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-90px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); } }
-@keyframes ppt-intro-title-right { from { opacity: 0; clip-path: inset(0 0 0 100%); transform: translateX(90px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); } }
+/* Negative vertical insets keep Vietnamese diacritics inside the wipe mask.
+   A zero inset clips glyphs such as Ắ/Ệ/Ộ to the line box during and after motion. */
+@keyframes ppt-intro-kicker { from { opacity: 0; clip-path: inset(-.32em 100% -.22em -.08em); transform: translateX(-18px); } to { opacity: 1; clip-path: inset(-.32em -.08em -.22em -.08em); transform: translateX(0); } }
+@keyframes ppt-intro-title-left { from { opacity: 0; clip-path: inset(-.3em 100% -.24em -.08em); transform: translateX(-90px); } to { opacity: 1; clip-path: inset(-.3em -.08em -.24em -.08em); transform: translateX(0); } }
+@keyframes ppt-intro-title-right { from { opacity: 0; clip-path: inset(-.3em -.08em -.24em 100%); transform: translateX(90px); } to { opacity: 1; clip-path: inset(-.3em -.08em -.24em -.08em); transform: translateX(0); } }
 @keyframes ppt-intro-rule { 0% { opacity: 0; filter: blur(8px); transform: translateY(38px) scale(.94); } 72% { opacity: 1; filter: blur(0); transform: translateY(-4px) scale(1.012); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); } }
 @keyframes ppt-intro-arena { from { opacity: 0; clip-path: inset(0 52% 0 52% round 24px); filter: blur(10px); transform: scale(.88); } to { opacity: 1; clip-path: inset(0 0 0 0 round 24px); filter: blur(0); transform: scale(1); } }
 @keyframes ppt-intro-photo { from { transform: scale(1.18); filter: saturate(.75) brightness(.72); } to { transform: scale(1); filter: saturate(.95) contrast(1.03); } }
