@@ -625,7 +625,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và nhà giáo">
             <figure className="is-ai" data-reveal data-motion="image-left">
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
-              <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Nhà giáo còn đọc lại và quyết định bản cuối.</p></figcaption>
+              <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Nhà giáo cần đọc lại và quyết định bản cuối.</p></figcaption>
             </figure>
             <figure className="is-teacher" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Nhà giáo trực tiếp dẫn dắt lớp học" />
