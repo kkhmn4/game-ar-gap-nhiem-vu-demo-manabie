@@ -530,7 +530,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
   };
 
   return (
-    <div className="debrief-v3" ref={scrollerRef}>
+    <div className="debrief-v3 force-motion" ref={scrollerRef}>
       <div className="debrief-atmosphere" aria-hidden="true" />
       {morphTarget && (
         <div className="debrief-morph-bridge" aria-hidden="true">
