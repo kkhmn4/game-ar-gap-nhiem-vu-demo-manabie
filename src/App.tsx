@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Game } from './components/Game';
+import { BRAND_MASCOTS, MANABIE_MARK } from './data/brand';
 import { audio } from './utils/audio';
 import { CORE_TASKS, Difficulty, GameState, TaskDef } from './utils/engine';
 
@@ -324,7 +325,7 @@ function Intro({
       <main className="workshop-shell" key={motionCycle}>
         <header className="workshop-header">
           <div className="workshop-brand">
-            <PinchMark live />
+            <img className="manabie-brand-mark" src={MANABIE_MARK} alt="" />
             <span>THCS ĐỒNG KHỞI</span>
             <i>MANABIE AI LAB</i>
           </div>
@@ -395,7 +396,7 @@ function Intro({
               <b>CỔNG HỌC LIỆU</b>
             </div>
             <div className="workshop-coach" aria-hidden="true">
-              <img src="/assets/mascot/02_giang_giai.png" alt="" />
+              <img src={BRAND_MASCOTS.explore} alt="" />
               <span>Đọc việc<br />Gọi tên nhóm<br />Rồi mới gắp</span>
             </div>
             <figure className="workshop-arena">
@@ -538,7 +539,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
         </div>
       )}
       <header className="debrief-header">
-          <div className="debrief-brand"><PinchMark live={state.isWin} /> THCS ĐỒNG KHỞI <i>MANABIE AI LAB</i></div>
+          <div className="debrief-brand"><img className="manabie-brand-mark" src={MANABIE_MARK} alt="" /> THCS ĐỒNG KHỞI <i>MANABIE AI LAB</i></div>
           <div className="debrief-header-tools">
             <button className="debrief-replay-motion" type="button" onClick={replayVisibleMotion}>
               <span>↻</span> XEM LẠI CHUYỂN ĐỘNG
@@ -597,7 +598,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <span className="debrief-confetti" aria-hidden="true">
               {Array.from({ length: 10 }, (_, index) => <i key={index} />)}
             </span>
-            <img src="/assets/mascot/09_hoan_thanh.png" alt="Mascot Manabie chúc mừng hoàn thành nhiệm vụ" />
+            <img src={BRAND_MASCOTS.action} alt="Mascot Manabie thể hiện tinh thần hoàn thành nhiệm vụ" />
             <div><b>{state.collected.length}/6</b><span>VIỆC AI CÓ THỂ<br />HỖ TRỢ DỰNG BẢN NHÁP</span></div>
           </aside>
 
@@ -614,7 +615,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
 
         <section className="debrief-chapter debrief-role" id="debrief-role">
           <header className="debrief-chapter-heading" data-reveal data-motion="title-wipe">
-            <img src="/assets/mascot/02_giang_giai.png" alt="Mascot Manabie đang giảng giải" />
+            <img src={BRAND_MASCOTS.inspect} alt="Mascot Manabie dùng kính lúp để kiểm tra căn cứ phân loại" />
             <div>
               <span>PHẦN CHỐT 01 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC</span>
               <h2>Ranh giới nằm ở <em>trách nhiệm về kết quả cuối cùng</em></h2>
@@ -644,7 +645,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <span className="debrief-confetti" aria-hidden="true">
               {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
             </span>
-            <img src="/assets/mascot/10_tong_ket.png" alt="Mascot Manabie tổng kết hoạt động" />
+            <img src={BRAND_MASCOTS.nurture} alt="Mascot Manabie chăm sóc mầm cây, biểu tượng cho trách nhiệm của nhà giáo" />
           </div>
 
           <div className="debrief-close-copy">

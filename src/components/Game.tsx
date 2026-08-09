@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import { FilesetResolver, HandLandmarker, HandLandmarkerResult } from '@mediapipe/tasks-vision';
+import { BRAND_MASCOTS } from '../data/brand';
 import { Difficulty, GameEngine, GameState, HandInput } from '../utils/engine';
 import { audio } from '../utils/audio';
 
@@ -47,6 +48,7 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
   const [isLoading, setIsLoading] = useState(!demoMode);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
+  const [mascotPhase, setMascotPhase] = useState<GameState['phase']>('CALIBRATE');
 
   useEffect(() => {
     let active = true;
@@ -56,6 +58,7 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
 
     engineRef.current = new GameEngine((state) => {
       const now = performance.now();
+      if (!lastPublishedState || state.phase !== lastPublishedState.phase) setMascotPhase(state.phase);
       const priorityUpdate = !lastPublishedState
         || state.score !== lastPublishedState.score
         || state.collected.length !== lastPublishedState.collected.length
@@ -287,6 +290,13 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
   };
 
   const usingMouse = demoMode || Boolean(cameraError);
+  const mascotGuide = mascotPhase === 'FINAL'
+    ? { src: BRAND_MASCOTS.action, text: 'Giữ chính xác đến cuối' }
+    : mascotPhase === 'CRISIS'
+      ? { src: BRAND_MASCOTS.inspect, text: 'Chậm lại, kiểm tra căn cứ' }
+      : mascotPhase === 'FLOW'
+        ? { src: BRAND_MASCOTS.explore, text: 'Đọc việc rồi mới gắp' }
+        : { src: BRAND_MASCOTS.phone, text: usingMouse ? 'Giữ chuột để gắp' : 'Đưa tay vào vùng chơi' };
 
   return (
     <div
@@ -308,8 +318,9 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       }}
     >
       {isLoading && (
-        <div className="absolute inset-0 z-50 grid place-items-center bg-[var(--ink)]/94 backdrop-blur-sm">
+        <div className="camera-loading absolute inset-0 z-50 grid place-items-center bg-[var(--ink)]/94 backdrop-blur-sm">
           <div className="max-w-md px-6 text-center">
+            <img className="camera-loading-mascot" src={BRAND_MASCOTS.phone} alt="" />
             <span className="pinch pinch-live text-[2.6rem] text-[var(--mint)]" aria-hidden="true" />
             <p className="t-title mt-7 text-[1.7rem] text-[var(--chalk)]">Đang bật camera</p>
             <p className="mt-3 text-[0.95rem] leading-6 text-[var(--dim)]">
@@ -323,14 +334,17 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       {cameraError && (
         <div
           role="status"
-          className="absolute left-1/2 top-5 z-40 w-[min(92vw,620px)] -translate-x-1/2 rounded-xl border px-5 py-4"
+          className="camera-error-card absolute left-1/2 top-5 z-40 w-[min(92vw,680px)] -translate-x-1/2 rounded-xl border px-5 py-4"
           style={{
             borderColor: 'color-mix(in oklab, var(--ember) 55%, transparent)',
             background: 'color-mix(in oklab, var(--ember) 14%, var(--ink))',
           }}
         >
-          <p className="t-eyebrow mb-1.5 text-[var(--ember)]">Đã chuyển sang chế độ chuột</p>
-          <p className="text-sm leading-6 text-[var(--chalk)]/85">{cameraError}</p>
+          <img className="camera-error-mascot" src={BRAND_MASCOTS.inspect} alt="" />
+          <div>
+            <p className="t-eyebrow mb-1.5 text-[var(--ember)]">Đã chuyển sang chế độ chuột</p>
+            <p className="text-sm leading-6 text-[var(--chalk)]/85">{cameraError}</p>
+          </div>
         </div>
       )}
 
@@ -342,6 +356,11 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       />
 
       <canvas ref={canvasRef} className="absolute inset-0 z-10 h-full w-full" style={{ touchAction: 'none' }} />
+
+      <div className={`game-mascot-guide phase-${mascotPhase.toLowerCase()}`} aria-live="polite">
+        <img src={mascotGuide.src} alt="" />
+        <span>{mascotGuide.text}</span>
+      </div>
 
       <div className="pointer-events-none absolute bottom-4 left-4 z-20 hidden max-w-[320px] sm:block">
         <p className="t-eyebrow mb-1.5 text-[var(--mint)]">

@@ -402,8 +402,50 @@ button {
 .game-hud.hud-hot .hud-combo-mini { animation:combo-charge .62s ease-in-out infinite alternate; }
 @keyframes objective-lock{40%{transform:scale(1.18);filter:brightness(1.8)}100%{transform:scale(1)}}@keyframes time-alert{to{opacity:.55}}
 
-@media(max-width:900px){.hud-compact{grid-template-columns:auto auto auto 1fr 36px 36px}.hud-signal{display:none}.hud-zone-label{display:none}.hud-objectives>div{width:31px}.hud-objectives span{font-size:0}.hud-objectives b{display:block;color:var(--dim);font:800 .65rem var(--data)}.hud-objectives>div.is-filled b{color:var(--mint)}}
-@media(max-width:620px){.hud-compact{grid-template-columns:auto auto auto 36px 36px;gap:.45rem}.hud-objective-zone{grid-column:1/-1;order:2}.hud-objectives{width:100%}.hud-objectives>div{flex:1;height:7px;border-radius:99px}.hud-objectives b{display:none}.hud-number{min-width:54px}.hud-clock b{font-size:1.45rem}.hud-number b{font-size:1.2rem}}
+/* Mascot đồng hành trong đấu trường: một trạng thái, một chỉ dẫn ngắn. */
+.camera-loading-mascot {
+  width: clamp(130px, 16vw, 210px);
+  height: auto;
+  margin: 0 auto -1.4rem;
+  filter: drop-shadow(0 20px 28px rgba(0,0,0,.34));
+  animation: mascot-device-ready 2.8s ease-in-out infinite;
+}
+.camera-error-card { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 1rem; }
+.camera-error-mascot { width: 76px; height: 68px; object-fit: contain; filter: drop-shadow(0 10px 16px rgba(0,0,0,.28)); }
+.game-mascot-guide {
+  position: absolute;
+  z-index: 22;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  grid-template-columns: 92px auto;
+  align-items: center;
+  max-width: 310px;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 26px rgba(0,0,0,.32));
+}
+.game-mascot-guide img { position: relative; z-index: 2; width: 98px; max-height: 104px; object-fit: contain; animation: game-mascot-float 3.8s ease-in-out infinite; }
+.game-mascot-guide span {
+  margin-left: -.25rem;
+  padding: .62rem .72rem .62rem .85rem;
+  border: 1px solid rgba(109,139,255,.36);
+  border-radius: 6px 13px 13px 13px;
+  color: #eef2ff;
+  background: rgba(6,15,38,.86);
+  box-shadow: inset 3px 0 var(--mint);
+  font-size: .63rem;
+  font-weight: 850;
+  line-height: 1.4;
+  letter-spacing: .025em;
+  backdrop-filter: blur(12px);
+}
+.game-mascot-guide.phase-crisis span { box-shadow: inset 3px 0 var(--ember); }
+.game-mascot-guide.phase-final span { box-shadow: inset 3px 0 var(--mascot-orange); }
+@keyframes mascot-device-ready { 50% { transform: translateY(-8px) rotate(1deg); } }
+@keyframes game-mascot-float { 50% { transform: translateY(-7px) rotate(-1.5deg); } }
+
+@media(max-width:900px){.hud-compact{grid-template-columns:auto auto auto 1fr 36px 36px}.hud-signal{display:none}.hud-zone-label{display:none}.hud-objectives>div{width:31px}.hud-objectives span{font-size:0}.hud-objectives b{display:block;color:var(--dim);font:800 .65rem var(--data)}.hud-objectives>div.is-filled b{color:var(--mint)}.game-mascot-guide{grid-template-columns:72px auto;max-width:250px}.game-mascot-guide img{width:76px;max-height:82px}.game-mascot-guide span{font-size:.56rem}}
+@media(max-width:620px){.hud-compact{grid-template-columns:auto auto auto 36px 36px;gap:.45rem}.hud-objective-zone{grid-column:1/-1;order:2}.hud-objectives{width:100%}.hud-objectives>div{flex:1;height:7px;border-radius:99px}.hud-objectives b{display:none}.hud-number{min-width:54px}.hud-clock b{font-size:1.45rem}.hud-number b{font-size:1.2rem}.game-mascot-guide{top:10px;right:10px;display:block}.game-mascot-guide img{width:62px;height:62px}.game-mascot-guide span{display:none}.camera-error-card{grid-template-columns:54px 1fr;gap:.7rem}.camera-error-mascot{width:54px;height:54px}}
 
 :focus-visible {
   outline: 3px solid var(--mint);
@@ -1356,6 +1398,7 @@ button {
 
 .workshop-brand { display: flex; align-items: center; gap: .72rem; color: #f3f6ff; }
 .workshop-brand .pinch { color: var(--mint); }
+.manabie-brand-mark { width: 28px; height: 28px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,.24)); }
 .workshop-brand i { padding-left: .72rem; border-left: 1px solid var(--wk-line); color: #8190b8; font-style: normal; }
 .workshop-status { display: flex; align-items: center; gap: .55rem; color: var(--mint); }
 .workshop-status b { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 14px var(--mint); animation: workshop-status 1.8s ease-in-out infinite; }
@@ -1669,6 +1712,7 @@ button {
   background: rgba(5, 10, 28, .78);
   backdrop-filter: blur(18px);
 }
+.debrief-brand .manabie-brand-mark { margin-right: .12rem; }
 .debrief-brand i { margin-left: .6rem; padding-left: .7rem; border-left: 1px solid rgba(135, 155, 213, .25); color: var(--manabie-blue-light); font-style: normal; }
 
 .debrief-chapter {
