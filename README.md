@@ -25,8 +25,15 @@ năm sản phẩm sau phải truy vết được về cùng yêu cầu cần đ�
 
 Màn hình tổng kết là một câu chuyện cuộn ba nhịp: kết quả 6/6 → tiêu chí phân
 loại → lời chốt của báo cáo viên. Hai nút hướng dẫn cuộn đưa giáo viên tới đúng
-phần tiếp theo; nội dung xuất hiện dần bằng `IntersectionObserver`. Nhịp cuối chỉ
-dẫn mở **Phiếu học tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
+phần tiếp theo; nội dung xuất hiện dần bằng các nhịp **Wipe · Fly In · Morph**
+giống một bản trình chiếu, có thứ tự rõ ràng sau mỗi lần bấm. `IntersectionObserver`
+vẫn kích hoạt các nhịp đó khi người xem tự cuộn. Nhịp cuối chỉ dẫn mở **Phiếu học
+tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
+
+Màn mở đầu dùng cùng ngôn ngữ chuyển động: tiêu đề vào từ hai phía, sân chơi mở
+từ tâm, mascot bật vào rồi trôi nhẹ, sáu ô nhiệm vụ xuất hiện nối tiếp. Các hiệu
+ứng chỉ dùng `transform`, `opacity` và `clip-path`, đồng thời tự tắt khi hệ điều
+hành bật `prefers-reduced-motion`.
 
 Ba mascot Manabie đảm nhiệm ba vai trò: hướng dẫn ở màn mở đầu, chúc mừng kết
 quả và tổng kết thông điệp. Toàn bộ 10 tư thế mascot nền trong suốt được lưu tại
@@ -173,6 +180,13 @@ làm được. Giỏ trên canvas cũng dâng mức chứa theo tiến độ.
 Khi bàn tay lại gần một quả cầu, một vòng nét đứt hiện dần quanh quả đó. Người
 chơi biết mình sắp gắp trúng cái gì trước khi chụm tay — không phải đoán.
 
+### Độ nét của quả cầu
+
+Canvas dùng kích thước logic đúng bằng vùng chơi và backing store theo mật độ
+điểm ảnh của thiết bị (giới hạn 1,5× để giữ hiệu năng). Không phóng một canvas
+độ phân giải thấp bằng CSS. Ảnh atlas được nội suy ở chế độ `high`, vì vậy biểu
+tượng, vòng kính và nhãn trên quả cầu giữ nét khi chiếu ở 1920×1080.
+
 ---
 
 ## Sửa nội dung nhiệm vụ
@@ -199,7 +213,7 @@ trống trường này thì biểu tượng của cả nhóm sẽ đổi hình t
 | Kiểm tra | Kết quả |
 | -------- | ------- |
 | `npm run lint` (tsc strict) | ✅ Sạch |
-| `npm run build` | ✅ JS 367.63 kB · gzip 115.11 kB · CSS 106.45 kB |
+| `npm run build` | ✅ JS 368.72 kB · gzip 115.41 kB · CSS 120.73 kB · gzip 30.45 kB |
 | Chạy thật chế độ chuột | ✅ Canvas, HUD, đồng hồ và nhịp rơi hoạt động |
 | Màn chốt 6/6 | ✅ Đủ 06 nhiệm vụ; ba chương cuộn và hai chỉ dẫn chuyển chương |
 | Lỗi console / lỗi trang | ✅ Không có |
@@ -208,7 +222,9 @@ trống trường này thì biểu tượng của cả nhóm sẽ đổi hình t
 | Bố cục desktop 1920×1080 | ✅ Không tràn ngang; màn chốt chủ động cuộn trên ba khung hình |
 | Bố cục mobile 390×844 | ✅ Không tràn ngang, cho phép cuộn dọc |
 | Hiệu ứng cuộn | ✅ Hai nút cuộn hoạt động; 3 cụm vai trò và 4 cụm tổng kết xuất hiện đúng điểm nhìn |
-| Độ mượt màn chơi | ✅ 108 mẫu, trung bình 16.65 ms; p95 16.8 ms |
+| Hiệu ứng trình chiếu | ✅ Mở đầu và kết thúc có Wipe · Fly In · Morph; ảnh giữa chuyển động đã được chụp kiểm tra |
+| Độ nét canvas | ✅ Không còn upscale 0,62×; mật độ backing/CSS đạt 1× ở máy kiểm thử và tự nâng tối đa 1,5× trên màn hình HiDPI |
+| Độ mượt màn chơi | ✅ 108 mẫu, trung bình 16.65 ms; p95 16.90 ms; cực đại 17.50 ms |
 | Tiếng Việt trên canvas | ✅ Hiển thị đúng, tự xuống dòng theo bề rộng quả |
 | Subset `vietnamese` được đóng gói | ✅ Đủ 5 trọng số Be Vietnam Pro trong `dist/` |
 | Dấu chồng ở cỡ tiêu đề 112 px | ✅ Không đè dòng trên (chụp màn hình 1920×1080) |

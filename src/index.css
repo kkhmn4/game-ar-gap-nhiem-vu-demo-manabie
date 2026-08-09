@@ -1593,3 +1593,304 @@ button {
   .debrief-v3 { scroll-behavior: auto; }
   .debrief-v3 [data-reveal] { opacity: 1; filter: none; transform: none; }
 }
+
+/* ================================================================== */
+/* PRESENTATION MOTION — MORPH / FLY IN / WIPE                        */
+/* ================================================================== */
+
+.debrief-v3 [data-motion='title-wipe'] {
+  opacity: 0;
+  clip-path: inset(0 100% 0 0 round 12px);
+  filter: blur(2px);
+  transform: translateY(22px);
+}
+.debrief-v3 [data-motion='title-wipe'].is-visible {
+  animation: ppt-title-wipe 1.05s cubic-bezier(.2,.84,.26,1) both;
+}
+
+.debrief-v3 [data-motion='fade-up'].is-visible {
+  animation: ppt-fade-up .82s cubic-bezier(.22,1,.36,1) .24s both;
+}
+
+.debrief-v3 [data-motion='card-left'],
+.debrief-v3 [data-motion='card-right'] {
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  filter: blur(8px);
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+}
+.debrief-v3 [data-motion='card-left'] { transform: translate3d(-110px, 18px, 0) rotateY(10deg); }
+.debrief-v3 [data-motion='card-right'] { transform: translate3d(110px, 18px, 0) rotateY(-10deg); }
+.debrief-v3 [data-motion='card-left'].is-visible,
+.debrief-v3 [data-motion='card-right'].is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0) rotateY(0);
+}
+.debrief-v3 [data-motion^='card-']::after {
+  content: '';
+  position: absolute;
+  inset: -40% auto -40% -35%;
+  width: 24%;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.52), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.debrief-v3 [data-motion^='card-'].is-visible::after {
+  animation: ppt-card-sheen .9s cubic-bezier(.22,1,.36,1) .62s both;
+}
+.debrief-v3 [data-motion^='card-'].is-visible > i {
+  animation: ppt-check-pop .72s cubic-bezier(.2,1.55,.42,1) both;
+  animation-delay: inherit;
+}
+
+.debrief-v3 [data-motion='mascot-pop'] {
+  opacity: 0;
+  filter: blur(12px);
+  transform: translateY(70px) scale(.52) rotate(-8deg);
+  transform-origin: 50% 82%;
+}
+.debrief-v3 [data-motion='mascot-pop'].is-visible {
+  animation: ppt-mascot-pop 1.22s cubic-bezier(.15,1.45,.35,1) .18s both;
+}
+
+.debrief-v3 [data-motion='image-left'],
+.debrief-v3 [data-motion='image-right'] {
+  opacity: 0;
+  filter: blur(10px);
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+.debrief-v3 [data-motion='image-left'] { transform: translateX(-170px) rotateY(10deg) scale(.92); transform-origin: right center; }
+.debrief-v3 [data-motion='image-right'] { transform: translateX(170px) rotateY(-10deg) scale(.92); transform-origin: left center; }
+.debrief-v3 [data-motion='image-left'].is-visible { animation: ppt-image-left 1.05s cubic-bezier(.16,1,.3,1) both; }
+.debrief-v3 [data-motion='image-right'].is-visible { animation: ppt-image-right 1.05s cubic-bezier(.16,1,.3,1) both; }
+.debrief-v3 [data-motion^='image-'] > img { transform: scale(1.16); }
+.debrief-v3 [data-motion^='image-'].is-visible > img { animation: ppt-photo-zoom 1.45s cubic-bezier(.2,.75,.25,1) .08s both; }
+.debrief-v3 [data-motion^='image-'] figcaption > * { opacity: 0; transform: translateY(22px); }
+.debrief-v3 [data-motion^='image-'].is-visible figcaption > span { animation: ppt-caption-rise .65s ease .48s both; }
+.debrief-v3 [data-motion^='image-'].is-visible figcaption > strong { animation: ppt-caption-rise .72s ease .62s both; }
+.debrief-v3 [data-motion^='image-'].is-visible figcaption > p { animation: ppt-caption-rise .72s ease .76s both; }
+
+.debrief-v3 [data-motion='mascot-celebrate'] {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(90px) scale(.48) rotate(7deg);
+  transform-origin: center bottom;
+}
+.debrief-v3 [data-motion='mascot-celebrate'].is-visible {
+  animation: ppt-mascot-celebrate 1.28s cubic-bezier(.16,1.52,.34,1) both;
+}
+
+.debrief-v3 [data-motion='quote-wipe'] {
+  position: relative;
+  overflow: hidden;
+  opacity: 1;
+  filter: none;
+  clip-path: inset(0 100% 0 0 round 0 16px 16px 0);
+  transform: none;
+}
+.debrief-v3 [data-motion='quote-wipe'].is-visible {
+  animation: ppt-quote-wipe 1.08s cubic-bezier(.22,1,.36,1) .1s both;
+}
+.debrief-v3 [data-motion='quote-wipe']::after {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  bottom: 0;
+  left: -28%;
+  width: 24%;
+  background: linear-gradient(90deg, transparent, rgba(128,148,255,.42), rgba(1,201,141,.45), transparent);
+  transform: skewX(-16deg);
+  pointer-events: none;
+}
+.debrief-v3 [data-motion='quote-wipe'].is-visible::after { animation: ppt-quote-light 1.15s ease .82s both; }
+.debrief-v3 [data-motion='quote-wipe'] > * { opacity: 0; transform: translateY(18px); }
+.debrief-v3 [data-motion='quote-wipe'].is-visible > span { animation: ppt-caption-rise .62s ease .7s both; }
+.debrief-v3 [data-motion='quote-wipe'].is-visible > p { animation: ppt-caption-rise .72s ease .88s both; }
+.debrief-v3 [data-motion='quote-wipe'].is-visible > strong { animation: ppt-key-message 1s cubic-bezier(.18,1.25,.32,1) 1.08s both; }
+
+.debrief-v3 [data-motion='rise-card'].is-visible {
+  animation: ppt-rise-card .86s cubic-bezier(.18,1.18,.3,1) .7s both;
+}
+
+.debrief-confetti {
+  position: absolute !important;
+  z-index: 6;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  pointer-events: none;
+}
+.debrief-confetti i {
+  --x: 0px;
+  --y: -180px;
+  --r: 180deg;
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  width: 10px;
+  height: 20px;
+  opacity: 0;
+  border-radius: 3px;
+  background: var(--manabie-green);
+}
+.is-visible > .debrief-confetti i { animation: ppt-confetti-burst 1.45s cubic-bezier(.12,.72,.25,1) .54s both; }
+.debrief-confetti i:nth-child(2n) { width: 13px; height: 13px; border-radius: 50%; background: var(--manabie-blue-light); }
+.debrief-confetti i:nth-child(3n) { background: var(--mascot-orange); }
+.debrief-confetti i:nth-child(4n) { width: 8px; height: 22px; background: var(--mascot-purple); }
+.debrief-confetti i:nth-child(1) { --x: -245px; --y: -170px; --r: -210deg; }
+.debrief-confetti i:nth-child(2) { --x: -170px; --y: -245px; --r: 260deg; }
+.debrief-confetti i:nth-child(3) { --x: -72px; --y: -285px; --r: -170deg; }
+.debrief-confetti i:nth-child(4) { --x: 58px; --y: -290px; --r: 230deg; }
+.debrief-confetti i:nth-child(5) { --x: 175px; --y: -238px; --r: -280deg; }
+.debrief-confetti i:nth-child(6) { --x: 248px; --y: -145px; --r: 190deg; }
+.debrief-confetti i:nth-child(7) { --x: -260px; --y: -42px; --r: 310deg; }
+.debrief-confetti i:nth-child(8) { --x: 275px; --y: -20px; --r: -240deg; }
+.debrief-confetti i:nth-child(9) { --x: -188px; --y: 70px; --r: 180deg; }
+.debrief-confetti i:nth-child(10) { --x: 194px; --y: 82px; --r: -220deg; }
+.debrief-confetti i:nth-child(11) { --x: -80px; --y: 124px; --r: 260deg; }
+.debrief-confetti i:nth-child(12) { --x: 92px; --y: 130px; --r: -190deg; }
+
+.debrief-role::after,
+.debrief-close::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 10%;
+  bottom: 10%;
+  width: 38%;
+  opacity: .18;
+  background: linear-gradient(110deg, transparent, rgba(128,148,255,.24), transparent);
+  filter: blur(30px);
+  transform: translateX(-180%) skewX(-18deg);
+}
+.debrief-role::after { left: 0; animation: ppt-stage-light 7s ease-in-out infinite; }
+.debrief-close::after { right: 0; animation: ppt-stage-light 8s ease-in-out -2s infinite reverse; }
+
+@keyframes ppt-title-wipe {
+  0% { opacity: 0; clip-path: inset(0 100% 0 0 round 12px); filter: blur(3px); transform: translateY(22px); }
+  58% { opacity: 1; }
+  100% { opacity: 1; clip-path: inset(0 0 0 0 round 12px); filter: blur(0); transform: translateY(0); }
+}
+@keyframes ppt-fade-up { from { opacity: 0; filter: blur(8px); transform: translateY(32px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+@keyframes ppt-card-sheen { 0% { left: -35%; opacity: 0; } 22% { opacity: .75; } 100% { left: 118%; opacity: 0; } }
+@keyframes ppt-check-pop { 0% { opacity: 0; transform: scale(.15) rotate(-160deg); } 64% { opacity: 1; transform: scale(1.24) rotate(8deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes ppt-mascot-pop { 0% { opacity: 0; filter: blur(12px); transform: translateY(70px) scale(.52) rotate(-8deg); } 66% { opacity: 1; filter: blur(0); transform: translateY(-12px) scale(1.06) rotate(2deg); } 82% { transform: translateY(5px) scale(.98) rotate(-1deg); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1) rotate(0); } }
+@keyframes ppt-image-left { from { opacity: 0; filter: blur(10px); transform: translateX(-170px) rotateY(10deg) scale(.92); } to { opacity: 1; filter: blur(0); transform: translateX(0) rotateY(0) scale(1); } }
+@keyframes ppt-image-right { from { opacity: 0; filter: blur(10px); transform: translateX(170px) rotateY(-10deg) scale(.92); } to { opacity: 1; filter: blur(0); transform: translateX(0) rotateY(0) scale(1); } }
+@keyframes ppt-photo-zoom { from { transform: scale(1.16); } to { transform: scale(1); } }
+@keyframes ppt-caption-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ppt-mascot-celebrate { 0% { opacity: 0; filter: blur(14px); transform: translateY(90px) scale(.48) rotate(7deg); } 58% { opacity: 1; filter: blur(0); transform: translateY(-18px) scale(1.08) rotate(-3deg); } 76% { transform: translateY(8px) scale(.97) rotate(1deg); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1) rotate(0); } }
+@keyframes ppt-quote-wipe { from { clip-path: inset(0 100% 0 0 round 0 16px 16px 0); } to { clip-path: inset(0 0 0 0 round 0 16px 16px 0); } }
+@keyframes ppt-quote-light { 0% { left: -28%; opacity: 0; } 22% { opacity: 1; } 100% { left: 118%; opacity: 0; } }
+@keyframes ppt-key-message { 0% { opacity: 0; transform: translateY(30px) scale(.9); letter-spacing: .02em; } 62% { opacity: 1; transform: translateY(-4px) scale(1.025); } 100% { opacity: 1; transform: translateY(0) scale(1); letter-spacing: -.035em; } }
+@keyframes ppt-rise-card { 0% { opacity: 0; filter: blur(8px); transform: translateY(60px) scale(.96); } 72% { opacity: 1; filter: blur(0); transform: translateY(-5px) scale(1.01); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); } }
+@keyframes ppt-confetti-burst { 0% { opacity: 0; transform: translate(0, 0) scale(.25) rotate(0); } 20% { opacity: 1; } 76% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1) rotate(var(--r)); } }
+@keyframes ppt-stage-light { 0%, 15% { transform: translateX(-180%) skewX(-18deg); opacity: 0; } 35% { opacity: .18; } 62%, 100% { transform: translateX(330%) skewX(-18deg); opacity: 0; } }
+
+@media (max-width: 720px) {
+  .debrief-v3 [data-motion='card-left'],
+  .debrief-v3 [data-motion='card-right'] { transform: translate3d(0, 55px, 0) rotateX(8deg); }
+  .debrief-v3 [data-motion='image-left'],
+  .debrief-v3 [data-motion='image-right'] { transform: translateY(90px) scale(.93); }
+  .debrief-confetti i:nth-child(n) { --x: calc(var(--x) * .62); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .debrief-v3 [data-motion],
+  .debrief-v3 [data-motion].is-visible,
+  .debrief-v3 [data-motion] > *,
+  .debrief-v3 [data-motion].is-visible > *,
+  .debrief-confetti i,
+  .debrief-role::after,
+  .debrief-close::after {
+    opacity: 1 !important;
+    clip-path: none !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  .debrief-confetti { display: none; }
+}
+
+/* ================================================================== */
+/* OPENING MOTION — SAME PRESENTATION LANGUAGE AS THE DEBRIEF         */
+/* ================================================================== */
+
+.workshop-header { animation: ppt-intro-header .72s cubic-bezier(.22,1,.36,1) both; }
+.workshop-kicker { animation: ppt-intro-kicker .72s cubic-bezier(.22,1,.36,1) .18s both; }
+.workshop-title > span:first-child { animation: ppt-intro-title-left .92s cubic-bezier(.16,1,.3,1) .28s both; }
+.workshop-title > span:last-child { animation: ppt-intro-title-right .98s cubic-bezier(.16,1,.3,1) .4s both; }
+.workshop-lead { animation: ppt-fade-up .76s cubic-bezier(.22,1,.36,1) .62s both; }
+.workshop-rule { animation: ppt-intro-rule .82s cubic-bezier(.18,1.18,.3,1) .76s both; }
+.workshop-settings { animation: ppt-fade-up .76s cubic-bezier(.22,1,.36,1) .9s both; }
+.workshop-arena { animation: ppt-intro-arena 1.18s cubic-bezier(.16,1,.3,1) .24s both; }
+.workshop-arena > img { animation: ppt-intro-photo 1.55s cubic-bezier(.2,.75,.25,1) .24s both; }
+.workshop-coach { animation: ppt-intro-coach 1.05s cubic-bezier(.16,1.45,.35,1) .82s both, manabie-coach-float 4.8s ease-in-out 1.9s infinite; }
+.workshop-mission { opacity: 0; transform: translateY(34px) rotateX(12deg); animation: ppt-intro-mission .7s cubic-bezier(.18,1.22,.3,1) both; }
+.workshop-mission:nth-child(1) { animation-delay: .92s; }
+.workshop-mission:nth-child(2) { animation-delay: 1s; }
+.workshop-mission:nth-child(3) { animation-delay: 1.08s; }
+.workshop-mission:nth-child(4) { animation-delay: 1.16s; }
+.workshop-mission:nth-child(5) { animation-delay: 1.24s; }
+.workshop-mission:nth-child(6) { animation-delay: 1.32s; }
+.workshop-mission::after {
+  content: '';
+  position: absolute;
+  inset: -45% auto -45% -32%;
+  width: 22%;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+.workshop-mission { position: relative; overflow: hidden; }
+.workshop-mission:nth-child(1)::after { animation: ppt-card-sheen .85s ease 1.42s both; }
+.workshop-mission:nth-child(2)::after { animation: ppt-card-sheen .85s ease 1.5s both; }
+.workshop-mission:nth-child(3)::after { animation: ppt-card-sheen .85s ease 1.58s both; }
+.workshop-mission:nth-child(4)::after { animation: ppt-card-sheen .85s ease 1.66s both; }
+.workshop-mission:nth-child(5)::after { animation: ppt-card-sheen .85s ease 1.74s both; }
+.workshop-mission:nth-child(6)::after { animation: ppt-card-sheen .85s ease 1.82s both; }
+.workshop-footer { animation: ppt-fade-up .7s cubic-bezier(.22,1,.36,1) 1.18s both; }
+
+@keyframes ppt-intro-header { from { opacity: 0; transform: translateY(-28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ppt-intro-kicker { from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-18px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); } }
+@keyframes ppt-intro-title-left { from { opacity: 0; clip-path: inset(0 100% 0 0); transform: translateX(-90px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); } }
+@keyframes ppt-intro-title-right { from { opacity: 0; clip-path: inset(0 0 0 100%); transform: translateX(90px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateX(0); } }
+@keyframes ppt-intro-rule { 0% { opacity: 0; filter: blur(8px); transform: translateY(38px) scale(.94); } 72% { opacity: 1; filter: blur(0); transform: translateY(-4px) scale(1.012); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); } }
+@keyframes ppt-intro-arena { from { opacity: 0; clip-path: inset(0 52% 0 52% round 24px); filter: blur(10px); transform: scale(.88); } to { opacity: 1; clip-path: inset(0 0 0 0 round 24px); filter: blur(0); transform: scale(1); } }
+@keyframes ppt-intro-photo { from { transform: scale(1.18); filter: saturate(.75) brightness(.72); } to { transform: scale(1); filter: saturate(.95) contrast(1.03); } }
+@keyframes ppt-intro-coach { 0% { opacity: 0; filter: blur(9px); transform: translateY(55px) scale(.45) rotate(-9deg); } 68% { opacity: 1; filter: blur(0); transform: translateY(-8px) scale(1.08) rotate(2deg); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1) rotate(0); } }
+@keyframes ppt-intro-mission { 0% { opacity: 0; filter: blur(7px); transform: translateY(34px) rotateX(12deg) scale(.94); } 74% { opacity: 1; filter: blur(0); transform: translateY(-4px) rotateX(0) scale(1.015); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) rotateX(0) scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .workshop-header,
+  .workshop-kicker,
+  .workshop-title > span,
+  .workshop-lead,
+  .workshop-rule,
+  .workshop-settings,
+  .workshop-arena,
+  .workshop-arena > img,
+  .workshop-coach,
+  .workshop-mission,
+  .workshop-mission::after,
+  .workshop-footer {
+    opacity: 1 !important;
+    clip-path: none !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

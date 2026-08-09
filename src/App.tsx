@@ -445,7 +445,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           }
         });
       },
-      { root, threshold: 0.16, rootMargin: '0px 0px -7% 0px' },
+      { root, threshold: 0.08, rootMargin: '0px 0px -4% 0px' },
     );
 
     revealItems.forEach((item) => observer.observe(item));
@@ -462,7 +462,24 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
     const root = scrollerRef.current;
     const section = root?.querySelector<HTMLElement>(`#${id}`);
     if (!root || !section) return;
-    root.scrollTo({ top: section.offsetTop - 62, behavior: 'smooth' });
+
+    // Compute the destination from the current viewport instead of relying on
+    // offsetTop (the chapters live inside a nested scrolling story). This keeps
+    // each chapter heading directly below the sticky header at every viewport.
+    const destination = root.scrollTop
+      + section.getBoundingClientRect().top
+      - root.getBoundingClientRect().top
+      - 70;
+    root.scrollTo({ top: destination, behavior: 'smooth' });
+
+    // Clicking a cue is an explicit "advance slide" action. Stage every beat in
+    // the destination chapter after the smooth scroll starts, like successive
+    // PowerPoint builds. IntersectionObserver remains the fallback for people
+    // who scroll manually.
+    const chapterBeats = Array.from(section.querySelectorAll<HTMLElement>('[data-reveal]'));
+    chapterBeats.forEach((beat, index) => {
+      window.setTimeout(() => beat.classList.add('is-visible'), 280 + index * 180);
+    });
   };
 
   return (
@@ -483,8 +500,8 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <p className={state.isWin ? 'debrief-kicker is-win' : 'debrief-kicker is-partial'}>
               {state.isWin ? 'ĐÃ PHÂN LOẠI ĐỦ 12 CÔNG VIỆC' : `ĐÃ TÌM ĐƯỢC ${state.collected.length}/6 VIỆC PHÙ HỢP`}
             </p>
-            <h1 data-reveal>AI DỰNG BẢN NHÁP.<br /><span>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI.</span></h1>
-            <p className="debrief-lead" data-reveal>06 việc vừa gắp chính là 06 sản phẩm sẽ thực hành đồng bộ trong Hoạt động 2.</p>
+            <h1 data-reveal data-motion="title-wipe">AI DỰNG BẢN NHÁP.<br /><span>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI.</span></h1>
+            <p className="debrief-lead" data-reveal data-motion="fade-up">06 việc vừa gắp chính là 06 sản phẩm sẽ thực hành đồng bộ trong Hoạt động 2.</p>
 
             <div className="debrief-missions" aria-label="Sáu việc AI có thể hỗ trợ dựng bản nháp">
               {CORE_TASKS.map((task, index) => (
@@ -492,7 +509,8 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
                   key={task.id}
                   data-found={collectedIds.has(task.id)}
                   data-reveal
-                  style={{ transitionDelay: `${120 + index * 75}ms` }}
+                  data-motion={index % 2 === 0 ? 'card-left' : 'card-right'}
+                  style={{ transitionDelay: `${120 + index * 75}ms`, animationDelay: `${120 + index * 75}ms` }}
                 >
                   <b>{String(index + 1).padStart(2, '0')}</b>
                   <span>{task.label}</span>
@@ -506,8 +524,11 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             )}
           </div>
 
-          <aside className="debrief-result-mascot" data-reveal>
+          <aside className="debrief-result-mascot" data-reveal data-motion="mascot-pop">
             <span className="debrief-result-ring" aria-hidden="true" />
+            <span className="debrief-confetti" aria-hidden="true">
+              {Array.from({ length: 10 }, (_, index) => <i key={index} />)}
+            </span>
             <img src="/assets/mascot/09_hoan_thanh.png" alt="Mascot Manabie chúc mừng hoàn thành nhiệm vụ" />
             <div><b>{state.collected.length}/6</b><span>VIỆC AI CÓ THỂ<br />HỖ TRỢ DỰNG BẢN NHÁP</span></div>
           </aside>
@@ -524,7 +545,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
         </section>
 
         <section className="debrief-chapter debrief-role" id="debrief-role">
-          <header className="debrief-chapter-heading" data-reveal>
+          <header className="debrief-chapter-heading" data-reveal data-motion="title-wipe">
             <img src="/assets/mascot/02_giang_giai.png" alt="Mascot Manabie đang giảng giải" />
             <div>
               <span>PHẦN CHỐT 01 · TIÊU CHÍ PHÂN LOẠI</span>
@@ -534,11 +555,11 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           </header>
 
           <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và nhà giáo">
-            <figure className="is-ai" data-reveal>
+            <figure className="is-ai" data-reveal data-motion="image-left">
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
               <figcaption><span>GIAO AI HỖ TRỢ</span><strong>Dựng bản nháp bằng chữ và hình</strong><p>Sản phẩm số có thể đọc lại, kiểm tra và chỉnh sửa.</p></figcaption>
             </figure>
-            <figure className="is-teacher" data-reveal style={{ transitionDelay: '140ms' }}>
+            <figure className="is-teacher" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Nhà giáo trực tiếp dẫn dắt lớp học" />
               <figcaption><span>NHÀ GIÁO GIỮ LẠI</span><strong>Kiểm tra, điều chỉnh và chịu trách nhiệm</strong><p>Việc cần hiện diện, thấu cảm hoặc thao tác vật lí.</p></figcaption>
             </figure>
@@ -550,20 +571,23 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
         </section>
 
         <section className="debrief-chapter debrief-close" id="debrief-close">
-          <div className="debrief-close-mascot" data-reveal>
+          <div className="debrief-close-mascot" data-reveal data-motion="mascot-celebrate">
             <span aria-hidden="true" />
+            <span className="debrief-confetti" aria-hidden="true">
+              {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
+            </span>
             <img src="/assets/mascot/10_tong_ket.png" alt="Mascot Manabie tổng kết hoạt động" />
           </div>
 
           <div className="debrief-close-copy">
-            <p className="debrief-kicker is-win" data-reveal>PHẦN CHỐT 02 · THÔNG ĐIỆP CẦN NHỚ</p>
-            <blockquote className="debrief-quote" data-reveal>
+            <p className="debrief-kicker is-win" data-reveal data-motion="fade-up">PHẦN CHỐT 02 · THÔNG ĐIỆP CẦN NHỚ</p>
+            <blockquote className="debrief-quote" data-reveal data-motion="quote-wipe">
               <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
               <p>“Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng.”</p>
               <strong>Trí tuệ nhân tạo dựng bản nháp.<br />Nhà giáo quyết định bản cuối.</strong>
             </blockquote>
 
-            <footer className="debrief-next" data-reveal>
+            <footer className="debrief-next" data-reveal data-motion="rise-card">
               <div><span>TIẾP THEO · PHIẾU HỌC TẬP SỐ 1</span><strong>Trả lời Câu hỏi 1: Nêu tiêu chí phân loại hai nhóm việc.</strong><p>Sau đó mở các bản sao học liệu trên Google Classroom để bắt đầu Hoạt động 2.</p></div>
               <button onClick={onReplay}><span>↻</span> Chơi lại</button>
             </footer>

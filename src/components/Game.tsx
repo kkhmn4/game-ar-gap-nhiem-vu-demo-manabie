@@ -4,12 +4,17 @@ import { FilesetResolver, HandLandmarker, HandLandmarkerResult } from '@mediapip
 import { Difficulty, GameEngine, GameState, HandInput } from '../utils/engine';
 import { audio } from '../utils/audio';
 
-const CANVAS_RENDER_SCALE = 0.62;
+/**
+ * Canvas dùng hệ tọa độ CSS để vật thể giữ nguyên kích thước và tốc độ, nhưng
+ * backing store được nhân theo mật độ điểm ảnh để atlas và chữ không bị trình
+ * duyệt phóng từ 62% lên toàn màn hình. Giới hạn 1.5 giữ cân bằng cho máy tập huấn.
+ */
+const MAX_CANVAS_PIXEL_RATIO = 1.5;
 const MAX_FRAME_DELTA_MS = 50;
 const MAX_PHYSICS_STEP_MS = 1000 / 120;
 const UI_STATE_PUBLISH_INTERVAL_MS = 80;
 /** Ngưỡng chụm ngón. Rộng hơn bản bắn của earth-defender-ar vì thao tác gắp cần dung sai lớn hơn. */
-const PINCH_DISTANCE = 42;
+const PINCH_DISTANCE = 66;
 const MAX_HANDS = 2;
 
 interface GameProps {
@@ -30,6 +35,7 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
   const lastHandDetectMsRef = useRef<number>(0);
   const cachedInputsRef = useRef<HandInput[]>([]);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const pixelRatioRef = useRef(1);
   const mouseRef = useRef({ x: 0, y: 0, down: false, inside: false });
   const finishedRef = useRef(false);
   const onGameOverRef = useRef(onGameOver);
@@ -158,20 +164,28 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       const frameDt = Math.max(0, Math.min(MAX_FRAME_DELTA_MS, currentTime - lastTime));
       lastTime = currentTime;
 
-      const targetWidth = Math.max(1, Math.floor(container.clientWidth * CANVAS_RENDER_SCALE));
-      const targetHeight = Math.max(1, Math.floor(container.clientHeight * CANVAS_RENDER_SCALE));
+      const logicalWidth = Math.max(1, container.clientWidth);
+      const logicalHeight = Math.max(1, container.clientHeight);
+      const pixelRatio = Math.min(MAX_CANVAS_PIXEL_RATIO, Math.max(1, window.devicePixelRatio || 1));
+      const targetWidth = Math.max(1, Math.floor(logicalWidth * pixelRatio));
+      const targetHeight = Math.max(1, Math.floor(logicalHeight * pixelRatio));
       if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
         canvas.width = targetWidth;
         canvas.height = targetHeight;
+        pixelRatioRef.current = pixelRatio;
         ctxRef.current = canvas.getContext('2d', { alpha: false, desynchronized: true } as CanvasRenderingContext2DSettings);
-        engine.resize(canvas.width, canvas.height);
+        if (ctxRef.current) {
+          ctxRef.current.imageSmoothingEnabled = true;
+          ctxRef.current.imageSmoothingQuality = 'high';
+        }
+        engine.resize(logicalWidth, logicalHeight);
       }
 
       const ctx = ctxRef.current || canvas.getContext('2d', { alpha: false, desynchronized: true } as CanvasRenderingContext2DSettings);
       if (!ctx) return;
       ctxRef.current = ctx;
 
-      const hands = demoMode || cameraError ? getMouseInputs() : getCameraInputs(canvas);
+      const hands = demoMode || cameraError ? getMouseInputs() : getCameraInputs();
       engine.updateHands(hands);
       // Chia khung hình chậm thành các bước nhỏ để trọng lực và quỹ đạo không bị
       // nhảy xa khi FPS dao động; canvas vẫn chỉ vẽ một lần cho mỗi frame màn hình.
@@ -181,7 +195,9 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
         engine.update(physicsDt);
         remainingDt -= physicsDt;
       }
+      ctx.setTransform(pixelRatioRef.current, 0, 0, pixelRatioRef.current, 0, 0);
       engine.draw(ctx);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
 
       requestRef.current = requestAnimationFrame(loop);
     };
@@ -189,10 +205,11 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
     requestRef.current = requestAnimationFrame(loop);
   };
 
-  const getCameraInputs = (canvas: HTMLCanvasElement): HandInput[] => {
+  const getCameraInputs = (): HandInput[] => {
     const video = videoRef.current;
     const landmarker = landmarkerRef.current;
-    if (!video || !landmarker || video.readyState < 2) return cachedInputsRef.current;
+    const container = containerRef.current;
+    if (!video || !landmarker || !container || video.readyState < 2) return cachedInputsRef.current;
 
     const now = performance.now();
     if (now - lastHandDetectMsRef.current < 33) return cachedInputsRef.current;
@@ -213,8 +230,8 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       return cachedInputsRef.current;
     }
 
-    const cw = canvas.width;
-    const ch = canvas.height;
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
     const inputs: HandInput[] = [];
 
     results.landmarks.forEach((landmarks, index) => {
@@ -264,8 +281,8 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
 
   const updateMouse = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    mouseRef.current.x = (event.clientX - rect.left) * CANVAS_RENDER_SCALE;
-    mouseRef.current.y = (event.clientY - rect.top) * CANVAS_RENDER_SCALE;
+    mouseRef.current.x = event.clientX - rect.left;
+    mouseRef.current.y = event.clientY - rect.top;
     mouseRef.current.inside = true;
   };
 

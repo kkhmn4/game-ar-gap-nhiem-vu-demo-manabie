@@ -255,7 +255,9 @@ export class GameEngine {
 
   private spawn() {
     const task = this.takeNextTask();
-    const r = Math.max(52, Math.min(86, this.width * 0.055));
+    // Bán kính tính theo tọa độ CSS. Giữ quả cầu đủ lớn để biểu tượng atlas và
+    // nhãn tiếng Việt đọc rõ trên máy chiếu sau khi canvas chuyển sang HiDPI.
+    const r = Math.max(66, Math.min(106, this.width * 0.055));
     const margin = r + 16;
     const x = margin + Math.random() * Math.max(1, this.width - margin * 2);
     this.balls.push({
