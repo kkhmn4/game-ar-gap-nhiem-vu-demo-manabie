@@ -316,7 +316,7 @@ function Intro({
           <div className="workshop-brand">
             <PinchMark live />
             <span>THCS ĐỒNG KHỞI</span>
-            <i>AI LEARNING LAB</i>
+            <i>MANABIE AI LAB</i>
           </div>
           <div className="workshop-status"><b /> SẴN SÀNG TRẢI NGHIỆM</div>
           <div className="workshop-code">TẬP HUẤN 10/8 · HĐ 01/03</div>
@@ -378,6 +378,10 @@ function Intro({
           </div>
 
           <div className="workshop-visual" aria-label="Minh họa đấu trường phân loại nhiệm vụ">
+            <div className="workshop-coach" aria-hidden="true">
+              <img src="/assets/mascot/02_giang_giai.png" alt="" />
+              <span>Đọc việc<br />Gọi tên nhóm<br />Rồi mới gắp</span>
+            </div>
             <figure className="workshop-arena">
               <img src="/assets/mission-arena-v2.png" alt="Không gian lớp học số với cổng nhiệm vụ và sáu học liệu" />
               <span className="workshop-arena-shade" aria-hidden="true" />
@@ -424,31 +428,72 @@ function Intro({
 function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }) {
   const collectedIds = new Set(state.collected.map((task) => task.id));
   const missed = CORE_TASKS.filter((task) => !collectedIds.has(task.id));
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root) return;
+
+    const revealItems = Array.from(root.querySelectorAll<HTMLElement>('[data-reveal]'));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { root, threshold: 0.16, rootMargin: '0px 0px -7% 0px' },
+    );
+
+    revealItems.forEach((item) => observer.observe(item));
+    const onScroll = () => setHasScrolled(root.scrollTop > 100);
+    root.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      root.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const root = scrollerRef.current;
+    const section = root?.querySelector<HTMLElement>(`#${id}`);
+    if (!root || !section) return;
+    root.scrollTo({ top: section.offsetTop - 62, behavior: 'smooth' });
+  };
 
   return (
-    <div className="debrief-v2">
+    <div className="debrief-v3" ref={scrollerRef}>
       <div className="debrief-atmosphere" aria-hidden="true" />
-      <main className="debrief-shell">
-        <header className="debrief-header">
-          <div className="debrief-brand"><PinchMark live={state.isWin} /> THCS ĐỒNG KHỞI · AI LEARNING LAB</div>
+      <header className="debrief-header">
+          <div className="debrief-brand"><PinchMark live={state.isWin} /> THCS ĐỒNG KHỞI <i>MANABIE AI LAB</i></div>
           <div className="debrief-stats" aria-label="Kết quả lượt chơi">
             <span><b>{state.collected.length}/6</b> việc phù hợp</span>
             <span><b>{state.wrongDrops}</b> lần thả nhầm</span>
             <span><b>{state.score}</b> điểm</span>
           </div>
-        </header>
+      </header>
 
-        <section className="debrief-hero">
-          <div className="debrief-copy">
+      <main className="debrief-story">
+        <section className="debrief-chapter debrief-result" id="debrief-result">
+          <div className="debrief-result-copy">
             <p className={state.isWin ? 'debrief-kicker is-win' : 'debrief-kicker is-partial'}>
               {state.isWin ? 'ĐÃ PHÂN LOẠI ĐỦ 12 CÔNG VIỆC' : `ĐÃ TÌM ĐƯỢC ${state.collected.length}/6 VIỆC PHÙ HỢP`}
             </p>
-            <h1>AI DỰNG BẢN NHÁP.<br /><span>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI.</span></h1>
-            <p className="debrief-lead">06 việc vừa gắp chính là 06 sản phẩm sẽ thực hành đồng bộ trong Hoạt động 2.</p>
+            <h1 data-reveal>AI DỰNG BẢN NHÁP.<br /><span>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI.</span></h1>
+            <p className="debrief-lead" data-reveal>06 việc vừa gắp chính là 06 sản phẩm sẽ thực hành đồng bộ trong Hoạt động 2.</p>
 
             <div className="debrief-missions" aria-label="Sáu việc AI có thể hỗ trợ dựng bản nháp">
               {CORE_TASKS.map((task, index) => (
-                <article key={task.id} data-found={collectedIds.has(task.id)}>
+                <article
+                  key={task.id}
+                  data-found={collectedIds.has(task.id)}
+                  data-reveal
+                  style={{ transitionDelay: `${120 + index * 75}ms` }}
+                >
                   <b>{String(index + 1).padStart(2, '0')}</b>
                   <span>{task.label}</span>
                   <i>{collectedIds.has(task.id) ? '✓' : '—'}</i>
@@ -461,33 +506,69 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             )}
           </div>
 
+          <aside className="debrief-result-mascot" data-reveal>
+            <span className="debrief-result-ring" aria-hidden="true" />
+            <img src="/assets/mascot/09_hoan_thanh.png" alt="Mascot Manabie chúc mừng hoàn thành nhiệm vụ" />
+            <div><b>{state.collected.length}/6</b><span>VIỆC AI CÓ THỂ<br />HỖ TRỢ DỰNG BẢN NHÁP</span></div>
+          </aside>
+
+          <button
+            className={`debrief-scroll-cue ${hasScrolled ? 'is-muted' : ''}`}
+            onClick={() => scrollToSection('debrief-role')}
+            aria-label="Cuộn xuống để xem tiêu chí phân loại"
+          >
+            <span>CUỘN XUỐNG ĐỂ ĐỌC PHẦN CHỐT</span>
+            <i aria-hidden="true"><b /></i>
+            <strong>↓</strong>
+          </button>
+        </section>
+
+        <section className="debrief-chapter debrief-role" id="debrief-role">
+          <header className="debrief-chapter-heading" data-reveal>
+            <img src="/assets/mascot/02_giang_giai.png" alt="Mascot Manabie đang giảng giải" />
+            <div>
+              <span>PHẦN CHỐT 01 · TIÊU CHÍ PHÂN LOẠI</span>
+              <h2>Ranh giới nằm ở <em>trách nhiệm cuối cùng</em></h2>
+              <p>Không phân loại theo việc khó hay dễ. Hãy nhìn vào dạng sản phẩm và vai trò của nhà giáo.</p>
+            </div>
+          </header>
+
           <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và nhà giáo">
-            <figure className="is-ai">
+            <figure className="is-ai" data-reveal>
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
-              <figcaption><span>TRÍ TUỆ NHÂN TẠO</span><strong>Dựng bản nháp bằng chữ và hình</strong></figcaption>
+              <figcaption><span>GIAO AI HỖ TRỢ</span><strong>Dựng bản nháp bằng chữ và hình</strong><p>Sản phẩm số có thể đọc lại, kiểm tra và chỉnh sửa.</p></figcaption>
             </figure>
-            <figure className="is-teacher">
+            <figure className="is-teacher" data-reveal style={{ transitionDelay: '140ms' }}>
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Nhà giáo trực tiếp dẫn dắt lớp học" />
-              <figcaption><span>NHÀ GIÁO</span><strong>Kiểm tra, điều chỉnh và chịu trách nhiệm</strong></figcaption>
+              <figcaption><span>NHÀ GIÁO GIỮ LẠI</span><strong>Kiểm tra, điều chỉnh và chịu trách nhiệm</strong><p>Việc cần hiện diện, thấu cảm hoặc thao tác vật lí.</p></figcaption>
             </figure>
           </div>
+
+          <button className="debrief-scroll-cue is-inline" onClick={() => scrollToSection('debrief-close')}>
+            <span>CUỘN TIẾP ĐỂ NHẬN LỜI CHỐT</span><i aria-hidden="true"><b /></i><strong>↓</strong>
+          </button>
         </section>
 
-        <section className="debrief-boundary" aria-label="Ranh giới phân loại">
-          <article className="is-ai"><span>GIAO AI HỖ TRỢ</span><strong>Sản phẩm là bản nháp số có thể kiểm tra và chỉnh sửa</strong></article>
-          <i>≠</i>
-          <article className="is-teacher"><span>NHÀ GIÁO GIỮ LẠI</span><strong>Việc cần hiện diện, thấu cảm hoặc thao tác vật lí</strong></article>
+        <section className="debrief-chapter debrief-close" id="debrief-close">
+          <div className="debrief-close-mascot" data-reveal>
+            <span aria-hidden="true" />
+            <img src="/assets/mascot/10_tong_ket.png" alt="Mascot Manabie tổng kết hoạt động" />
+          </div>
+
+          <div className="debrief-close-copy">
+            <p className="debrief-kicker is-win" data-reveal>PHẦN CHỐT 02 · THÔNG ĐIỆP CẦN NHỚ</p>
+            <blockquote className="debrief-quote" data-reveal>
+              <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
+              <p>“Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng.”</p>
+              <strong>Trí tuệ nhân tạo dựng bản nháp.<br />Nhà giáo quyết định bản cuối.</strong>
+            </blockquote>
+
+            <footer className="debrief-next" data-reveal>
+              <div><span>TIẾP THEO · PHIẾU HỌC TẬP SỐ 1</span><strong>Trả lời Câu hỏi 1: Nêu tiêu chí phân loại hai nhóm việc.</strong><p>Sau đó mở các bản sao học liệu trên Google Classroom để bắt đầu Hoạt động 2.</p></div>
+              <button onClick={onReplay}><span>↻</span> Chơi lại</button>
+            </footer>
+          </div>
         </section>
-
-        <blockquote className="debrief-quote">
-          <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
-          <p>“Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp, nhà giáo quyết định bản cuối.”</p>
-        </blockquote>
-
-        <footer className="debrief-next">
-          <div><span>TIẾP THEO · PHIẾU HỌC TẬP SỐ 1</span><strong>Trả lời Câu hỏi 1: Nêu tiêu chí phân loại hai nhóm việc.</strong></div>
-          <button onClick={onReplay}><span>↻</span> Chơi lại</button>
-        </footer>
       </main>
     </div>
   );

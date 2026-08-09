@@ -32,11 +32,15 @@ with sync_playwright() as p:
     page.on("requestfailed", lambda request: failed_requests.append(f"{request.url}:{request.failure}"))
     page.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
     page.locator(".workshop-stage").wait_for()
+    page.wait_for_timeout(500)
     page.screenshot(path=str(out / "intro-live.png"), full_page=False)
     motion = page.locator(".workshop-scanline").evaluate("el => getComputedStyle(el).animationName")
     orbs = page.locator(".workshop-mission").count()
     no_horizontal_overflow = page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     no_vertical_overflow = page.evaluate("document.documentElement.scrollHeight <= document.documentElement.clientHeight")
+    kicker_box = page.locator(".workshop-kicker").bounding_box()
+    title_box = page.locator(".workshop-title").bounding_box()
+    intro_text_separated = bool(kicker_box and title_box and title_box["y"] >= kicker_box["y"] + kicker_box["height"] - 1)
     selected_modes = []
     speed_buttons = page.locator(".workshop-speed button")
     for index, mode in enumerate(("easy", "normal", "hard")):
@@ -49,16 +53,41 @@ with sync_playwright() as p:
     mobile.locator(".workshop-stage").wait_for()
     mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
     mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    mobile_kicker = mobile.locator(".workshop-kicker").bounding_box()
+    mobile_title = mobile.locator(".workshop-title").bounding_box()
+    mobile_text_separated = bool(mobile_kicker and mobile_title and mobile_title["y"] >= mobile_kicker["y"] + mobile_kicker["height"] - 1)
     mobile.close()
 
     debrief = browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
     debrief.goto("http://127.0.0.1:4173/?qa=debrief", wait_until="domcontentloaded")
     debrief.get_by_text("AI DỰNG BẢN NHÁP.").wait_for()
+    debrief.wait_for_timeout(1100)
     debrief.screenshot(path=str(out / "debrief-live.png"), full_page=False)
     debrief_no_horizontal_overflow = debrief.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
-    debrief_no_vertical_overflow = debrief.evaluate("document.documentElement.scrollHeight <= document.documentElement.clientHeight")
+    debrief_has_vertical_scroll = debrief.locator(".debrief-v3").evaluate("el => el.scrollHeight > el.clientHeight * 2.2")
     debrief_missions = debrief.locator(".debrief-missions article").count()
+    scroll_cues = debrief.locator(".debrief-scroll-cue").count()
+    scroll_start = debrief.locator(".debrief-v3").evaluate("el => el.scrollTop")
+    debrief.locator("#debrief-result .debrief-scroll-cue").click()
+    debrief.wait_for_timeout(1200)
+    scroll_role = debrief.locator(".debrief-v3").evaluate("el => el.scrollTop")
+    role_reveals = debrief.locator("#debrief-role [data-reveal].is-visible").count()
+    debrief.screenshot(path=str(out / "debrief-role-live.png"), full_page=False)
+    debrief.locator("#debrief-role .debrief-scroll-cue").click()
+    debrief.wait_for_timeout(1200)
+    scroll_close = debrief.locator(".debrief-v3").evaluate("el => el.scrollTop")
+    close_reveals = debrief.locator("#debrief-close [data-reveal].is-visible").count()
+    debrief.screenshot(path=str(out / "debrief-close-live.png"), full_page=False)
     debrief.close()
+
+    assert intro_text_separated, "Desktop intro kicker overlaps the main title"
+    assert mobile_text_separated, "Mobile intro kicker overlaps the main title"
+    assert debrief_has_vertical_scroll, "Debrief must contain a deliberate multi-screen scroll story"
+    assert scroll_cues >= 2, "Debrief needs visible scroll guidance between chapters"
+    assert scroll_role > scroll_start + 300, "First scroll guide did not move to the role chapter"
+    assert scroll_close > scroll_role + 300, "Second scroll guide did not move to the closing chapter"
+    assert role_reveals >= 3, f"Role chapter reveal animation did not activate: {role_reveals}"
+    assert close_reveals >= 3, f"Closing chapter reveal animation did not activate: {close_reveals}"
 
     page.bring_to_front()
     page.get_by_role("button", name="Chơi bằng chuột").click()
@@ -98,10 +127,16 @@ with sync_playwright() as p:
         "animated_tasks": orbs,
         "desktop_no_horizontal_overflow": no_horizontal_overflow,
         "desktop_no_vertical_overflow": no_vertical_overflow,
+        "intro_text_separated": intro_text_separated,
         "mobile_no_horizontal_overflow": mobile_overflow,
+        "mobile_text_separated": mobile_text_separated,
         "debrief_no_horizontal_overflow": debrief_no_horizontal_overflow,
-        "debrief_no_vertical_overflow": debrief_no_vertical_overflow,
+        "debrief_has_three_screen_scroll": debrief_has_vertical_scroll,
         "debrief_missions": debrief_missions,
+        "scroll_cues": scroll_cues,
+        "scroll_positions": [scroll_start, scroll_role, scroll_close],
+        "role_reveals": role_reveals,
+        "close_reveals": close_reveals,
         "fall_speed_scale": fall_scale,
         "frame_stats": frame_stats,
         "selected_modes": selected_modes,

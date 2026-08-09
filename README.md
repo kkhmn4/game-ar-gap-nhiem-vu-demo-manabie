@@ -23,8 +23,14 @@ chữ với **06 việc của hoạt động 2**. Nhờ vậy báo cáo viên n�
 mà không cần thêm lời dẫn. Ma trận đặc tả theo đặc trưng môn học là nguồn chuẩn;
 năm sản phẩm sau phải truy vết được về cùng yêu cầu cần đạt.
 
-Màn hình tổng kết hiển thị sẵn lời chốt của mục d.1, hai tiêu chí phân loại và
-chỉ dẫn mở **Phiếu học tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
+Màn hình tổng kết là một câu chuyện cuộn ba nhịp: kết quả 6/6 → tiêu chí phân
+loại → lời chốt của báo cáo viên. Hai nút hướng dẫn cuộn đưa giáo viên tới đúng
+phần tiếp theo; nội dung xuất hiện dần bằng `IntersectionObserver`. Nhịp cuối chỉ
+dẫn mở **Phiếu học tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
+
+Ba mascot Manabie đảm nhiệm ba vai trò: hướng dẫn ở màn mở đầu, chúc mừng kết
+quả và tổng kết thông điệp. Toàn bộ 10 tư thế mascot nền trong suốt được lưu tại
+`public/assets/mascot/` để có thể dùng tiếp ở các nhịp tập huấn sau.
 
 ---
 
@@ -193,14 +199,16 @@ trống trường này thì biểu tượng của cả nhóm sẽ đổi hình t
 | Kiểm tra | Kết quả |
 | -------- | ------- |
 | `npm run lint` (tsc strict) | ✅ Sạch |
-| `npm run build` | ✅ JS 364.52 kB · gzip 114.23 kB · CSS 93.64 kB |
+| `npm run build` | ✅ JS 367.63 kB · gzip 115.11 kB · CSS 106.45 kB |
 | Chạy thật chế độ chuột | ✅ Canvas, HUD, đồng hồ và nhịp rơi hoạt động |
-| Màn chốt 6/6 | ✅ Dựng bằng trạng thái QA, đủ 06 nhiệm vụ và không phải cuộn ở 1920×1080 |
+| Màn chốt 6/6 | ✅ Đủ 06 nhiệm vụ; ba chương cuộn và hai chỉ dẫn chuyển chương |
 | Lỗi console / lỗi trang | ✅ Không có |
 | Tài nguyên ảnh / yêu cầu mạng thất bại | ✅ Không có |
-| Bố cục desktop 1920×1080 | ✅ Màn mở đầu và màn chốt không tràn ngang/dọc |
+| Chữ tiêu đề/kicker | ✅ Không giao nhau ở desktop 1920×1080 và mobile 390×844 |
+| Bố cục desktop 1920×1080 | ✅ Không tràn ngang; màn chốt chủ động cuộn trên ba khung hình |
 | Bố cục mobile 390×844 | ✅ Không tràn ngang, cho phép cuộn dọc |
-| Độ mượt màn chơi | ✅ 101 mẫu, trung bình 17.89 ms; p95 19 ms |
+| Hiệu ứng cuộn | ✅ Hai nút cuộn hoạt động; 3 cụm vai trò và 4 cụm tổng kết xuất hiện đúng điểm nhìn |
+| Độ mượt màn chơi | ✅ 108 mẫu, trung bình 16.65 ms; p95 16.8 ms |
 | Tiếng Việt trên canvas | ✅ Hiển thị đúng, tự xuống dòng theo bề rộng quả |
 | Subset `vietnamese` được đóng gói | ✅ Đủ 5 trọng số Be Vietnam Pro trong `dist/` |
 | Dấu chồng ở cỡ tiêu đề 112 px | ✅ Không đè dòng trên (chụp màn hình 1920×1080) |
