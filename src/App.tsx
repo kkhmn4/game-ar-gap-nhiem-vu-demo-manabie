@@ -419,7 +419,8 @@ function Intro({
               Phân loại 12 công việc để tìm đúng 6 việc trí tuệ nhân tạo có thể hỗ trợ quý thầy cô dựng bản nháp.
             </p>
 
-            <div className="workshop-rule" aria-label="Quy tắc phân loại">
+            <div className="workshop-rule lux-card" aria-label="Quy tắc phân loại">
+              <span className="lux-border" aria-hidden="true" />
               <article className="is-ai">
                 <span>GẮP VÀO CỔNG AI</span>
                 <strong>Kết quả là bản nháp số</strong>
@@ -433,7 +434,7 @@ function Intro({
 
             <div className="workshop-settings">
               <div className="workshop-speed">
-                <img className="workshop-speed-mascot" src={BRAND_MASCOTS.time} alt="" aria-hidden="true" />
+                <img className="workshop-speed-mascot lux-image" src={BRAND_MASCOTS.time} alt="" aria-hidden="true" />
                 <span>CHỌN NHỊP CHƠI</span>
                 <div>
                   {SPEEDS.map((speed) => (
@@ -472,10 +473,11 @@ function Intro({
               <b>CỔNG HỌC LIỆU</b>
             </div>
             <div className="workshop-coach" aria-hidden="true">
-              <img src={BRAND_MASCOTS.explore} alt="" />
+              <img className="lux-image" src={BRAND_MASCOTS.explore} alt="" />
               <span>Đọc việc<br />Gọi tên nhóm<br />Rồi mới gắp</span>
             </div>
-            <figure className="workshop-arena">
+            <figure className="workshop-arena lux-card">
+              <span className="lux-border" aria-hidden="true" />
               <img src="/assets/mission-arena-v2.png" alt="Không gian lớp học số với cổng nhiệm vụ và sáu học liệu" />
               <span className="workshop-arena-shade" aria-hidden="true" />
               <figcaption>
@@ -488,7 +490,8 @@ function Intro({
               {CORE_TASKS.map((task, index) => {
                 const icon = task.iconIndex ?? index;
                 return (
-                    <div className="workshop-mission" key={task.id}>
+                    <div className="workshop-mission lux-card" key={task.id}>
+                    <span className="lux-border" aria-hidden="true" />
                     <span
                       className="workshop-mission-icon"
                       style={{ backgroundPosition: `${(icon % 4) * 33.333}% ${Math.floor(icon / 4) * 33.333}%` }}
@@ -562,7 +565,12 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
     const section = root?.querySelector<HTMLElement>(`#${id}`);
     if (!root || !section) return;
 
-    setMorphTarget(id === 'debrief-role' ? 'AI HỖ TRỢ → QUÝ THẦY CÔ QUYẾT ĐỊNH' : 'CHỐT THÔNG ĐIỆP');
+    const morphLabels: Record<string, string> = {
+      'debrief-role': 'AI HỖ TRỢ → QUÝ THẦY CÔ QUYẾT ĐỊNH',
+      'debrief-close': 'CHỐT THÔNG ĐIỆP',
+      'debrief-next': 'PHẦN 3 → THỰC HIỆN TRÊN CLASSROOM',
+    };
+    setMorphTarget(morphLabels[id] ?? 'TIẾP TỤC');
     window.setTimeout(() => setMorphTarget(null), 1180);
 
     // Compute the destination from the current viewport instead of relying on
@@ -638,12 +646,14 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <div className="debrief-missions" aria-label="Sáu việc AI có thể hỗ trợ dựng bản nháp">
               {CORE_TASKS.map((task, index) => (
                 <article
+                  className="lux-card"
                   key={task.id}
                   data-found={collectedIds.has(task.id)}
                   data-reveal
                   data-motion={index % 2 === 0 ? 'card-left' : 'card-right'}
                   style={{ transitionDelay: `${120 + index * 75}ms`, animationDelay: `${120 + index * 75}ms` }}
                 >
+                  <span className="lux-border" aria-hidden="true" />
                   <b>{String(index + 1).padStart(2, '0')}</b>
                   <span>{task.label}</span>
                   <i>{collectedIds.has(task.id) ? '✓' : '—'}</i>
@@ -652,11 +662,12 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             </div>
 
             <div
-              className="debrief-result-sequence"
+              className="debrief-result-sequence lux-card"
               data-reveal
               data-motion="result-kinetic"
               aria-label="06 việc vừa gắp được chính là 06 việc của 180 phút sắp tới"
             >
+              <span className="lux-border" aria-hidden="true" />
               <span className="result-beat result-beat-one" aria-hidden="true">06 VIỆC VỪA GẮP ĐƯỢC</span>
               <span className="result-beat result-beat-two" aria-hidden="true">CHÍNH LÀ 06 VIỆC CỦA 180 PHÚT SẮP TỚI</span>
               <strong className="result-lock" aria-hidden="true">
@@ -674,7 +685,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <span className="debrief-confetti" aria-hidden="true">
               {Array.from({ length: 10 }, (_, index) => <i key={index} />)}
             </span>
-            <img src={BRAND_MASCOTS.action} alt="Mascot Manabie thể hiện tinh thần hoàn thành nhiệm vụ" />
+            <img className="lux-image" src={BRAND_MASCOTS.action} alt="Mascot Manabie thể hiện tinh thần hoàn thành nhiệm vụ" />
             <div><b>{state.collected.length}/6</b><span>VIỆC AI CÓ THỂ<br />HỖ TRỢ DỰNG BẢN NHÁP</span></div>
           </aside>
 
@@ -692,7 +703,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
 
         <section className="debrief-chapter debrief-role" id="debrief-role">
           <header className="debrief-chapter-heading" data-reveal data-motion="title-wipe">
-            <img src={BRAND_MASCOTS.inspect} alt="Mascot Manabie dùng kính lúp để kiểm tra căn cứ phân loại" />
+            <img className="lux-image" src={BRAND_MASCOTS.inspect} alt="Mascot Manabie dùng kính lúp để kiểm tra căn cứ phân loại" />
             <div>
               <span>PHẦN CHỐT 01 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC</span>
               <h2>Ranh giới nằm ở <em>trách nhiệm về kết quả cuối cùng</em></h2>
@@ -701,11 +712,13 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           </header>
 
           <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và quý thầy cô">
-            <figure className="is-ai" data-reveal data-motion="image-left">
+            <figure className="is-ai lux-card" data-reveal data-motion="image-left">
+              <span className="lux-border" aria-hidden="true" />
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
               <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Quý thầy cô cần đọc lại và quyết định bản cuối.</p></figcaption>
             </figure>
-            <figure className="is-teacher" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
+            <figure className="is-teacher lux-card" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
+              <span className="lux-border" aria-hidden="true" />
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Quý thầy cô trực tiếp dẫn dắt lớp học" />
               <figcaption><span>QUÝ THẦY CÔ GIỮ LẠI</span><strong>Việc cần hiện diện, cần thấu cảm</strong><p>Hoặc cần thao tác vật lí.</p></figcaption>
             </figure>
@@ -723,17 +736,18 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <span className="debrief-confetti" aria-hidden="true">
               {Array.from({ length: 12 }, (_, index) => <i key={index} />)}
             </span>
-            <img src={BRAND_MASCOTS.nurture} alt="Mascot Manabie chăm sóc mầm cây, biểu tượng cho trách nhiệm của quý thầy cô" />
+            <img className="lux-image" src={BRAND_MASCOTS.nurture} alt="Mascot Manabie chăm sóc mầm cây, biểu tượng cho trách nhiệm của quý thầy cô" />
           </div>
 
           <div className="debrief-close-copy">
             <p className="debrief-kicker is-win" data-reveal data-motion="fade-up">PHẦN CHỐT 02 · THÔNG ĐIỆP CẦN NHỚ</p>
             <div
-              className="debrief-close-kinetic"
+              className="debrief-close-kinetic lux-card"
               data-reveal
               data-motion="close-kinetic"
               aria-label="Việc khó chưa chắc là việc quý thầy cô giữ lại. Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp. Quý thầy cô quyết định bản cuối và cần chịu trách nhiệm về kết quả cuối cùng."
             >
+              <span className="lux-border" aria-hidden="true" />
               <div className="close-beat close-beat-one" aria-hidden="true">
                 VIỆC KHÓ CHƯA CHẮC LÀ<br /><strong>VIỆC QUÝ THẦY CÔ GIỮ LẠI</strong>
               </div>
@@ -759,19 +773,55 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               </blockquote>
             </div>
 
-            <footer className="debrief-next" data-reveal data-motion="rise-card">
-              <img className="debrief-next-mascot" src={BRAND_MASCOTS.submit} alt="" aria-hidden="true" />
+          </div>
+
+          <button className="debrief-scroll-cue is-inline" onClick={() => scrollToSection('debrief-next')}>
+            <img className="debrief-scroll-mascot" src={BRAND_MASCOTS.scroll} alt="" aria-hidden="true" />
+            <span>TIẾP TỤC ĐẾN PHẦN 3</span><i aria-hidden="true"><b /></i><strong>↓</strong>
+          </button>
+        </section>
+
+        <section className="debrief-chapter debrief-next-chapter" id="debrief-next">
+          <div className="debrief-next-heading" data-reveal data-motion="title-wipe">
+            <div className="debrief-next-number" aria-hidden="true"><span>03</span><i /></div>
+            <div>
+              <span>PHẦN 3 · THỰC HIỆN NHIỆM VỤ TIẾP THEO</span>
+              <h2>Mở Phiếu học tập số 1<br /><em>trên Google Classroom</em></h2>
+              <p>Hoàn thành câu hỏi sau phần chốt và nộp phiếu trước khi chuyển sang Hoạt động 2.</p>
+            </div>
+          </div>
+
+          <div className="debrief-next-workspace">
+            <aside className="debrief-next-visual lux-card" data-reveal data-motion="mascot-pop">
+              <span className="lux-border" aria-hidden="true" />
+              <span className="debrief-next-orbit" aria-hidden="true"><i /><i /><i /></span>
+              <img className="lux-image" src={BRAND_MASCOTS.submit} alt="Mascot Manabie hướng dẫn hoàn thành và nộp Phiếu học tập số 1" />
               <div>
-                <span>TIẾP THEO · PHẦN 1.2</span>
-                <strong>Mở Phiếu học tập số 1 trên Google Classroom</strong>
-                <p><b>Câu hỏi 1.</b> Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</p>
-                <p>Ghi câu trả lời theo suy nghĩ của quý thầy cô, sau đó đối chiếu với phần chốt của báo cáo viên.</p>
-                <ol aria-label="Thứ tự thao tác ở phần 1.2">
-                  <li>Mở mục 1.2</li><li>Mở Phiếu học tập số 1</li><li>Ghi câu trả lời</li><li>Nộp bài</li>
-                </ol>
+                <span>ĐÍCH ĐẾN</span>
+                <strong>Ghi câu trả lời và nộp Phiếu học tập số 1</strong>
               </div>
-              <button onClick={onReplay}><span>↻</span> Chơi lại</button>
-            </footer>
+            </aside>
+
+            <article className="debrief-next-panel lux-card" data-reveal data-motion="rise-card">
+              <span className="lux-border" aria-hidden="true" />
+              <div className="debrief-next-question">
+                <span>CÂU HỎI 1</span>
+                <strong>Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</strong>
+                <p>Ghi câu trả lời theo suy nghĩ của quý thầy cô, sau đó đối chiếu với phần chốt của báo cáo viên.</p>
+              </div>
+
+              <ol className="debrief-next-steps" aria-label="Thứ tự thao tác ở phần 1.2">
+                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>01</b><strong>Mở mục 1.2</strong><small>Trên Google Classroom</small></li>
+                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>02</b><strong>Mở Phiếu học tập số 1</strong><small>Đọc lại yêu cầu</small></li>
+                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>03</b><strong>Ghi câu trả lời</strong><small>Theo suy nghĩ của quý thầy cô</small></li>
+                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>04</b><strong>Nộp bài</strong><small>Hoàn tất phần 1.2</small></li>
+              </ol>
+
+              <footer className="debrief-next-actions">
+                <div><span>TRÌNH TỰ</span><strong>Mở mục 1.2 → Trả lời → Nộp bài</strong></div>
+                <button onClick={onReplay}><span>↻</span> Chơi lại</button>
+              </footer>
+            </article>
           </div>
         </section>
       </main>
