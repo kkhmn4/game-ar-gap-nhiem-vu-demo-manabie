@@ -53,7 +53,9 @@ export default function App() {
   const [final, setFinal] = useState<GameState>(qaDebrief ? QA_DEBRIEF : EMPTY);
   const [runKey, setRunKey] = useState(0);
   const pointerFrameRef = useRef<number | null>(null);
-  const lastReactiveRef = useRef<HTMLElement | null>(null);
+  const pointerHostRef = useRef<HTMLDivElement | null>(null);
+  const pointerTargetRef = useRef({ x: 0, y: 0 });
+  const pointerCurrentRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const intensity = state.phase === 'FINAL' ? 1 : state.phase === 'CRISIS' ? 0.72 : state.streak >= 3 ? 0.5 : 0.2;
@@ -75,47 +77,64 @@ export default function App() {
     setScreen('playing');
   };
 
+  const animatePointer = useCallback(function tick() {
+    const stage = pointerHostRef.current;
+    if (!stage) {
+      pointerFrameRef.current = null;
+      return;
+    }
+
+    const target = pointerTargetRef.current;
+    const current = pointerCurrentRef.current;
+    current.x += (target.x - current.x) * 0.16;
+    current.y += (target.y - current.y) * 0.16;
+
+    const width = Math.max(window.innerWidth, 1);
+    const height = Math.max(window.innerHeight, 1);
+    stage.style.setProperty('--cursor-x', `${current.x}px`);
+    stage.style.setProperty('--cursor-y', `${current.y}px`);
+    stage.style.setProperty('--cursor-nx', `${(current.x / width - 0.5) * 2}`);
+    stage.style.setProperty('--cursor-ny', `${(current.y / height - 0.5) * 2}`);
+
+    if (Math.abs(target.x - current.x) + Math.abs(target.y - current.y) > 0.35) {
+      pointerFrameRef.current = requestAnimationFrame(tick);
+      return;
+    }
+
+    current.x = target.x;
+    current.y = target.y;
+    pointerFrameRef.current = null;
+  }, []);
+
   const onPointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'touch') return;
     const stage = event.currentTarget;
-    const target = (event.target as HTMLElement).closest<HTMLElement>('[data-pointer-reactive]');
+    const firstMove = stage.dataset.pointerActive !== 'true';
     const { clientX, clientY } = event;
 
-    if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
-    pointerFrameRef.current = requestAnimationFrame(() => {
-      const width = Math.max(window.innerWidth, 1);
-      const height = Math.max(window.innerHeight, 1);
+    pointerHostRef.current = stage;
+    pointerTargetRef.current = { x: clientX, y: clientY };
+    stage.dataset.pointerActive = 'true';
+
+    if (firstMove) {
+      pointerCurrentRef.current = { x: clientX, y: clientY };
       stage.style.setProperty('--cursor-x', `${clientX}px`);
       stage.style.setProperty('--cursor-y', `${clientY}px`);
-      stage.style.setProperty('--cursor-nx', `${(clientX / width - 0.5) * 2}`);
-      stage.style.setProperty('--cursor-ny', `${(clientY / height - 0.5) * 2}`);
-      stage.dataset.pointerActive = 'true';
+    }
 
-      if (lastReactiveRef.current && lastReactiveRef.current !== target) {
-        lastReactiveRef.current.style.removeProperty('--pointer-shift-x');
-        lastReactiveRef.current.style.removeProperty('--pointer-shift-y');
-      }
-
-      if (target) {
-        const rect = target.getBoundingClientRect();
-        const localX = Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(rect.width, 1)));
-        const localY = Math.max(0, Math.min(1, (clientY - rect.top) / Math.max(rect.height, 1)));
-        target.style.setProperty('--pointer-shift-x', `${(localX - 0.5) * 7}px`);
-        target.style.setProperty('--pointer-shift-y', `${(localY - 0.5) * 7}px`);
-      }
-      lastReactiveRef.current = target;
-    });
-  }, []);
+    if (pointerFrameRef.current === null) {
+      pointerFrameRef.current = requestAnimationFrame(animatePointer);
+    }
+  }, [animatePointer]);
 
   const onPointerLeave = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     delete event.currentTarget.dataset.pointerActive;
-    lastReactiveRef.current?.style.removeProperty('--pointer-shift-x');
-    lastReactiveRef.current?.style.removeProperty('--pointer-shift-y');
-    lastReactiveRef.current = null;
   }, []);
 
   useEffect(() => () => {
     if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
+    pointerFrameRef.current = null;
+    pointerHostRef.current = null;
   }, []);
 
   return (
@@ -400,7 +419,7 @@ function Intro({
               Phân loại 12 công việc để tìm đúng 6 việc trí tuệ nhân tạo có thể hỗ trợ quý thầy cô dựng bản nháp.
             </p>
 
-            <div className="workshop-rule" aria-label="Quy tắc phân loại" data-pointer-reactive>
+            <div className="workshop-rule" aria-label="Quy tắc phân loại">
               <article className="is-ai">
                 <span>GẮP VÀO CỔNG AI</span>
                 <strong>Kết quả là bản nháp số</strong>
@@ -456,7 +475,7 @@ function Intro({
               <img src={BRAND_MASCOTS.explore} alt="" />
               <span>Đọc việc<br />Gọi tên nhóm<br />Rồi mới gắp</span>
             </div>
-            <figure className="workshop-arena" data-pointer-reactive>
+            <figure className="workshop-arena">
               <img src="/assets/mission-arena-v2.png" alt="Không gian lớp học số với cổng nhiệm vụ và sáu học liệu" />
               <span className="workshop-arena-shade" aria-hidden="true" />
               <figcaption>
@@ -469,7 +488,7 @@ function Intro({
               {CORE_TASKS.map((task, index) => {
                 const icon = task.iconIndex ?? index;
                 return (
-                    <div className="workshop-mission" key={task.id} data-pointer-reactive>
+                    <div className="workshop-mission" key={task.id}>
                     <span
                       className="workshop-mission-icon"
                       style={{ backgroundPosition: `${(icon % 4) * 33.333}% ${Math.floor(icon / 4) * 33.333}%` }}
@@ -620,7 +639,6 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               {CORE_TASKS.map((task, index) => (
                 <article
                   key={task.id}
-                  data-pointer-reactive
                   data-found={collectedIds.has(task.id)}
                   data-reveal
                   data-motion={index % 2 === 0 ? 'card-left' : 'card-right'}
@@ -683,11 +701,11 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           </header>
 
           <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và quý thầy cô">
-            <figure className="is-ai" data-reveal data-motion="image-left" data-pointer-reactive>
+            <figure className="is-ai" data-reveal data-motion="image-left">
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
               <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Quý thầy cô cần đọc lại và quyết định bản cuối.</p></figcaption>
             </figure>
-            <figure className="is-teacher" data-reveal data-motion="image-right" data-pointer-reactive style={{ transitionDelay: '140ms' }}>
+            <figure className="is-teacher" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Quý thầy cô trực tiếp dẫn dắt lớp học" />
               <figcaption><span>QUÝ THẦY CÔ GIỮ LẠI</span><strong>Việc cần hiện diện, cần thấu cảm</strong><p>Hoặc cần thao tác vật lí.</p></figcaption>
             </figure>
@@ -712,7 +730,6 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <p className="debrief-kicker is-win" data-reveal data-motion="fade-up">PHẦN CHỐT 02 · THÔNG ĐIỆP CẦN NHỚ</p>
             <div
               className="debrief-close-kinetic"
-              data-pointer-reactive
               data-reveal
               data-motion="close-kinetic"
               aria-label="Việc khó chưa chắc là việc quý thầy cô giữ lại. Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp. Quý thầy cô quyết định bản cuối và cần chịu trách nhiệm về kết quả cuối cùng."
@@ -742,7 +759,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               </blockquote>
             </div>
 
-            <footer className="debrief-next" data-reveal data-motion="rise-card" data-pointer-reactive>
+            <footer className="debrief-next" data-reveal data-motion="rise-card">
               <img className="debrief-next-mascot" src={BRAND_MASCOTS.submit} alt="" aria-hidden="true" />
               <div>
                 <span>TIẾP THEO · PHẦN 1.2</span>

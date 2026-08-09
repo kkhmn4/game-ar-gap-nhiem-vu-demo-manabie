@@ -411,8 +411,8 @@ button {
   animation: mascot-device-ready 2.8s ease-in-out infinite;
 }
 
-/* Pointer-responsive presentation layer. It never captures clicks and keeps
-   all movement within a few pixels so the teaching content remains stable. */
+/* Quiet pointer layer: content stays fixed while a restrained light and the
+   mascot follow with inertia. This keeps the interface calm and premium. */
 .app-pointer-stage {
   --cursor-x: 50vw;
   --cursor-y: 50vh;
@@ -427,62 +427,57 @@ button {
   z-index: 64;
   inset: 0;
   opacity: 0;
-  background: radial-gradient(260px circle at var(--cursor-x) var(--cursor-y), rgba(1,201,141,.105), rgba(60,90,210,.045) 42%, transparent 72%);
+  background: radial-gradient(180px circle at var(--cursor-x) var(--cursor-y), rgba(1,201,141,.055), rgba(60,90,210,.018) 45%, transparent 74%);
   pointer-events: none;
-  transition: opacity .22s ease;
-  mix-blend-mode: screen;
+  transition: opacity .38s ease;
 }
-.app-pointer-stage[data-pointer-active='true']::before { opacity: 1; }
+.app-pointer-stage[data-pointer-active='true']::before { opacity: .82; }
 .pointer-orbit {
   position: fixed;
   z-index: 140;
   top: var(--cursor-y);
   left: var(--cursor-x);
-  width: 30px;
-  height: 30px;
-  border: 1px solid rgba(1,201,141,.52);
+  width: 6px;
+  height: 6px;
+  border: 0;
   border-radius: 50%;
   opacity: 0;
-  box-shadow: 0 0 18px rgba(1,201,141,.2), inset 0 0 12px rgba(128,148,255,.18);
-  transform: translate(-50%, -50%) scale(.72);
+  background: rgba(224,255,248,.88);
+  box-shadow: 0 0 0 1px rgba(1,201,141,.24), 0 0 14px rgba(1,201,141,.24);
+  transform: translate(-50%, -50%);
   pointer-events: none;
-  transition: width .2s ease, height .2s ease, opacity .2s ease, border-color .2s ease;
+  transition: opacity .28s ease;
 }
-.app-pointer-stage[data-pointer-active='true'] .pointer-orbit { opacity: .78; animation: pointer-orbit-pulse 2.8s ease-in-out infinite; }
+.pointer-orbit::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border: 1px solid rgba(1,201,141,.16);
+  border-radius: 50%;
+}
+.app-pointer-stage[data-pointer-active='true'] .pointer-orbit { opacity: .68; }
 .pointer-mascot {
   position: fixed;
   z-index: 62;
-  right: 1.15rem;
-  bottom: 4.6rem;
-  width: clamp(86px, 7.2vw, 132px);
-  opacity: .88;
-  translate: calc(var(--cursor-nx) * 10px) calc(var(--cursor-ny) * 8px);
+  right: 1.35rem;
+  bottom: 5rem;
+  width: clamp(78px, 6vw, 108px);
+  opacity: .68;
+  translate: calc(var(--cursor-nx) * 3px) calc(var(--cursor-ny) * 2.5px);
   pointer-events: none;
-  transition: translate .22s cubic-bezier(.22,1,.36,1), opacity .25s ease;
+  transition: translate .4s cubic-bezier(.22,1,.36,1), opacity .35s ease;
 }
 .pointer-mascot::before {
   content: '';
   position: absolute;
   inset: 22% 10% 8%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(1,201,141,.24), rgba(60,90,210,.1) 48%, transparent 72%);
-  filter: blur(8px);
+  background: radial-gradient(circle, rgba(1,201,141,.12), rgba(60,90,210,.04) 48%, transparent 72%);
+  filter: blur(10px);
 }
-.pointer-mascot img { position: relative; width: 100%; height: auto; filter: drop-shadow(0 16px 22px rgba(0,0,0,.35)); animation: pointer-mascot-idle 4.8s ease-in-out infinite; }
-.app-pointer-stage[data-pointer-active='true'] .pointer-mascot { opacity: 1; }
-[data-pointer-reactive] {
-  --pointer-shift-x: 0px;
-  --pointer-shift-y: 0px;
-  outline: 1px solid transparent;
-  outline-offset: 3px;
-  will-change: translate;
-}
-[data-pointer-reactive]:hover {
-  translate: var(--pointer-shift-x) var(--pointer-shift-y);
-  outline-color: rgba(1,201,141,.2);
-}
-@keyframes pointer-orbit-pulse { 0%, 100% { scale: .84; opacity: .48; } 50% { scale: 1.08; opacity: .9; } }
-@keyframes pointer-mascot-idle { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-6px) rotate(1deg); } }
+.pointer-mascot img { position: relative; width: 100%; height: auto; filter: drop-shadow(0 12px 18px rgba(0,0,0,.28)); animation: pointer-mascot-idle 5.8s ease-in-out infinite; }
+.app-pointer-stage[data-pointer-active='true'] .pointer-mascot { opacity: .8; }
+@keyframes pointer-mascot-idle { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(.4deg); } }
 .camera-error-card { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 1rem; }
 .camera-error-mascot { width: 76px; height: 68px; object-fit: contain; filter: drop-shadow(0 10px 16px rgba(0,0,0,.28)); }
 .game-mascot-guide {
@@ -2291,7 +2286,6 @@ button {
   .app-pointer-stage::before,
   .pointer-orbit,
   .pointer-mascot { display: none; }
-  [data-pointer-reactive]:hover { translate: 0 0; outline-color: transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {
