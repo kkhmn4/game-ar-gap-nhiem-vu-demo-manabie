@@ -529,7 +529,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
   };
 
   return (
-    <div className="debrief-v3 force-motion" ref={scrollerRef}>
+    <div className="debrief-v3" ref={scrollerRef}>
       <div className="debrief-atmosphere" aria-hidden="true" />
       {morphTarget && (
         <div className="debrief-morph-bridge" aria-hidden="true">
@@ -555,10 +555,8 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
         <section className="debrief-chapter debrief-result" id="debrief-result">
           <div className="debrief-result-copy">
             <p className={state.isWin ? 'debrief-kicker is-win' : 'debrief-kicker is-partial'}>
-              {state.isWin ? 'ĐÃ PHÂN LOẠI ĐỦ 12 CÔNG VIỆC' : `ĐÃ TÌM ĐƯỢC ${state.collected.length}/6 VIỆC PHÙ HỢP`}
+              CHỐT LẦN 1 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC
             </p>
-            <h1 data-reveal data-motion="title-wipe">AI DỰNG BẢN NHÁP.<br /><span>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI.</span></h1>
-            <p className="debrief-lead" data-reveal data-motion="fade-up">06 việc vừa gắp chính là 06 sản phẩm sẽ thực hành đồng bộ trong Hoạt động 2.</p>
 
             <div className="debrief-missions" aria-label="Sáu việc AI có thể hỗ trợ dựng bản nháp">
               {CORE_TASKS.map((task, index) => (
@@ -574,6 +572,19 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
                   <i>{collectedIds.has(task.id) ? '✓' : '—'}</i>
                 </article>
               ))}
+            </div>
+
+            <div
+              className="debrief-result-sequence"
+              data-reveal
+              data-motion="result-kinetic"
+              aria-label="06 việc vừa gắp được chính là 06 việc của 180 phút sắp tới"
+            >
+              <span className="result-beat result-beat-one" aria-hidden="true">06 VIỆC VỪA GẮP ĐƯỢC</span>
+              <span className="result-beat result-beat-two" aria-hidden="true">CHÍNH LÀ 06 VIỆC CỦA 180 PHÚT SẮP TỚI</span>
+              <strong className="result-lock" aria-hidden="true">
+                <b>06 VIỆC VỪA GẮP ĐƯỢC</b><i>·</i><span>180 PHÚT SẮP TỚI</span>
+              </strong>
             </div>
 
             {missed.length > 0 && (
@@ -605,20 +616,20 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
           <header className="debrief-chapter-heading" data-reveal data-motion="title-wipe">
             <img src="/assets/mascot/02_giang_giai.png" alt="Mascot Manabie đang giảng giải" />
             <div>
-              <span>PHẦN CHỐT 01 · TIÊU CHÍ PHÂN LOẠI</span>
-              <h2>Ranh giới nằm ở <em>trách nhiệm cuối cùng</em></h2>
-              <p>Không phân loại theo việc khó hay dễ. Hãy nhìn vào dạng sản phẩm và vai trò của nhà giáo.</p>
+              <span>PHẦN CHỐT 01 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC</span>
+              <h2>Ranh giới nằm ở <em>trách nhiệm về kết quả cuối cùng</em></h2>
+              <p>Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</p>
             </div>
           </header>
 
           <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và nhà giáo">
             <figure className="is-ai" data-reveal data-motion="image-left">
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
-              <figcaption><span>GIAO AI HỖ TRỢ</span><strong>Dựng bản nháp bằng chữ và hình</strong><p>Sản phẩm số có thể đọc lại, kiểm tra và chỉnh sửa.</p></figcaption>
+              <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Nhà giáo còn đọc lại và quyết định bản cuối.</p></figcaption>
             </figure>
             <figure className="is-teacher" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Nhà giáo trực tiếp dẫn dắt lớp học" />
-              <figcaption><span>NHÀ GIÁO GIỮ LẠI</span><strong>Kiểm tra, điều chỉnh và chịu trách nhiệm</strong><p>Việc cần hiện diện, thấu cảm hoặc thao tác vật lí.</p></figcaption>
+              <figcaption><span>NHÀ GIÁO GIỮ LẠI</span><strong>Việc cần hiện diện, cần thấu cảm</strong><p>Hoặc cần thao tác vật lí.</p></figcaption>
             </figure>
           </div>
 
@@ -638,14 +649,47 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
 
           <div className="debrief-close-copy">
             <p className="debrief-kicker is-win" data-reveal data-motion="fade-up">PHẦN CHỐT 02 · THÔNG ĐIỆP CẦN NHỚ</p>
-            <blockquote className="debrief-quote" data-reveal data-motion="quote-wipe">
-              <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
-              <p>“Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng.”</p>
-              <strong>Trí tuệ nhân tạo dựng bản nháp.<br />Nhà giáo quyết định bản cuối.</strong>
-            </blockquote>
+            <div
+              className="debrief-close-kinetic"
+              data-reveal
+              data-motion="close-kinetic"
+              aria-label="Việc khó chưa chắc là việc nhà giáo giữ lại. Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp. Nhà giáo quyết định bản cuối."
+            >
+              <div className="close-beat close-beat-one" aria-hidden="true">
+                VIỆC KHÓ CHƯA CHẮC LÀ<br /><strong>VIỆC NHÀ GIÁO GIỮ LẠI</strong>
+              </div>
+              <div className="close-beat close-beat-two" aria-hidden="true">
+                RANH GIỚI KHÔNG NẰM Ở VIỆC<br /><strong><i>KHÓ</i> HAY <i>DỄ</i></strong>
+              </div>
+              <div className="close-beat close-beat-three" aria-hidden="true">
+                AI CHỊU TRÁCH NHIỆM VỀ<br /><strong>KẾT QUẢ CUỐI CÙNG?</strong>
+              </div>
+              <div className="close-beat close-beat-four" aria-hidden="true">
+                <strong>TRÍ TUỆ NHÂN TẠO DỰNG BẢN NHÁP</strong>
+                <i>→</i>
+                <b>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI</b>
+              </div>
+              <blockquote className="debrief-quote close-lock">
+                <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
+                <p>“Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng.”</p>
+                <div className="close-lock-points">
+                  <strong className="is-ai">Trí tuệ nhân tạo dựng bản nháp.</strong>
+                  <strong className="is-teacher">Nhà giáo quyết định bản cuối.</strong>
+                  <strong className="is-responsibility">Nhà giáo chịu trách nhiệm về kết quả cuối cùng.</strong>
+                </div>
+              </blockquote>
+            </div>
 
             <footer className="debrief-next" data-reveal data-motion="rise-card">
-              <div><span>TIẾP THEO · PHIẾU HỌC TẬP SỐ 1</span><strong>Trả lời Câu hỏi 1: Nêu tiêu chí phân loại hai nhóm việc.</strong><p>Sau đó mở các bản sao học liệu trên Google Classroom để bắt đầu Hoạt động 2.</p></div>
+              <div>
+                <span>TIẾP THEO · PHẦN 1.2</span>
+                <strong>Mở bản sao Phiếu học tập số 1 mang tên quý thầy cô</strong>
+                <p><b>Câu hỏi 1.</b> Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</p>
+                <p>Ghi câu trả lời theo trí nhớ của mình rồi đối chiếu với phần chốt của báo cáo viên.</p>
+                <ol aria-label="Thứ tự thao tác ở phần 1.2">
+                  <li>Mở mục 1.2</li><li>Mở bản sao phiếu</li><li>Ghi câu trả lời</li><li>Nộp bài</li>
+                </ol>
+              </div>
               <button onClick={onReplay}><span>↻</span> Chơi lại</button>
             </footer>
           </div>
