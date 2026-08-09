@@ -1009,6 +1009,278 @@ button {
 }
 
 /* ================================================================== */
+/* CINEMATIC MORPH — VISIBLE, REPLAYABLE PRESENTATION BUILDS          */
+/* ================================================================== */
+
+.workshop-replay-motion,
+.debrief-replay-motion {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border: 1px solid rgba(128, 148, 255, .38);
+  border-radius: 999px;
+  color: #dce4ff;
+  background: rgba(7, 15, 39, .82);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .24), inset 0 0 18px rgba(128, 148, 255, .06);
+  font: 850 .54rem/1 var(--display);
+  letter-spacing: .1em;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition: border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.workshop-replay-motion:hover,
+.debrief-replay-motion:hover { border-color: var(--manabie-green); color: #fff; transform: translateY(-2px); }
+.workshop-replay-motion span,
+.debrief-replay-motion span { color: var(--manabie-green); font: 900 .9rem/1 var(--data); }
+
+.workshop-replay-motion {
+  position: fixed;
+  z-index: 90;
+  top: 78px;
+  right: clamp(1.25rem, 4vw, 4.8rem);
+  padding: .62rem .82rem;
+}
+
+.workshop-morph-gate {
+  position: absolute;
+  z-index: 15;
+  inset: 0 0 52px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,.18) 0 2%, rgba(1,201,141,.22) 3% 8%, rgba(60,90,210,.2) 13%, rgba(5,10,28,.92) 38%, rgba(5,10,28,.38) 70%, transparent 100%);
+  box-shadow: inset 0 0 110px rgba(60,90,210,.28);
+  pointer-events: none;
+  animation: ppt-portal-shell 3.05s linear both;
+}
+.workshop-morph-gate::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(1, 201, 141, .92);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255,255,255,.95) 0 5%, rgba(1,201,141,.78) 8%, rgba(60,90,210,.7) 35%, rgba(5,10,28,.98) 72%);
+  box-shadow: 0 0 28px rgba(1,201,141,.8), 0 0 90px rgba(60,90,210,.76);
+  transform: translate(-50%, -50%);
+  animation: ppt-portal-morph 2.65s cubic-bezier(.18,.76,.2,1) .12s both;
+}
+.workshop-morph-gate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 34%, rgba(255,255,255,.22) 48%, rgba(1,201,141,.2) 52%, transparent 66%);
+  transform: translateX(-100%);
+  animation: ppt-portal-sweep .82s ease 1.92s both;
+}
+.workshop-morph-gate > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 92px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(128,148,255,.8);
+  border-radius: 50%;
+  box-shadow: inset 0 0 24px rgba(128,148,255,.28), 0 0 25px rgba(1,201,141,.2);
+  transform: translate(-50%, -50%) scale(.15);
+}
+.workshop-morph-gate .is-ring-one { animation: ppt-portal-ring 1.55s cubic-bezier(.16,.82,.28,1) .18s both; }
+.workshop-morph-gate .is-ring-two { animation: ppt-portal-ring 1.55s cubic-bezier(.16,.82,.28,1) .42s both reverse; }
+.workshop-morph-gate > i,
+.workshop-morph-gate > b {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  font-style: normal;
+  text-shadow: 0 0 26px rgba(1,201,141,.72);
+}
+.workshop-morph-gate > i {
+  color: #f6f8ff;
+  font: 950 clamp(2.8rem, 4vw, 4.8rem)/1 var(--display);
+  animation: ppt-portal-ai 1.18s ease .32s both;
+}
+.workshop-morph-gate > b {
+  margin-top: 72px;
+  color: var(--manabie-green);
+  font: 900 clamp(.62rem, .8vw, .88rem)/1 var(--display);
+  letter-spacing: .24em;
+  animation: ppt-portal-label 1.45s ease .48s both;
+}
+
+/* The first second establishes the portal; the interface then builds in a
+   deliberate order that remains visible from the back of a classroom. */
+.workshop-header { animation-delay: .18s; animation-duration: .82s; }
+.workshop-kicker { animation-delay: .54s; animation-duration: .82s; }
+.workshop-title > span:first-child { animation-delay: .72s; animation-duration: 1.05s; }
+.workshop-title > span:last-child { animation-delay: .98s; animation-duration: 1.08s; }
+.workshop-lead { animation-delay: 1.42s; animation-duration: .88s; }
+.workshop-rule { animation-delay: 1.66s; animation-duration: .92s; }
+.workshop-settings { animation-delay: 1.94s; animation-duration: .9s; }
+.workshop-arena { animation-delay: 1.18s; animation-duration: 1.42s; }
+.workshop-arena > img { animation-delay: 1.18s; animation-duration: 1.75s; }
+.workshop-coach { animation-delay: 2.08s, 3.25s; animation-duration: 1.16s, 4.8s; }
+.workshop-mission:nth-child(1) { animation-delay: 2.04s; }
+.workshop-mission:nth-child(2) { animation-delay: 2.16s; }
+.workshop-mission:nth-child(3) { animation-delay: 2.28s; }
+.workshop-mission:nth-child(4) { animation-delay: 2.40s; }
+.workshop-mission:nth-child(5) { animation-delay: 2.52s; }
+.workshop-mission:nth-child(6) { animation-delay: 2.64s; }
+.workshop-mission:nth-child(1)::after { animation-delay: 2.64s; }
+.workshop-mission:nth-child(2)::after { animation-delay: 2.76s; }
+.workshop-mission:nth-child(3)::after { animation-delay: 2.88s; }
+.workshop-mission:nth-child(4)::after { animation-delay: 3s; }
+.workshop-mission:nth-child(5)::after { animation-delay: 3.12s; }
+.workshop-mission:nth-child(6)::after { animation-delay: 3.24s; }
+.workshop-footer { animation-delay: 2.58s; animation-duration: .82s; }
+
+/* The training deck deliberately opts into motion. Some Windows/Chrome setups
+   report reduced motion globally; these explicit durations keep the presenter
+   replay controls functional instead of collapsing every build to 0.001 ms. */
+@media (prefers-reduced-motion: reduce) {
+  .workshop-stage.force-motion .workshop-morph-gate { animation-duration: 3.05s !important; }
+  .workshop-stage.force-motion .workshop-morph-gate::before { animation-duration: 2.65s !important; }
+  .workshop-stage.force-motion .workshop-morph-gate::after { animation-duration: .82s !important; }
+  .workshop-stage.force-motion .workshop-morph-gate > span { animation-duration: 1.55s !important; }
+  .workshop-stage.force-motion .workshop-morph-gate > i { animation-duration: 1.18s !important; }
+  .workshop-stage.force-motion .workshop-morph-gate > b { animation-duration: 1.45s !important; }
+  .workshop-stage.force-motion .workshop-header { animation-duration: .82s !important; }
+  .workshop-stage.force-motion .workshop-kicker { animation-duration: .82s !important; }
+  .workshop-stage.force-motion .workshop-title > span:first-child { animation-duration: 1.05s !important; }
+  .workshop-stage.force-motion .workshop-title > span:last-child { animation-duration: 1.08s !important; }
+  .workshop-stage.force-motion .workshop-lead { animation-duration: .88s !important; }
+  .workshop-stage.force-motion .workshop-rule { animation-duration: .92s !important; }
+  .workshop-stage.force-motion .workshop-settings { animation-duration: .9s !important; }
+  .workshop-stage.force-motion .workshop-arena { animation-duration: 1.42s !important; }
+  .workshop-stage.force-motion .workshop-arena > img { animation-duration: 1.75s !important; }
+  .workshop-stage.force-motion .workshop-coach { animation-duration: 1.16s, 4.8s !important; }
+  .workshop-stage.force-motion .workshop-mission { animation-duration: .7s !important; }
+  .workshop-stage.force-motion .workshop-mission::after { animation-duration: .85s !important; }
+  .workshop-stage.force-motion .workshop-footer { animation-duration: .82s !important; }
+
+  .debrief-v3.force-motion .debrief-morph-bridge { animation-duration: 1.16s !important; }
+  .debrief-v3.force-motion .debrief-morph-bridge::before { animation-duration: 1.08s !important; }
+  .debrief-v3.force-motion .debrief-morph-bridge span { animation-duration: .78s !important; }
+  .debrief-v3.force-motion .debrief-morph-bridge b { animation-duration: .9s !important; }
+  .debrief-v3.force-motion [data-motion='title-wipe'].is-visible { animation-duration: 1.05s !important; }
+  .debrief-v3.force-motion [data-motion='fade-up'].is-visible { animation-duration: .82s !important; }
+  .debrief-v3.force-motion [data-motion^='card-'] { transition-duration: .72s !important; }
+  .debrief-v3.force-motion [data-motion='mascot-pop'].is-visible,
+  .debrief-v3.force-motion [data-motion='mascot-celebrate'].is-visible { animation-duration: 1.24s !important; }
+  .debrief-v3.force-motion [data-motion^='image-'].is-visible { animation-duration: 1.05s !important; }
+  .debrief-v3.force-motion [data-motion='quote-wipe'].is-visible { animation-duration: 1.08s !important; }
+  .debrief-v3.force-motion [data-motion='rise-card'].is-visible { animation-duration: .86s !important; }
+  .debrief-v3.force-motion .debrief-confetti i { animation-duration: 1.45s !important; }
+}
+
+.debrief-header-tools { display: flex; align-items: center; gap: 1rem; }
+.debrief-replay-motion { padding: .54rem .72rem; }
+.debrief-morph-bridge {
+  position: fixed;
+  z-index: 120;
+  inset: 64px 0 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  animation: ppt-bridge-fade 1.16s ease both;
+}
+.debrief-morph-bridge::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 74px;
+  height: 74px;
+  border: 2px solid rgba(1,201,141,.9);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(1,201,141,.35), rgba(60,90,210,.35) 48%, rgba(5,10,28,.96) 70%);
+  box-shadow: 0 0 46px rgba(1,201,141,.62), 0 0 130px rgba(60,90,210,.62);
+  transform: translate(-50%, -50%);
+  animation: ppt-bridge-morph 1.08s cubic-bezier(.2,.8,.2,1) both;
+}
+.debrief-morph-bridge span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70vw;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--manabie-blue-light), var(--manabie-green), transparent);
+  box-shadow: 0 0 20px var(--manabie-green);
+  transform: translate(-50%, -50%) scaleX(0);
+  animation: ppt-bridge-line .78s ease .28s both;
+}
+.debrief-morph-bridge b {
+  position: relative;
+  z-index: 2;
+  padding: .8rem 1.1rem;
+  border: 1px solid rgba(128,148,255,.45);
+  border-radius: 999px;
+  color: #f4f7ff;
+  background: rgba(5,10,28,.78);
+  box-shadow: 0 16px 44px rgba(0,0,0,.38);
+  font: 900 clamp(.72rem, 1vw, 1rem)/1 var(--display);
+  letter-spacing: .14em;
+  animation: ppt-bridge-label .9s ease .16s both;
+}
+
+@keyframes ppt-portal-shell {
+  0%, 88% { visibility: visible; opacity: 1; }
+  100% { visibility: hidden; opacity: 0; }
+}
+@keyframes ppt-portal-morph {
+  0% { width: 24px; height: 24px; opacity: 0; border-radius: 50%; transform: translate(-50%, -50%) scale(.1) rotate(0); }
+  18% { width: 84px; height: 84px; opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(70deg); }
+  44% { width: 156px; height: 156px; border-radius: 50%; transform: translate(-50%, -50%) rotate(170deg); }
+  72% { width: 94%; height: 86%; opacity: .95; border-radius: 28px; transform: translate(-50%, -50%) rotate(180deg); }
+  100% { width: 100%; height: 100%; opacity: 0; border-radius: 24px; transform: translate(-50%, -50%) rotate(180deg); }
+}
+@keyframes ppt-portal-ring {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.15) rotate(0); }
+  32% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(5.8) rotate(210deg); }
+}
+@keyframes ppt-portal-ai {
+  0% { opacity: 0; filter: blur(12px); transform: scale(.2) rotate(-90deg); }
+  58% { opacity: 1; filter: blur(0); transform: scale(1.18) rotate(5deg); }
+  100% { opacity: 0; filter: blur(4px); transform: scale(.84) rotate(0); }
+}
+@keyframes ppt-portal-label {
+  0% { opacity: 0; clip-path: inset(0 50%); letter-spacing: .5em; }
+  38%, 72% { opacity: 1; clip-path: inset(0 0); letter-spacing: .24em; }
+  100% { opacity: 0; clip-path: inset(0 50%); }
+}
+@keyframes ppt-portal-sweep {
+  0% { opacity: 0; transform: translateX(-100%); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+@keyframes ppt-bridge-fade { 0%, 78% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes ppt-bridge-morph {
+  0% { width: 28px; height: 28px; opacity: 0; border-radius: 50%; transform: translate(-50%, -50%) scale(.2); }
+  28% { width: 110px; height: 110px; opacity: 1; border-radius: 50%; transform: translate(-50%, -50%) scale(1); }
+  72% { width: min(78vw, 1180px); height: 112px; opacity: .96; border-radius: 58px; }
+  100% { width: min(92vw, 1580px); height: 3px; opacity: 0; border-radius: 2px; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes ppt-bridge-line { 0% { opacity: 0; transform: translate(-50%, -50%) scaleX(0); } 45% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scaleX(1); } }
+@keyframes ppt-bridge-label { 0% { opacity: 0; filter: blur(10px); transform: scale(.7); } 42%, 76% { opacity: 1; filter: blur(0); transform: scale(1); } 100% { opacity: 0; transform: scale(1.06); } }
+
+@media (max-width: 720px) {
+  .workshop-replay-motion { top: 70px; right: 1rem; padding: .58rem; font-size: 0; }
+  .workshop-replay-motion span { font-size: .92rem; }
+  .debrief-header-tools { width: 100%; justify-content: space-between; }
+  .debrief-replay-motion { font-size: 0; }
+  .debrief-replay-motion span { font-size: .86rem; }
+  .workshop-morph-gate { bottom: 96px; }
+  .debrief-morph-bridge b { max-width: 86vw; text-align: center; line-height: 1.45; }
+}
+
+/* ================================================================== */
 /* WORKSHOP OPENING — THCS ĐỒNG KHỞI                                  */
 /* ================================================================== */
 
@@ -1282,9 +1554,9 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .workshop-stage *,
-  .workshop-stage *::before,
-  .workshop-stage *::after,
+  .workshop-stage:not(.force-motion) *,
+  .workshop-stage:not(.force-motion) *::before,
+  .workshop-stage:not(.force-motion) *::after,
   .debrief-v2 *,
   .debrief-v2 *::before,
   .debrief-v2 *::after {
@@ -1590,8 +1862,8 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .debrief-v3 { scroll-behavior: auto; }
-  .debrief-v3 [data-reveal] { opacity: 1; filter: none; transform: none; }
+  .debrief-v3:not(.force-motion) { scroll-behavior: auto; }
+  .debrief-v3:not(.force-motion) [data-reveal] { opacity: 1; filter: none; transform: none; }
 }
 
 /* ================================================================== */
@@ -1807,13 +2079,13 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .debrief-v3 [data-motion],
-  .debrief-v3 [data-motion].is-visible,
-  .debrief-v3 [data-motion] > *,
-  .debrief-v3 [data-motion].is-visible > *,
-  .debrief-confetti i,
-  .debrief-role::after,
-  .debrief-close::after {
+  .debrief-v3:not(.force-motion) [data-motion],
+  .debrief-v3:not(.force-motion) [data-motion].is-visible,
+  .debrief-v3:not(.force-motion) [data-motion] > *,
+  .debrief-v3:not(.force-motion) [data-motion].is-visible > *,
+  .debrief-v3:not(.force-motion) .debrief-confetti i,
+  .debrief-v3:not(.force-motion) .debrief-role::after,
+  .debrief-v3:not(.force-motion) .debrief-close::after {
     opacity: 1 !important;
     clip-path: none !important;
     filter: none !important;
@@ -1821,7 +2093,7 @@ button {
     animation: none !important;
     transition: none !important;
   }
-  .debrief-confetti { display: none; }
+  .debrief-v3:not(.force-motion) .debrief-confetti { display: none; }
 }
 
 /* ================================================================== */
@@ -1875,18 +2147,18 @@ button {
 @keyframes ppt-intro-mission { 0% { opacity: 0; filter: blur(7px); transform: translateY(34px) rotateX(12deg) scale(.94); } 74% { opacity: 1; filter: blur(0); transform: translateY(-4px) rotateX(0) scale(1.015); } 100% { opacity: 1; filter: blur(0); transform: translateY(0) rotateX(0) scale(1); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .workshop-header,
-  .workshop-kicker,
-  .workshop-title > span,
-  .workshop-lead,
-  .workshop-rule,
-  .workshop-settings,
-  .workshop-arena,
-  .workshop-arena > img,
-  .workshop-coach,
-  .workshop-mission,
-  .workshop-mission::after,
-  .workshop-footer {
+  .workshop-stage:not(.force-motion) .workshop-header,
+  .workshop-stage:not(.force-motion) .workshop-kicker,
+  .workshop-stage:not(.force-motion) .workshop-title > span,
+  .workshop-stage:not(.force-motion) .workshop-lead,
+  .workshop-stage:not(.force-motion) .workshop-rule,
+  .workshop-stage:not(.force-motion) .workshop-settings,
+  .workshop-stage:not(.force-motion) .workshop-arena,
+  .workshop-stage:not(.force-motion) .workshop-arena > img,
+  .workshop-stage:not(.force-motion) .workshop-coach,
+  .workshop-stage:not(.force-motion) .workshop-mission,
+  .workshop-stage:not(.force-motion) .workshop-mission::after,
+  .workshop-stage:not(.force-motion) .workshop-footer {
     opacity: 1 !important;
     clip-path: none !important;
     filter: none !important;
@@ -1894,3 +2166,29 @@ button {
     animation: none !important;
   }
 }
+
+/* This block intentionally stays last: it lengthens the original presentation
+   builds after all legacy animation shorthands have been declared. */
+.workshop-header { animation-delay: .18s; animation-duration: .82s; }
+.workshop-kicker { animation-delay: .54s; animation-duration: .82s; }
+.workshop-title > span:first-child { animation-delay: .72s; animation-duration: 1.05s; }
+.workshop-title > span:last-child { animation-delay: .98s; animation-duration: 1.08s; }
+.workshop-lead { animation-delay: 1.42s; animation-duration: .88s; }
+.workshop-rule { animation-delay: 1.66s; animation-duration: .92s; }
+.workshop-settings { animation-delay: 1.94s; animation-duration: .9s; }
+.workshop-arena { animation-delay: 1.18s; animation-duration: 1.42s; }
+.workshop-arena > img { animation-delay: 1.18s; animation-duration: 1.75s; }
+.workshop-coach { animation-delay: 2.08s, 3.25s; animation-duration: 1.16s, 4.8s; }
+.workshop-mission:nth-child(1) { animation-delay: 2.04s; }
+.workshop-mission:nth-child(2) { animation-delay: 2.16s; }
+.workshop-mission:nth-child(3) { animation-delay: 2.28s; }
+.workshop-mission:nth-child(4) { animation-delay: 2.40s; }
+.workshop-mission:nth-child(5) { animation-delay: 2.52s; }
+.workshop-mission:nth-child(6) { animation-delay: 2.64s; }
+.workshop-mission:nth-child(1)::after { animation-delay: 2.64s; }
+.workshop-mission:nth-child(2)::after { animation-delay: 2.76s; }
+.workshop-mission:nth-child(3)::after { animation-delay: 2.88s; }
+.workshop-mission:nth-child(4)::after { animation-delay: 3s; }
+.workshop-mission:nth-child(5)::after { animation-delay: 3.12s; }
+.workshop-mission:nth-child(6)::after { animation-delay: 3.24s; }
+.workshop-footer { animation-delay: 2.58s; animation-duration: .82s; }

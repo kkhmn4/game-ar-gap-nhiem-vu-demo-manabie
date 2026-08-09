@@ -289,6 +289,7 @@ function Intro({
   onStart: (mouse: boolean) => void;
 }) {
   const [launching, setLaunching] = useState(false);
+  const [motionCycle, setMotionCycle] = useState(0);
 
   const launch = (mouse: boolean) => {
     if (launching) return;
@@ -299,7 +300,7 @@ function Intro({
   };
 
   return (
-    <div className={`workshop-stage ${launching ? 'is-launching' : ''}`}>
+    <div className={`workshop-stage force-motion ${launching ? 'is-launching' : ''}`}>
       <div className="launch-wipe" aria-hidden="true">
         <span>KHỞI ĐỘNG HOẠT ĐỘNG 1</span>
       </div>
@@ -311,7 +312,16 @@ function Intro({
         <span className="workshop-glow workshop-glow-b" />
       </div>
 
-      <main className="workshop-shell">
+      <button
+        className="workshop-replay-motion"
+        type="button"
+        onClick={() => setMotionCycle((cycle) => cycle + 1)}
+        aria-label="Xem lại hiệu ứng mở đầu"
+      >
+        <span>↻</span> XEM LẠI HIỆU ỨNG
+      </button>
+
+      <main className="workshop-shell" key={motionCycle}>
         <header className="workshop-header">
           <div className="workshop-brand">
             <PinchMark live />
@@ -378,6 +388,12 @@ function Intro({
           </div>
 
           <div className="workshop-visual" aria-label="Minh họa đấu trường phân loại nhiệm vụ">
+            <div className="workshop-morph-gate" aria-hidden="true">
+              <span className="is-ring-one" />
+              <span className="is-ring-two" />
+              <i>AI</i>
+              <b>CỔNG HỌC LIỆU</b>
+            </div>
             <div className="workshop-coach" aria-hidden="true">
               <img src="/assets/mascot/02_giang_giai.png" alt="" />
               <span>Đọc việc<br />Gọi tên nhóm<br />Rồi mới gắp</span>
@@ -430,6 +446,12 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
   const missed = CORE_TASKS.filter((task) => !collectedIds.has(task.id));
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const [morphTarget, setMorphTarget] = useState<string | null>('KẾT QUẢ → THÔNG ĐIỆP');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMorphTarget(null), 1180);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -463,6 +485,9 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
     const section = root?.querySelector<HTMLElement>(`#${id}`);
     if (!root || !section) return;
 
+    setMorphTarget(id === 'debrief-role' ? 'AI HỖ TRỢ → NHÀ GIÁO QUYẾT ĐỊNH' : 'CHỐT THÔNG ĐIỆP');
+    window.setTimeout(() => setMorphTarget(null), 1180);
+
     // Compute the destination from the current viewport instead of relying on
     // offsetTop (the chapters live inside a nested scrolling story). This keeps
     // each chapter heading directly below the sticky header at every viewport.
@@ -482,15 +507,47 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
     });
   };
 
+  const replayVisibleMotion = () => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    setMorphTarget('XEM LẠI NHỊP TRÌNH CHIẾU');
+    window.setTimeout(() => setMorphTarget(null), 1180);
+    const chapters = Array.from(root.querySelectorAll<HTMLElement>('.debrief-chapter'));
+    if (chapters.length === 0) return;
+    const active = chapters.reduce((nearest, chapter) => {
+      const chapterDistance = Math.abs(chapter.getBoundingClientRect().top - 76);
+      const nearestDistance = Math.abs(nearest.getBoundingClientRect().top - 76);
+      return chapterDistance < nearestDistance ? chapter : nearest;
+    }, chapters[0]);
+
+    const beats = Array.from(active.querySelectorAll<HTMLElement>('[data-reveal]'));
+    beats.forEach((beat) => beat.classList.remove('is-visible'));
+    void active.offsetWidth;
+    beats.forEach((beat, index) => {
+      window.setTimeout(() => beat.classList.add('is-visible'), 120 + index * 180);
+    });
+  };
+
   return (
-    <div className="debrief-v3" ref={scrollerRef}>
+    <div className="debrief-v3 force-motion" ref={scrollerRef}>
       <div className="debrief-atmosphere" aria-hidden="true" />
+      {morphTarget && (
+        <div className="debrief-morph-bridge" aria-hidden="true">
+          <span />
+          <b>{morphTarget}</b>
+        </div>
+      )}
       <header className="debrief-header">
           <div className="debrief-brand"><PinchMark live={state.isWin} /> THCS ĐỒNG KHỞI <i>MANABIE AI LAB</i></div>
-          <div className="debrief-stats" aria-label="Kết quả lượt chơi">
-            <span><b>{state.collected.length}/6</b> việc phù hợp</span>
-            <span><b>{state.wrongDrops}</b> lần thả nhầm</span>
-            <span><b>{state.score}</b> điểm</span>
+          <div className="debrief-header-tools">
+            <button className="debrief-replay-motion" type="button" onClick={replayVisibleMotion}>
+              <span>↻</span> XEM LẠI CHUYỂN ĐỘNG
+            </button>
+            <div className="debrief-stats" aria-label="Kết quả lượt chơi">
+              <span><b>{state.collected.length}/6</b> việc phù hợp</span>
+              <span><b>{state.wrongDrops}</b> lần thả nhầm</span>
+              <span><b>{state.score}</b> điểm</span>
+            </div>
           </div>
       </header>
 

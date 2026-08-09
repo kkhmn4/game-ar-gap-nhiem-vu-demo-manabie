@@ -10,6 +10,8 @@ failed_requests = []
 
 engine_source = Path("src/utils/engine.ts").read_text(encoding="utf-8")
 game_source = Path("src/components/Game.tsx").read_text(encoding="utf-8")
+app_source = Path("src/App.tsx").read_text(encoding="utf-8")
+css_source = Path("src/index.css").read_text(encoding="utf-8")
 fall_scale_match = re.search(r"const FALL_SPEED_SCALE = ([0-9.]+);", engine_source)
 fall_scale = float(fall_scale_match.group(1)) if fall_scale_match else None
 assert fall_scale == 0.35, f"Unexpected fall speed scale: {fall_scale}"
@@ -22,6 +24,11 @@ assert "MAX_CANVAS_PIXEL_RATIO" in game_source, "Canvas must render at device-aw
 assert "imageSmoothingQuality = 'high'" in game_source, "Atlas scaling must use high-quality smoothing"
 assert "ctx.setTransform(pixelRatioRef.current" in game_source, "Canvas must map HiDPI backing pixels to CSS coordinates"
 assert "CANVAS_RENDER_SCALE" not in game_source, "Low-resolution canvas upscaling makes falling orbs blurry"
+assert "workshop-replay-motion" in app_source, "Opening motion must be replayable without reloading"
+assert "workshop-morph-gate" in app_source, "Opening needs a visible AI portal morph"
+assert "debrief-replay-motion" in app_source, "Debrief motion must be replayable"
+assert "debrief-morph-bridge" in app_source, "Debrief needs a visible chapter-transition morph"
+assert ".workshop-stage.force-motion .workshop-morph-gate" in css_source, "Presenter motion must not collapse to 0.001 ms"
 
 with sync_playwright() as p:
     chrome = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -41,7 +48,12 @@ with sync_playwright() as p:
     motion = page.locator(".workshop-scanline").evaluate("el => getComputedStyle(el).animationName")
     intro_title_motion = page.locator(".workshop-title > span").first.evaluate("el => getComputedStyle(el).animationName")
     intro_arena_motion = page.locator(".workshop-arena").evaluate("el => getComputedStyle(el).animationName")
-    page.wait_for_timeout(1800)
+    page.locator(".workshop-replay-motion").click()
+    page.wait_for_timeout(650)
+    portal_duration = page.locator(".workshop-morph-gate").evaluate("el => getComputedStyle(el).animationDuration")
+    portal_visibility = page.locator(".workshop-morph-gate").evaluate("el => getComputedStyle(el).visibility")
+    page.screenshot(path=str(out / "intro-morph-clicked.png"), full_page=False)
+    page.wait_for_timeout(2850)
     page.screenshot(path=str(out / "intro-live.png"), full_page=False)
     orbs = page.locator(".workshop-mission").count()
     no_horizontal_overflow = page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
@@ -59,7 +71,7 @@ with sync_playwright() as p:
     mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
     mobile.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
     mobile.locator(".workshop-stage").wait_for()
-    mobile.wait_for_timeout(2200)
+    mobile.wait_for_timeout(3500)
     mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
     mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     mobile_kicker = mobile.locator(".workshop-kicker").bounding_box()
@@ -111,6 +123,8 @@ with sync_playwright() as p:
     assert role_image_motion == "ppt-image-left", f"Role image motion missing: {role_image_motion}"
     assert close_quote_motion == "ppt-quote-wipe", f"Closing quote motion missing: {close_quote_motion}"
     assert close_mascot_motion == "ppt-mascot-celebrate", f"Closing mascot motion missing: {close_mascot_motion}"
+    assert portal_duration == "3.05s", f"Opening portal morph was shortened or disabled: {portal_duration}"
+    assert portal_visibility == "visible", f"Opening portal morph is not visible after replay: {portal_visibility}"
 
     page.bring_to_front()
     page.get_by_role("button", name="Chơi bằng chuột").click()
@@ -150,6 +164,7 @@ with sync_playwright() as p:
     print({
         "intro_animation": motion,
         "intro_presentation_motion": [intro_title_motion, intro_arena_motion],
+        "intro_portal_morph": [portal_duration, portal_visibility],
         "animated_tasks": orbs,
         "desktop_no_horizontal_overflow": no_horizontal_overflow,
         "desktop_no_vertical_overflow": no_vertical_overflow,
