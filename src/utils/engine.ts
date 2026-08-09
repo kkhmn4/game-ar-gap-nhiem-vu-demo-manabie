@@ -861,6 +861,7 @@ export class GameEngine {
   private drawBall(ctx: CanvasRenderingContext2D, ball: Ball) {
     const held = ball.grabbedBy !== null;
     const taskIndex = Math.max(0, ALL_TASKS.findIndex((task) => task.id === ball.task.id));
+    const iconIndex = ball.task.iconIndex ?? taskIndex;
     const accents = ['#6D8BFF', '#AF7CFF', '#32C8E6', '#FF8A5B', '#F4BE4F', '#4ED6AD', '#F178B6'];
     const accent = accents[taskIndex % accents.length];
     const driftX = Math.sin(this.elapsedMs / 720 + ball.seed) * 1.6;
@@ -930,8 +931,8 @@ export class GameEngine {
     if (this.iconAtlas.complete && this.iconAtlas.naturalWidth > 0) {
       const cellW = this.iconAtlas.naturalWidth / 4;
       const cellH = this.iconAtlas.naturalHeight / 4;
-      const col = taskIndex % 4;
-      const row = Math.floor(taskIndex / 4);
+      const col = iconIndex % 4;
+      const row = Math.floor(iconIndex / 4);
       ctx.save();
       ctx.beginPath();
       ctx.arc(0, -ball.r * .22, ball.r * .72, 0, Math.PI * 2);

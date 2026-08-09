@@ -12,15 +12,19 @@ camera và nhận diện tay MediaPipe, thay toàn bộ cơ chế chơi từ *ng
 
 ## Vai trò sư phạm
 
-Trò chơi không phải để giải trí. Nó tạo ra **tiêu chí phân loại công việc**:
+Trò chơi không phải để giải trí. Nó tạo ra **tiêu chí phân loại công việc**. Cả
+ván có 12 quả, chia đều hai nhóm:
 
-- **Quả xanh — 6 nhiệm vụ cốt lõi:** đều là đầu ra số AI có thể hỗ trợ tạo bản nháp. Giáo viên phải kiểm tra và quyết định bản cuối.
-- **Quả cam — nhiễu:** đều cần hiện diện, thấu cảm, phán đoán nghề nghiệp hoặc thao tác vật lý. AI không làm thay và không chịu trách nhiệm thay con người.
+- **06 quả xanh — việc trí tuệ nhân tạo dựng được bản nháp:** xây khung ma trận đặc tả cho môn, soạn dự thảo kế hoạch bài dạy, soạn kịch bản trình chiếu, soạn phiếu học tập, gợi ý bài tập về nhà, tóm tắt bài học thành infographic.
+- **06 quả cam — việc nhà giáo giữ lại:** đều cần hiện diện, cần thấu cảm hoặc cần thao tác vật lí. Trí tuệ nhân tạo không làm thay và không chịu trách nhiệm thay nhà giáo.
 
-Sáu nhiệm vụ gắp được vào giỏ chính là **sáu nhiệm vụ chia cho sáu nhóm** ở hoạt
-động NotebookLM ngay sau đó. Không có bước chuyển gượng ép.
+Sáu nhãn quả xanh chép đúng Phụ lục 2 của kế hoạch bài dạy ngày 10/8, trùng từng
+chữ với **06 việc của hoạt động 2**. Nhờ vậy báo cáo viên nối được hai hoạt động
+mà không cần thêm lời dẫn. Ma trận đặc tả theo đặc trưng môn học là nguồn chuẩn;
+năm sản phẩm sau phải truy vết được về cùng yêu cầu cần đạt.
 
-Màn hình tổng kết hiển thị sẵn câu chốt và câu hỏi chuyển tiếp cho người dẫn.
+Màn hình tổng kết hiển thị sẵn lời chốt của mục d.1, hai tiêu chí phân loại và
+chỉ dẫn mở **Phiếu học tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
 
 ---
 
@@ -38,6 +42,16 @@ npm run lint       # tsc --noEmit
 npm run build      # dist/
 npm run preview    # chạy bản dist
 ```
+
+Để kiểm tra riêng màn chốt trong quá trình phát triển, mở
+`http://localhost:3100/?qa=debrief`. Tham số này chỉ dựng một lượt kết quả mẫu,
+không thay đổi luồng chơi thông thường.
+
+### Triển khai Netlify
+
+Kho mã có sẵn [`netlify.toml`](netlify.toml): Netlify chạy `npm run build` và
+phát hành thư mục `dist`. Khi site đã liên kết với nhánh `main` trên GitHub, mỗi
+lần đẩy commit mới sẽ tự tạo một bản triển khai production.
 
 ---
 
@@ -66,7 +80,7 @@ bị gián đoạn. Nên chạy thử một lượt bằng chuột trước khi 
 | Chuẩn | 90 giây | 1150 ms | 45% |
 | Nhanh | 70 giây | 850 ms | 55% |
 
-Cho buổi demo 20 phút, hoạt động 1 chỉ có **3 phút** — dùng mức **Nhanh** hoặc **Chuẩn**.
+Trong hoạt động khởi động, dành **3 phút** cho một lượt chơi — dùng mức **Nhanh** hoặc **Chuẩn**.
 
 ---
 
@@ -82,7 +96,7 @@ cho ngẫu nhiên. Quả cốt lõi chưa gắp được sẽ thả lại.
 
 ```text
 src/
-├── data/tasks.ts          # 6 nhiệm vụ cốt lõi + 8 quả nhiễu + câu chốt
+├── data/tasks.ts          # 06 quả xanh + 06 quả cam
 ├── utils/engine.ts        # Vòng lặp game, cơ chế gắp/thả, vẽ canvas
 ├── utils/audio.ts         # Tổng hợp âm bằng WebAudio, không tải tệp ngoài
 ├── components/Game.tsx    # Camera, MediaPipe HandLandmarker, fallback chuột
@@ -158,10 +172,19 @@ chơi biết mình sắp gắp trúng cái gì trước khi chụm tay — khôn
 ## Sửa nội dung nhiệm vụ
 
 Toàn bộ danh sách nằm ở [`src/data/tasks.ts`](src/data/tasks.ts). Đổi nhiệm vụ chỉ
-cần sửa file này — không phải chạm vào engine.
+cần sửa tệp này — không phải chạm vào engine.
 
-Quả nhiễu phải **buồn cười nhưng không xúc phạm nghề**. Mục đích là tạo tiếng cười
-và buộc người chơi phải phân biệt, không phải chê công việc của giáo viên.
+Sáu nhãn quả xanh phải khớp Phụ lục 2 của kế hoạch bài dạy; sửa một bên thì sửa
+luôn bên kia.
+
+Quả cam cần nhẹ nhàng nhưng không hạ thấp nghề. Mục đích là buộc người chơi phân
+biệt hai nhóm việc, không phải chê công việc của nhà giáo. Mỗi quả cam phải là
+việc cần hiện diện, cần thấu cảm hoặc cần thao tác vật lí; việc ngoài chuyên môn
+nhà giáo, chẳng hạn đỗ xe hay ăn trưa, không giúp phân loại nên đã bỏ.
+
+Mỗi mục trong `NOISE_TASKS` cần ghi rõ `iconIndex`. Bỏ hoặc thêm một mục mà để
+trống trường này thì biểu tượng của cả nhóm sẽ đổi hình theo vị trí trong
+`ALL_TASKS`.
 
 ---
 
@@ -170,10 +193,14 @@ và buộc người chơi phải phân biệt, không phải chê công việc c
 | Kiểm tra | Kết quả |
 | -------- | ------- |
 | `npm run lint` (tsc strict) | ✅ Sạch |
-| `npm run build` | ✅ 351 kB · gzip 110 kB · CSS 37 kB |
-| Chạy thật chế độ chuột | ✅ Gắp được quả vào giỏ, điểm và đồng hồ chạy đúng |
-| Chơi đến hết ván | ✅ Đủ 6/6, màn tổng kết hiện đúng câu chốt |
+| `npm run build` | ✅ JS 364.52 kB · gzip 114.23 kB · CSS 93.64 kB |
+| Chạy thật chế độ chuột | ✅ Canvas, HUD, đồng hồ và nhịp rơi hoạt động |
+| Màn chốt 6/6 | ✅ Dựng bằng trạng thái QA, đủ 06 nhiệm vụ và không phải cuộn ở 1920×1080 |
 | Lỗi console / lỗi trang | ✅ Không có |
+| Tài nguyên ảnh / yêu cầu mạng thất bại | ✅ Không có |
+| Bố cục desktop 1920×1080 | ✅ Màn mở đầu và màn chốt không tràn ngang/dọc |
+| Bố cục mobile 390×844 | ✅ Không tràn ngang, cho phép cuộn dọc |
+| Độ mượt màn chơi | ✅ 101 mẫu, trung bình 17.89 ms; p95 19 ms |
 | Tiếng Việt trên canvas | ✅ Hiển thị đúng, tự xuống dòng theo bề rộng quả |
 | Subset `vietnamese` được đóng gói | ✅ Đủ 5 trọng số Be Vietnam Pro trong `dist/` |
 | Dấu chồng ở cỡ tiêu đề 112 px | ✅ Không đè dòng trên (chụp màn hình 1920×1080) |

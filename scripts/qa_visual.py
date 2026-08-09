@@ -30,23 +30,35 @@ with sync_playwright() as p:
     page.on("pageerror", lambda exc: errors.append(f"page:{exc}"))
     page.on("response", lambda response: failed_resources.append(f"{response.status}:{response.url}") if response.status >= 400 else None)
     page.on("requestfailed", lambda request: failed_requests.append(f"{request.url}:{request.failure}"))
-    page.goto("http://127.0.0.1:4173", wait_until="networkidle")
+    page.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
+    page.locator(".workshop-stage").wait_for()
     page.screenshot(path=str(out / "intro-live.png"), full_page=False)
-    motion = page.locator(".entry-scanline").evaluate("el => getComputedStyle(el).animationName")
-    orbs = page.locator(".entry-task").count()
+    motion = page.locator(".workshop-scanline").evaluate("el => getComputedStyle(el).animationName")
+    orbs = page.locator(".workshop-mission").count()
     no_horizontal_overflow = page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    no_vertical_overflow = page.evaluate("document.documentElement.scrollHeight <= document.documentElement.clientHeight")
     selected_modes = []
-    speed_buttons = page.locator(".entry-speed button")
+    speed_buttons = page.locator(".workshop-speed button")
     for index, mode in enumerate(("easy", "normal", "hard")):
         button = speed_buttons.nth(index)
         button.click()
         selected_modes.append((mode, button.get_attribute("aria-pressed")))
 
     mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
-    mobile.goto("http://127.0.0.1:4173", wait_until="networkidle")
+    mobile.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
+    mobile.locator(".workshop-stage").wait_for()
     mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
     mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     mobile.close()
+
+    debrief = browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
+    debrief.goto("http://127.0.0.1:4173/?qa=debrief", wait_until="domcontentloaded")
+    debrief.get_by_text("AI DỰNG BẢN NHÁP.").wait_for()
+    debrief.screenshot(path=str(out / "debrief-live.png"), full_page=False)
+    debrief_no_horizontal_overflow = debrief.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    debrief_no_vertical_overflow = debrief.evaluate("document.documentElement.scrollHeight <= document.documentElement.clientHeight")
+    debrief_missions = debrief.locator(".debrief-missions article").count()
+    debrief.close()
 
     page.bring_to_front()
     page.get_by_role("button", name="Chơi bằng chuột").click()
@@ -85,7 +97,11 @@ with sync_playwright() as p:
         "intro_animation": motion,
         "animated_tasks": orbs,
         "desktop_no_horizontal_overflow": no_horizontal_overflow,
+        "desktop_no_vertical_overflow": no_vertical_overflow,
         "mobile_no_horizontal_overflow": mobile_overflow,
+        "debrief_no_horizontal_overflow": debrief_no_horizontal_overflow,
+        "debrief_no_vertical_overflow": debrief_no_vertical_overflow,
+        "debrief_missions": debrief_missions,
         "fall_speed_scale": fall_scale,
         "frame_stats": frame_stats,
         "selected_modes": selected_modes,

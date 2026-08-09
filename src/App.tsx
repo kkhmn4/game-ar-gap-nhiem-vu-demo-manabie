@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Game } from './components/Game';
 import { audio } from './utils/audio';
 import { CORE_TASKS, Difficulty, GameState, TaskDef } from './utils/engine';
@@ -30,13 +30,26 @@ const EMPTY: GameState = {
   countdown: 3,
 };
 
+const QA_DEBRIEF: GameState = {
+  ...EMPTY,
+  score: 1680,
+  collected: CORE_TASKS,
+  bestStreak: 6,
+  timeLeftSec: 24,
+  isGameOver: true,
+  isWin: true,
+  phase: 'FINAL',
+  eventText: 'ĐÃ PHÂN LOẠI ĐỦ SÁU NHIỆM VỤ',
+};
+
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('intro');
+  const qaDebrief = new URLSearchParams(window.location.search).get('qa') === 'debrief';
+  const [screen, setScreen] = useState<Screen>(qaDebrief ? 'debrief' : 'intro');
   const [demoMode, setDemoMode] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [muted, setMuted] = useState(false);
   const [state, setState] = useState<GameState>(EMPTY);
-  const [final, setFinal] = useState<GameState>(EMPTY);
+  const [final, setFinal] = useState<GameState>(qaDebrief ? QA_DEBRIEF : EMPTY);
   const [runKey, setRunKey] = useState(0);
 
   useEffect(() => {
@@ -286,135 +299,120 @@ function Intro({
   };
 
   return (
-    <div className={`entry-stage ${launching ? 'is-launching' : ''}`}>
+    <div className={`workshop-stage ${launching ? 'is-launching' : ''}`}>
       <div className="launch-wipe" aria-hidden="true">
-        <span>ĐỒNG BỘ ĐẤU TRƯỜNG</span>
+        <span>KHỞI ĐỘNG HOẠT ĐỘNG 1</span>
       </div>
 
-      <div className="entry-backdrop" aria-hidden="true">
-        <span className="entry-horizon" />
-        <span className="entry-scanline" />
-        <span className="entry-glow entry-glow-a" />
-        <span className="entry-glow entry-glow-b" />
+      <div className="workshop-atmosphere" aria-hidden="true">
+        <span className="workshop-grid" />
+        <span className="workshop-scanline" />
+        <span className="workshop-glow workshop-glow-a" />
+        <span className="workshop-glow workshop-glow-b" />
       </div>
 
-      <main className="entry-frame">
-        <header className="entry-header">
-          <div className="entry-brand">
+      <main className="workshop-shell">
+        <header className="workshop-header">
+          <div className="workshop-brand">
             <PinchMark live />
-            <span>MANABIE</span>
-            <i>AI LAB</i>
+            <span>THCS ĐỒNG KHỞI</span>
+            <i>AI LEARNING LAB</i>
           </div>
-          <div className="entry-system"><b /> CAMERA AR SẴN SÀNG</div>
-          <div className="entry-mission-id">NHIỆM VỤ / 01</div>
+          <div className="workshop-status"><b /> SẴN SÀNG TRẢI NGHIỆM</div>
+          <div className="workshop-code">TẬP HUẤN 10/8 · HĐ 01/03</div>
         </header>
 
-        <section className="entry-hero">
-          <div className="entry-copy">
-            <p className="entry-kicker"><span>HOẠT ĐỘNG MỞ ĐẦU</span> GẮP VIỆC — GIAO AI</p>
-            <h1 className="entry-title">
-              <span>GẮP ĐÚNG</span>
-              <span>VIỆC.</span>
-              <span className="is-outline">GIAO ĐÚNG</span>
-              <span className="is-outline">AI.</span>
+        <section className="workshop-hero">
+          <div className="workshop-copy">
+            <p className="workshop-kicker"><span>HOẠT ĐỘNG KHỞI ĐỘNG</span> · 20 PHÚT</p>
+            <h1 className="workshop-title">
+              <span>GẮP VIỆC</span>
+              <span className="is-accent">GIAO AI</span>
             </h1>
-            <p className="entry-lead">
-              Đọc nhanh từng tình huống. Gắp những việc AI có thể hỗ trợ tạo bản nháp và đưa vào cổng nhiệm vụ.
+            <p className="workshop-lead">
+              Phân loại 12 công việc để tìm đúng 6 việc trí tuệ nhân tạo có thể hỗ trợ nhà giáo dựng bản nháp.
             </p>
 
-            <div className="entry-rule">
-              <span className="entry-rule-icon" aria-hidden="true">⌁</span>
-              <div>
-                <b>QUY TẮC NHẬN DIỆN</b>
-                <p>AI tạo bản nháp số → giáo viên kiểm tra và quyết định</p>
+            <div className="workshop-rule" aria-label="Quy tắc phân loại">
+              <article className="is-ai">
+                <span>GẮP VÀO CỔNG AI</span>
+                <strong>Kết quả là bản nháp số</strong>
+              </article>
+              <i aria-hidden="true">/</i>
+              <article className="is-teacher">
+                <span>GIỮ LẠI CHO NHÀ GIÁO</span>
+                <strong>Cần hiện diện, thấu cảm hoặc thao tác vật lí</strong>
+              </article>
+            </div>
+
+            <div className="workshop-settings">
+              <div className="workshop-speed">
+                <span>CHỌN NHỊP CHƠI</span>
+                <div>
+                  {SPEEDS.map((speed) => (
+                    <button
+                      key={speed.key}
+                      onClick={() => onDifficulty(speed.key)}
+                      aria-pressed={difficulty === speed.key}
+                      title={speed.desc}
+                    >
+                      <b>{speed.name}</b>
+                      <i>{speed.seconds}s</i>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <strong>06</strong>
-              <small>MỤC TIÊU</small>
-            </div>
 
-            <div className="entry-metrics" aria-label="Thông số trò chơi">
-              <div><span>THỜI LƯỢNG</span><b>{SPEEDS.find((s) => s.key === difficulty)?.seconds ?? 90}<i>s</i></b></div>
-              <div><span>COMBO TỐI ĐA</span><b>×4</b></div>
-              <div><span>THƯỞNG AI FLOW</span><b>+3<i>s</i></b></div>
-            </div>
-          </div>
-
-          <div className="entry-visual" aria-label="Mô phỏng cổng gắp nhiệm vụ AI">
-            <div className="entry-pinch-demo" aria-hidden="true">
-              <span className="entry-finger entry-finger-a" />
-              <span className="entry-finger entry-finger-b" />
-              <i>CHỤM ĐỂ GẮP</i>
-            </div>
-
-            <div className="entry-orbit entry-orbit-outer" aria-hidden="true" />
-            <div className="entry-orbit entry-orbit-mid" aria-hidden="true" />
-            <div className="entry-orbit entry-orbit-inner" aria-hidden="true" />
-            <span className="entry-vector vector-a" aria-hidden="true" />
-            <span className="entry-vector vector-b" aria-hidden="true" />
-
-            <div className="entry-task task-a">
-              <img src="/assets/orbs/v1_0.png" alt="" />
-              <span>KHBD</span>
-            </div>
-            <div className="entry-task task-b">
-              <img src="/assets/orbs/v1_3.png" alt="" />
-              <span>SLIDE</span>
-            </div>
-            <div className="entry-task task-c">
-              <img src="/assets/orbs/v1_5.png" alt="" />
-              <span>PHIẾU HỌC TẬP</span>
-            </div>
-            <div className="entry-task task-d">
-              <img src="/assets/orbs/v2_1.png" alt="" />
-              <span>ĐỀ KIỂM TRA</span>
-            </div>
-
-            <div className="entry-core">
-              <span className="entry-core-index">AI / 01</span>
-              <img src="/assets/mission-collector-v1.png" alt="" />
-              <strong>CỔNG<br />NHIỆM VỤ</strong>
-              <i>ĐANG CHỜ</i>
-            </div>
-            <p className="entry-visual-caption">GẮP <i /> ĐỌC <i /> QUYẾT ĐỊNH</p>
-          </div>
-        </section>
-
-        <section className="entry-command" aria-label="Thiết lập và bắt đầu trò chơi">
-          <div className="entry-speed">
-            <span>CHỌN NHỊP</span>
-            <div>
-              {SPEEDS.map((speed) => (
-                <button
-                  key={speed.key}
-                  onClick={() => onDifficulty(speed.key)}
-                  aria-pressed={difficulty === speed.key}
-                >
-                  <b>{speed.name}</b>
-                  <i>{speed.seconds}s</i>
+              <div className="workshop-actions">
+                <button className="workshop-primary pinch-host" onClick={() => launch(false)}>
+                  <PinchMark />
+                  <span>Bắt đầu bằng camera AR</span>
+                  <i>↗</i>
                 </button>
-              ))}
+                <button className="workshop-secondary" onClick={() => launch(true)}>
+                  Chơi bằng chuột
+                  <span>DỰ PHÒNG</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="entry-actions">
-            <button className="entry-primary pinch-host" onClick={() => launch(false)}>
-              <PinchMark />
-              <span>BẮT ĐẦU BẰNG CAMERA AR</span>
-              <i>↗</i>
-            </button>
-            <button className="entry-secondary" onClick={() => launch(true)}>
-              Chơi bằng chuột
-              <span>DỰ PHÒNG</span>
-            </button>
+          <div className="workshop-visual" aria-label="Minh họa đấu trường phân loại nhiệm vụ">
+            <figure className="workshop-arena">
+              <img src="/assets/mission-arena-v2.png" alt="Không gian lớp học số với cổng nhiệm vụ và sáu học liệu" />
+              <span className="workshop-arena-shade" aria-hidden="true" />
+              <figcaption>
+                <b>06</b>
+                <span>VIỆC AI HỖ TRỢ<br />ĐANG CHỜ ĐƯỢC KHÁM PHÁ</span>
+              </figcaption>
+            </figure>
+
+            <div className="workshop-missions" aria-label="Sáu sản phẩm sẽ được khám phá">
+              {CORE_TASKS.map((task, index) => {
+                const icon = task.iconIndex ?? index;
+                return (
+                  <div className="workshop-mission" key={task.id}>
+                    <span
+                      className="workshop-mission-icon"
+                      style={{ backgroundPosition: `${(icon % 4) * 33.333}% ${Math.floor(icon / 4) * 33.333}%` }}
+                      aria-hidden="true"
+                    />
+                    <b>{String(index + 1).padStart(2, '0')}</b>
+                    <span>{task.short}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <footer className="entry-footer">
-          <span><b>01</b> Đưa tay vào khung hình</span>
+        <footer className="workshop-footer">
+          <span><b>01</b> Đọc công việc</span>
           <i />
-          <span><b>02</b> Chụm ngón trên nhiệm vụ</span>
+          <span><b>02</b> Chụm để gắp</span>
           <i />
-          <span><b>03</b> Kéo và thả vào cổng AI</span>
+          <span><b>03</b> Thả đúng cổng AI</span>
+          <em>Nhà giáo quan sát và cùng gọi tên nhóm việc</em>
         </footer>
       </main>
     </div>
@@ -424,168 +422,73 @@ function Intro({
 /* ------------------------------------------------------------------ */
 
 function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }) {
-  const missed = useMemo(
-    () => CORE_TASKS.filter((t) => !state.collected.some((c) => c.id === t.id)),
-    [state.collected],
-  );
-  const targetXp = Math.max(0, state.score + state.bestStreak * 80 - state.wrongDrops * 40);
-  const rank = targetXp >= 1400 ? 'Bậc thầy quy trình' : targetXp >= 800 ? 'Kiến trúc sư prompt' : 'Tân binh AI';
-  const rankBadgeIcon = targetXp >= 1400 ? '🏆' : targetXp >= 800 ? '⚡' : '🎓';
-
-  const [animScore, setAnimScore] = useState(0);
-  const [animXp, setAnimXp] = useState(0);
-
-  useEffect(() => {
-    let startTimestamp: number | null = null;
-    const duration = 1200;
-
-    const step = (timestamp: number) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min(1, (timestamp - startTimestamp) / duration);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      setAnimScore(Math.round(state.score * ease));
-      setAnimXp(Math.round(targetXp * ease));
-
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
-    };
-    requestAnimationFrame(step);
-  }, [state.score, targetXp]);
+  const collectedIds = new Set(state.collected.map((task) => task.id));
+  const missed = CORE_TASKS.filter((task) => !collectedIds.has(task.id));
 
   return (
-    <div className="relative h-full overflow-y-auto bg-gradient-to-b from-[#050a1c] via-[#081536] to-[#050a1c]">
-      {/* Background glow atmospheric Orbs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-[var(--mint)]/10 blur-[120px]" />
-        <div className="absolute top-1/2 left-1/3 h-80 w-80 rounded-full bg-[var(--brand)]/15 blur-[100px]" />
-      </div>
-
-      <div className="relative z-10 mx-auto w-full max-w-5xl px-[var(--gap)] py-[clamp(2rem,5vh,4rem)]">
-        <div className="rise text-center sm:text-left">
-          <p className="t-eyebrow flex items-center justify-center gap-3 sm:justify-start" style={{ color: state.isWin ? 'var(--mint)' : 'var(--ember)' }}>
-            <PinchMark live={state.isWin} />
-            {state.isWin ? 'ĐỦ SÁU NHIỆM VỤ CỐT LÕI' : 'HẾT THỜI GIAN ĐẤU TRƯỜNG'}
-          </p>
-          <h1 className="t-hero mt-3 text-[var(--chalk)]">
-            {state.isWin ? 'GIỎ ĐÃ ĐẦY' : `ĐẠT ${state.collected.length}/6 NHIỆM VỤ`}
-          </h1>
-        </div>
-
-        <div className="rise mt-8" style={{ animationDelay: '80ms' }}>
-          <SlotRow collected={state.collected} size="lg" />
-        </div>
-
-        <div className="rise mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4" style={{ animationDelay: '140ms' }}>
-          <Stat label="Điểm số" value={animScore} />
-          <Stat label="Chuỗi dài nhất" value={state.bestStreak} />
-          <Stat label="Thả nhầm" value={state.wrongDrops} warn={state.wrongDrops > 0} />
-          <Stat label="Để rơi mất" value={state.missedCore} warn={state.missedCore > 0} />
-        </div>
-
-        <div className="rank-card rise mt-6 rounded-2xl border border-[var(--mint)]/50 bg-gradient-to-r from-[rgba(0,216,154,0.16)] via-[rgba(76,109,240,0.14)] to-[rgba(5,10,28,0.6)] p-6 shadow-[0_0_50px_rgba(0,216,154,0.15)] backdrop-blur-xl" style={{ animationDelay: '180ms' }}>
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--mint)]/20 text-3xl shadow-[0_0_20px_rgba(0,216,154,0.3)] border border-[var(--mint)]/40">
-              {rankBadgeIcon}
-            </div>
-            <div>
-              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--mint)]">CẤP ĐỘ MỚI</span>
-              <strong className="block text-2xl font-black text-[var(--chalk)] uppercase tracking-wide">{rank}</strong>
-            </div>
+    <div className="debrief-v2">
+      <div className="debrief-atmosphere" aria-hidden="true" />
+      <main className="debrief-shell">
+        <header className="debrief-header">
+          <div className="debrief-brand"><PinchMark live={state.isWin} /> THCS ĐỒNG KHỞI · AI LEARNING LAB</div>
+          <div className="debrief-stats" aria-label="Kết quả lượt chơi">
+            <span><b>{state.collected.length}/6</b> việc phù hợp</span>
+            <span><b>{state.wrongDrops}</b> lần thả nhầm</span>
+            <span><b>{state.score}</b> điểm</span>
           </div>
-          <div className="rank-xp text-right">
-            <b className="t-data text-4xl font-black text-[var(--mint)]">{animXp}</b>
-            <span className="text-sm font-bold text-[var(--dim)]"> XP</span>
-          </div>
-        </div>
+        </header>
 
-        {missed.length > 0 && (
-          <div className="rise mt-5 rounded-xl border border-[var(--edge)] bg-[var(--field)]/40 p-4 backdrop-blur-md" style={{ animationDelay: '200ms' }}>
-            <p className="text-sm font-medium text-[var(--dim)]">
-              ⚠️ Chưa gắp được: <strong className="text-[var(--chalk)]">{missed.map((t) => t.label).join(' · ')}</strong>
+        <section className="debrief-hero">
+          <div className="debrief-copy">
+            <p className={state.isWin ? 'debrief-kicker is-win' : 'debrief-kicker is-partial'}>
+              {state.isWin ? 'ĐÃ PHÂN LOẠI ĐỦ 12 CÔNG VIỆC' : `ĐÃ TÌM ĐƯỢC ${state.collected.length}/6 VIỆC PHÙ HỢP`}
             </p>
-          </div>
-        )}
+            <h1>AI DỰNG BẢN NHÁP.<br /><span>NHÀ GIÁO QUYẾT ĐỊNH BẢN CUỐI.</span></h1>
+            <p className="debrief-lead">06 việc vừa gắp chính là 06 sản phẩm sẽ thực hành đồng bộ trong Hoạt động 2.</p>
 
-        {/* Dual 3D Graphic Cards — Pedagogical Role Separation */}
-        <div className="rise mt-10 grid gap-6 md:grid-cols-2" style={{ animationDelay: '240ms' }}>
-          {/* Card 1: AI Assistant */}
-          <div className="group relative overflow-hidden rounded-2xl border border-[var(--mint)]/35 bg-gradient-to-b from-[rgba(0,216,154,0.12)] to-[rgba(5,10,28,0.7)] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-300 hover:border-[var(--mint)]/60 hover:shadow-[0_15px_45px_rgba(0,216,154,0.2)]">
-            <div className="relative h-56 w-full overflow-hidden rounded-xl bg-black/40 border border-white/10 mb-5">
-              <img
-                src="/assets/debrief_ai_assistant_3d.png"
-                alt="AI Tối ưu Hồ sơ & Giáo án"
-                className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-transparent to-transparent" />
+            <div className="debrief-missions" aria-label="Sáu việc AI có thể hỗ trợ dựng bản nháp">
+              {CORE_TASKS.map((task, index) => (
+                <article key={task.id} data-found={collectedIds.has(task.id)}>
+                  <b>{String(index + 1).padStart(2, '0')}</b>
+                  <span>{task.label}</span>
+                  <i>{collectedIds.has(task.id) ? '✓' : '—'}</i>
+                </article>
+              ))}
             </div>
-            <h3 className="text-xl font-extrabold uppercase text-[var(--mint)] tracking-wider">
-              AI Đồng Hành & Tối Ưu Hồ Sơ
-            </h3>
-            <p className="mt-2.5 text-base leading-relaxed text-[var(--chalk)]/90 font-medium">
-              AI có thể hỗ trợ tạo bản nháp hồ sơ, giáo án, phiếu học tập và đề kiểm tra. Giáo viên kiểm tra mục tiêu, độ chính xác, dữ liệu riêng tư và quyết định bản cuối.
-            </p>
+
+            {missed.length > 0 && (
+              <p className="debrief-missed">Cần thử lại: <strong>{missed.map((task) => task.short).join(' · ')}</strong></p>
+            )}
           </div>
 
-          {/* Card 2: Teacher Inspiring */}
-          <div className="group relative overflow-hidden rounded-2xl border border-[var(--brand)]/40 bg-gradient-to-b from-[rgba(76,109,240,0.14)] to-[rgba(5,10,28,0.7)] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-300 hover:border-[var(--brand)]/70 hover:shadow-[0_15px_45px_rgba(76,109,240,0.25)]">
-            <div className="relative h-56 w-full overflow-hidden rounded-xl bg-black/40 border border-white/10 mb-5">
-              <img
-                src="/assets/debrief_teacher_inspiring_3d.png"
-                alt="Thầy Cô Truyền Cảm Hứng"
-                className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-transparent to-transparent" />
-            </div>
-            <h3 className="text-xl font-extrabold uppercase text-[var(--chalk)] tracking-wider">
-              Thầy Cô Dẫn Dắt & Truyền Cảm Hứng
-            </h3>
-            <p className="mt-2.5 text-base leading-relaxed text-[var(--chalk)]/90 font-medium">
-              Thầy cô trực tiếp quan sát, thấu hiểu, xử lý tình huống và giao tiếp với học sinh, phụ huynh; đồng thời chịu trách nhiệm chuyên môn cho mọi sản phẩm dùng trong lớp học.
-            </p>
+          <div className="debrief-portraits" aria-label="Vai trò của trí tuệ nhân tạo và nhà giáo">
+            <figure className="is-ai">
+              <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
+              <figcaption><span>TRÍ TUỆ NHÂN TẠO</span><strong>Dựng bản nháp bằng chữ và hình</strong></figcaption>
+            </figure>
+            <figure className="is-teacher">
+              <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Nhà giáo trực tiếp dẫn dắt lớp học" />
+              <figcaption><span>NHÀ GIÁO</span><strong>Kiểm tra, điều chỉnh và chịu trách nhiệm</strong></figcaption>
+            </figure>
           </div>
-        </div>
-
-        {/* Discussion Hook Banner */}
-        <section
-          className="rise mt-8 rounded-2xl border border-[var(--mint)]/50 bg-gradient-to-r from-[rgba(0,216,154,0.18)] via-[rgba(76,109,240,0.12)] to-[rgba(5,10,28,0.8)] p-7 shadow-[0_12px_45px_rgba(0,216,154,0.15)] backdrop-blur-xl"
-          style={{ animationDelay: '280ms' }}
-        >
-          <div className="flex items-center gap-3">
-            <span className="flex h-3 w-3 rounded-full bg-[var(--mint)] shadow-[0_0_12px_var(--mint)] animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--mint)]">
-              THẢO LUẬN & MỞ ĐẦU BÀI HỌC
-            </span>
-          </div>
-          <p className="mt-3.5 text-[clamp(1.15rem,2.1vw,1.65rem)] font-bold leading-[1.55] text-[var(--chalk)]">
-            Sáu việc này, AI nên hỗ trợ đến bước nào? Thầy cô cần kiểm tra điều gì trước khi sử dụng với học sinh và phụ huynh?
-          </p>
         </section>
 
-        <div className="rise mt-8 flex justify-center" style={{ animationDelay: '320ms' }}>
-          <button
-            onClick={onReplay}
-            className="pinch-host group flex items-center justify-center gap-4 rounded-2xl border border-[var(--mint)] bg-[var(--mint)]/15 px-10 py-5 text-lg font-extrabold text-[var(--chalk)] shadow-[0_0_30px_rgba(0,216,154,0.2)] transition-all duration-300 hover:scale-105 hover:bg-[var(--mint)] hover:text-[#032117] hover:shadow-[0_0_50px_rgba(0,216,154,0.4)]"
-          >
-            <PinchMark />
-            <span>Chơi lại ngay</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+        <section className="debrief-boundary" aria-label="Ranh giới phân loại">
+          <article className="is-ai"><span>GIAO AI HỖ TRỢ</span><strong>Sản phẩm là bản nháp số có thể kiểm tra và chỉnh sửa</strong></article>
+          <i>≠</i>
+          <article className="is-teacher"><span>NHÀ GIÁO GIỮ LẠI</span><strong>Việc cần hiện diện, thấu cảm hoặc thao tác vật lí</strong></article>
+        </section>
 
-function Stat({ label, value, warn }: { label: string; value: number; warn?: boolean }) {
-  return (
-    <div className="rounded-xl border border-[var(--edge)] bg-[var(--field)]/60 p-4 backdrop-blur-md transition-all duration-300 hover:border-[var(--mint)]/40">
-      <p className="t-eyebrow text-xs text-[var(--dim)]">{label}</p>
-      <p
-        className="t-data mt-2 text-[clamp(1.8rem,3.2vw,2.6rem)] font-black leading-none"
-        style={{ color: warn ? 'var(--ember)' : 'var(--chalk)' }}
-      >
-        {value}
-      </p>
+        <blockquote className="debrief-quote">
+          <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
+          <p>“Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp, nhà giáo quyết định bản cuối.”</p>
+        </blockquote>
+
+        <footer className="debrief-next">
+          <div><span>TIẾP THEO · PHIẾU HỌC TẬP SỐ 1</span><strong>Trả lời Câu hỏi 1: Nêu tiêu chí phân loại hai nhóm việc.</strong></div>
+          <button onClick={onReplay}><span>↻</span> Chơi lại</button>
+        </footer>
+      </main>
     </div>
   );
 }
