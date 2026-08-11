@@ -30,9 +30,11 @@ giống một bản trình chiếu, có thứ tự rõ ràng sau mỗi lần b�
 vẫn kích hoạt các nhịp đó khi người xem tự cuộn. Nhịp cuối chỉ dẫn mở **Phiếu học
 tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
 
-Trước màn mở đầu là popup chào mừng dùng mascot Manabie chính thức, nêu tên khóa
-tập huấn, tên Module 1, câu hỏi khởi động và ba bước chơi. Popup chỉ xuất hiện
-trong lần vào đầu tiên và đóng khi người dùng chọn **Đã hiểu nhiệm vụ**.
+Trước màn mở đầu là briefing deck ba trang dùng mascot Manabie chính thức:
+chào mừng khóa tập huấn → câu hỏi khởi động → ba bước chơi. Người dùng chuyển
+trang bằng click, lăn chuột, phím điều hướng hoặc nút trên giao diện; mỗi lần
+chuyển có hiệu ứng morph từ vị trí con trỏ. Deck chỉ xuất hiện trong lần vào đầu
+tiên và đóng khi người dùng chọn **Đã hiểu nhiệm vụ**.
 
 Màn mở đầu dùng cùng ngôn ngữ chuyển động: một **cổng AI hình cầu morph thành
 khung đấu trường**, tiêu đề vào từ hai phía, mascot bật vào rồi trôi nhẹ, sáu ô

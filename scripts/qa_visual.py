@@ -31,6 +31,8 @@ assert "CANVAS_RENDER_SCALE" not in game_source, "Low-resolution canvas upscalin
 assert "workshop-replay-motion" in app_source, "Opening motion must be replayable without reloading"
 assert "workshop-morph-gate" in app_source, "Opening needs a visible AI portal morph"
 assert "briefing-overlay" in app_source, "Opening must include the Module 1 briefing dialog"
+assert all(name in app_source for name in ("briefing-page-welcome", "briefing-page-question", "briefing-page-howto")), "Briefing must use three distinct pages"
+assert "onWheel" in app_source and "briefing-morph" in app_source, "Briefing needs wheel navigation and morph transitions"
 assert "Đã hiểu nhiệm vụ" in app_source, "Briefing needs one explicit acknowledgement action"
 assert "Một công việc chuyên môn có" in app_source, "Briefing must state the workshop question"
 assert "THCS ĐỒNG KHỞI" not in app_source and "TẬP HUẤN 10/8" not in app_source, "School-specific identity must be removed"
@@ -63,10 +65,23 @@ with sync_playwright() as p:
     page.locator(".workshop-stage").wait_for()
     briefing = page.get_by_role("dialog")
     briefing.wait_for()
-    page.wait_for_timeout(1650)
+    page.mouse.move(1260, 420)
+    page.wait_for_timeout(1100)
     page.screenshot(path=str(out / "briefing-desktop.png"), full_page=False)
     briefing_visible = briefing.is_visible()
-    briefing_question = page.locator(".briefing-question").inner_text()
+    page_one_title = page.locator(".briefing-page-welcome h2").inner_text()
+    cursor_aura_visible = float(page.locator(".briefing-cursor-aura").evaluate("el => getComputedStyle(el).opacity")) > 0.8
+    page.get_by_role("button", name="Tiếp tục").click()
+    page.wait_for_timeout(260)
+    briefing_morph_animation = page.locator(".briefing-morph").evaluate("el => getComputedStyle(el).animationName")
+    page.screenshot(path=str(out / "briefing-morph-1-2.png"), full_page=False)
+    page.wait_for_timeout(700)
+    briefing_question = page.locator(".briefing-question-copy").inner_text()
+    page.screenshot(path=str(out / "briefing-question-desktop.png"), full_page=False)
+    page.mouse.wheel(0, 620)
+    page.wait_for_timeout(920)
+    page_three_steps = page.locator(".briefing-steps-large li").count()
+    page.screenshot(path=str(out / "briefing-howto-desktop.png"), full_page=False)
     page.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
     page.wait_for_timeout(500)
     page.screenshot(path=str(out / "intro-motion-frame.png"), full_page=False)
@@ -97,9 +112,15 @@ with sync_playwright() as p:
     mobile.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
     mobile.locator(".workshop-stage").wait_for()
     mobile.get_by_role("dialog").wait_for()
-    mobile.wait_for_timeout(1650)
+    mobile.wait_for_timeout(1050)
     mobile.screenshot(path=str(out / "briefing-mobile.png"), full_page=True)
     mobile_briefing_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    mobile.get_by_role("button", name="Tiếp tục").click()
+    mobile.wait_for_timeout(900)
+    mobile.screenshot(path=str(out / "briefing-question-mobile.png"), full_page=True)
+    mobile.get_by_role("button", name="Tiếp tục").click()
+    mobile.wait_for_timeout(900)
+    mobile.screenshot(path=str(out / "briefing-howto-mobile.png"), full_page=True)
     mobile.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
     mobile.wait_for_timeout(3500)
     mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
@@ -167,7 +188,11 @@ with sync_playwright() as p:
     assert intro_text_separated, "Desktop intro kicker overlaps the main title"
     assert mobile_text_separated, "Mobile intro kicker overlaps the main title"
     assert briefing_visible, "Module briefing dialog is not visible on first entry"
+    assert "Ứng dụng trí tuệ nhân tạo" in page_one_title, page_one_title
     assert "người dạy phải giữ lại cho mình" in briefing_question, briefing_question
+    assert page_three_steps == 3, f"Expected three large play steps, got {page_three_steps}"
+    assert briefing_morph_animation == "briefing-morph-layer", briefing_morph_animation
+    assert cursor_aura_visible, "Mouse-reactive briefing aura did not appear"
     assert mobile_briefing_overflow, "Mobile briefing has horizontal overflow"
     assert debrief_has_vertical_scroll, "Debrief must contain a deliberate multi-screen scroll story"
     assert result_motion == {"name": "result-beat-one", "duration": "4.9s"}, f"Result typography timing changed: {result_motion}"
@@ -226,7 +251,11 @@ with sync_playwright() as p:
     print({
         "intro_animation": motion,
         "briefing_visible": briefing_visible,
+        "briefing_page_one_title": page_one_title,
         "briefing_question": briefing_question,
+        "briefing_large_steps": page_three_steps,
+        "briefing_morph_animation": briefing_morph_animation,
+        "briefing_cursor_aura": cursor_aura_visible,
         "mobile_briefing_no_horizontal_overflow": mobile_briefing_overflow,
         "intro_presentation_motion": [intro_title_motion, intro_arena_motion],
         "intro_portal_morph": [portal_duration, portal_visibility],

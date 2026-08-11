@@ -377,13 +377,40 @@ function Intro({
 }) {
   const [launching, setLaunching] = useState(false);
   const [motionCycle, setMotionCycle] = useState(0);
-  const briefingButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [briefingStep, setBriefingStep] = useState(0);
+  const [briefingDirection, setBriefingDirection] = useState<'next' | 'prev'>('next');
+  const [briefingMorph, setBriefingMorph] = useState(false);
+  const briefingDeckRef = useRef<HTMLElement | null>(null);
+  const briefingMorphTimerRef = useRef<number | null>(null);
+  const briefingMorphLockRef = useRef(false);
 
   useEffect(() => {
     if (!briefingOpen) return;
-    const timer = window.setTimeout(() => briefingButtonRef.current?.focus({ preventScroll: true }), 900);
+    const timer = window.setTimeout(() => briefingDeckRef.current?.focus({ preventScroll: true }), 700);
     return () => window.clearTimeout(timer);
   }, [briefingOpen]);
+
+  useEffect(() => () => {
+    if (briefingMorphTimerRef.current !== null) window.clearTimeout(briefingMorphTimerRef.current);
+  }, []);
+
+  const goToBriefingStep = (nextStep: number) => {
+    const target = Math.max(0, Math.min(2, nextStep));
+    if (target === briefingStep || briefingMorphLockRef.current) return;
+    briefingMorphLockRef.current = true;
+    setBriefingDirection(target > briefingStep ? 'next' : 'prev');
+    setBriefingStep(target);
+    setBriefingMorph(true);
+    audio.init();
+    audio.playPower();
+    briefingMorphTimerRef.current = window.setTimeout(() => {
+      setBriefingMorph(false);
+      briefingMorphLockRef.current = false;
+      briefingMorphTimerRef.current = null;
+    }, 860);
+  };
+
+  const advanceBriefing = () => goToBriefingStep(briefingStep + 1);
 
   const launch = (mouse: boolean) => {
     if (launching) return;
@@ -506,69 +533,164 @@ function Intro({
 
       {briefingOpen && (
         <section
-          className="briefing-overlay"
+          ref={briefingDeckRef}
+          className={`briefing-overlay briefing-deck ${briefingMorph ? 'is-morphing' : ''}`}
+          data-step={briefingStep + 1}
+          data-direction={briefingDirection}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="briefing-title"
-          aria-describedby="briefing-question"
+          aria-labelledby="briefing-page-title"
+          tabIndex={-1}
+          onWheel={(event) => {
+            if (Math.abs(event.deltaY) < 18) return;
+            if (event.deltaY > 0) advanceBriefing();
+            else goToBriefingStep(briefingStep - 1);
+          }}
+          onKeyDown={(event) => {
+            if (['ArrowRight', 'ArrowDown', 'PageDown', 'Enter', ' '].includes(event.key)) {
+              event.preventDefault();
+              advanceBriefing();
+            }
+            if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+              event.preventDefault();
+              goToBriefingStep(briefingStep - 1);
+            }
+          }}
         >
           <div className="briefing-backdrop" aria-hidden="true" />
-          <div className="briefing-card">
+          <span className="briefing-cursor-aura" aria-hidden="true"><i /></span>
+
+          <div className="briefing-deck-shell" onClick={briefingStep < 2 ? advanceBriefing : undefined}>
             <span className="briefing-orbit briefing-orbit-a" aria-hidden="true" />
             <span className="briefing-orbit briefing-orbit-b" aria-hidden="true" />
 
-            <aside className="briefing-mascot" aria-hidden="true">
-              <span className="briefing-signal">AI</span>
-              <img src={BRAND_MASCOTS.present} alt="" />
-              <p><b>Mana</b> đã sẵn sàng<br />đồng hành cùng quý thầy cô!</p>
-            </aside>
-
-            <div className="briefing-content">
-              <header className="briefing-header">
-                <div className="briefing-brand">
-                  <img src={MANABIE_MARK} alt="" />
-                  <span>MANABIE AI LAB</span>
-                </div>
-                <span className="briefing-step">MODULE 1 · PROMPT</span>
-              </header>
-
-              <p className="briefing-welcome">Chào mừng quý thầy cô tham gia buổi tập huấn</p>
-              <h2 id="briefing-title">Ứng dụng trí tuệ nhân tạo<br />vào công việc chuyên môn</h2>
-              <p className="briefing-module">
-                <span>Module 1</span>
-                Prompt và quy trình tạo tài liệu phục vụ hoạt động dạy học
-              </p>
-
-              <div className="briefing-question" id="briefing-question">
-                <span className="briefing-question-label">CÂU HỎI KHỞI ĐỘNG</span>
-                <p>
-                  Một công việc chuyên môn có <strong>dấu hiệu gì</strong> thì giao được cho trí tuệ nhân tạo,
-                  và có dấu hiệu gì thì <strong>người dạy phải giữ lại cho mình?</strong>
-                </p>
+            <header className="briefing-deck-header">
+              <div className="briefing-brand">
+                <img src={MANABIE_MARK} alt="" />
+                <span>MANABIE AI LAB</span>
               </div>
-
-              <div className="briefing-howto" aria-label="Hướng dẫn chơi">
-                <div className="briefing-howto-title">
-                  <img src={BRAND_MASCOTS.inspect} alt="" aria-hidden="true" />
-                  <span><b>Hướng dẫn chơi</b> Chọn đúng việc AI có thể hỗ trợ dựng bản nháp</span>
-                </div>
-                <ol>
-                  <li><b>01</b><span>Đọc công việc<br /><small>xuất hiện trên quả cầu</small></span></li>
-                  <li><b>02</b><span>Chụm tay để gắp<br /><small>hoặc kéo bằng chuột</small></span></li>
-                  <li><b>03</b><span>Thả vào cổng AI<br /><small>nếu việc phù hợp</small></span></li>
-                </ol>
+              <div className="briefing-progress" aria-label={`Trang ${briefingStep + 1} trên 3`}>
+                {[0, 1, 2].map((step) => (
+                  <button
+                    key={step}
+                    type="button"
+                    aria-label={`Mở trang ${step + 1}`}
+                    aria-current={briefingStep === step ? 'step' : undefined}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      goToBriefingStep(step);
+                    }}
+                  >
+                    <span>{String(step + 1).padStart(2, '0')}</span><i />
+                  </button>
+                ))}
               </div>
+              <span className="briefing-step">MODULE 1 · PROMPT</span>
+            </header>
 
+            <main className="briefing-page-stage">
+              {briefingStep === 0 && (
+                <article className="briefing-page briefing-page-welcome" key="welcome">
+                  <div className="briefing-page-visual" aria-hidden="true">
+                    <span className="briefing-portal"><i /><i /><b>AI</b></span>
+                    <img src={BRAND_MASCOTS.present} alt="" />
+                    <p><b>Mana</b> chào đón quý thầy cô!</p>
+                  </div>
+                  <div className="briefing-page-copy">
+                    <p className="briefing-kicker">CHÀO MỪNG QUÝ THẦY CÔ THAM GIA BUỔI TẬP HUẤN</p>
+                    <h2 id="briefing-page-title">Ứng dụng trí tuệ nhân tạo<br /><em>vào công việc chuyên môn</em></h2>
+                    <div className="briefing-module-card">
+                      <span>MODULE 1</span>
+                      <strong>Prompt và quy trình tạo tài liệu<br />phục vụ hoạt động dạy học</strong>
+                    </div>
+                  </div>
+                </article>
+              )}
+
+              {briefingStep === 1 && (
+                <article className="briefing-page briefing-page-question" key="question">
+                  <div className="briefing-question-mark" aria-hidden="true">
+                    <span>?</span>
+                    <img src={BRAND_MASCOTS.inspect} alt="" />
+                  </div>
+                  <div className="briefing-question-copy">
+                    <p className="briefing-kicker">CÂU HỎI KHỞI ĐỘNG</p>
+                    <h2 id="briefing-page-title">
+                      Một công việc chuyên môn có <em>dấu hiệu gì</em> thì giao được cho trí tuệ nhân tạo?
+                    </h2>
+                    <div className="briefing-question-divider"><span>VÀ</span></div>
+                    <p>
+                      Có dấu hiệu gì thì <strong>người dạy phải giữ lại cho mình?</strong>
+                    </p>
+                  </div>
+                </article>
+              )}
+
+              {briefingStep === 2 && (
+                <article className="briefing-page briefing-page-howto" key="howto">
+                  <div className="briefing-howto-heading">
+                    <div>
+                      <p className="briefing-kicker">HƯỚNG DẪN CHƠI</p>
+                      <h2 id="briefing-page-title">Ba động tác.<br /><em>Một quyết định.</em></h2>
+                    </div>
+                    <img src={BRAND_MASCOTS.action} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
+                  </div>
+                  <ol className="briefing-steps-large">
+                    <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
+                    <li><b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small></li>
+                    <li><b>03</b><span>Thả vào cổng AI</span><small>Chỉ khi AI có thể hỗ trợ việc đó</small></li>
+                  </ol>
+                  <p className="briefing-objective"><span>ĐÍCH ĐẾN</span> Tìm đúng <b>06 công việc</b> AI có thể hỗ trợ quý thầy cô dựng bản nháp.</p>
+                </article>
+              )}
+            </main>
+
+            <footer className="briefing-deck-footer">
               <button
-                ref={briefingButtonRef}
-                className="briefing-accept"
+                className="briefing-back"
                 type="button"
-                onClick={onAcknowledgeBriefing}
+                disabled={briefingStep === 0}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  goToBriefingStep(briefingStep - 1);
+                }}
               >
-                <span>Đã hiểu nhiệm vụ</span>
-                <i aria-hidden="true">BẮT ĐẦU KHỞI ĐỘNG&nbsp; →</i>
+                ← <span>Quay lại</span>
               </button>
-            </div>
+              <div className="briefing-gesture-hint" aria-hidden="true">
+                <i><b /></i>
+                <span>{briefingStep < 2 ? 'Lăn chuột hoặc click để xem tiếp' : 'Sẵn sàng bước vào hoạt động'}</span>
+              </div>
+              {briefingStep < 2 ? (
+                <button
+                  className="briefing-next"
+                  type="button"
+                  aria-label="Tiếp tục"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    advanceBriefing();
+                  }}
+                >
+                  <span>Tiếp tục</span> →
+                </button>
+              ) : (
+                <button
+                  className="briefing-accept"
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onAcknowledgeBriefing();
+                  }}
+                >
+                  <span>Đã hiểu nhiệm vụ</span><i>→</i>
+                </button>
+              )}
+            </footer>
+          </div>
+
+          <div className="briefing-morph" aria-hidden="true">
+            <span><i /><i /><b>AI</b></span>
+            <strong>{briefingDirection === 'next' ? 'MỞ PHẦN TIẾP THEO' : 'QUAY LẠI PHẦN TRƯỚC'}</strong>
           </div>
         </section>
       )}
