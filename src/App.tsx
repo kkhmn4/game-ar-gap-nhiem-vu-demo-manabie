@@ -701,7 +701,6 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
     const morphLabels: Record<string, string> = {
       'debrief-role': 'AI HỖ TRỢ → QUÝ THẦY CÔ QUYẾT ĐỊNH',
       'debrief-close': 'CHỐT THÔNG ĐIỆP',
-      'debrief-next': 'PHẦN 3 → THỰC HIỆN TRÊN CLASSROOM',
     };
     setMorphTarget(morphLabels[id] ?? 'TIẾP TỤC');
     window.setTimeout(() => setMorphTarget(null), 1180);
@@ -919,56 +918,10 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
                 </div>
               </blockquote>
             </div>
-
-          </div>
-
-          <button className="debrief-scroll-cue is-inline" onClick={() => scrollToSection('debrief-next')}>
-            <img className="debrief-scroll-mascot" src={BRAND_MASCOTS.scroll} alt="" aria-hidden="true" />
-            <span>TIẾP TỤC ĐẾN PHẦN 3</span><i aria-hidden="true"><b /></i><strong>↓</strong>
-          </button>
-        </section>
-
-        <section className="debrief-chapter debrief-next-chapter" id="debrief-next">
-          <div className="debrief-next-heading" data-reveal data-motion="title-wipe">
-            <div className="debrief-next-number" aria-hidden="true"><span>03</span><i /></div>
-            <div>
-              <span>PHẦN 3 · THỰC HIỆN NHIỆM VỤ TIẾP THEO</span>
-              <h2>Mở Phiếu học tập số 1<br /><em>trên Google Classroom</em></h2>
-              <p>Hoàn thành câu hỏi sau phần chốt và nộp phiếu trước khi chuyển sang Hoạt động 2.</p>
-            </div>
-          </div>
-
-          <div className="debrief-next-workspace">
-            <aside className="debrief-next-visual lux-card" data-reveal data-motion="mascot-pop">
-              <span className="lux-border" aria-hidden="true" />
-              <span className="debrief-next-orbit" aria-hidden="true"><i /><i /><i /></span>
-              <img className="lux-image" src={BRAND_MASCOTS.submit} alt="Mascot Manabie hướng dẫn hoàn thành và nộp Phiếu học tập số 1" />
-              <div>
-                <span>ĐÍCH ĐẾN</span>
-                <strong>Ghi câu trả lời và nộp Phiếu học tập số 1</strong>
-              </div>
-            </aside>
-
-            <article className="debrief-next-panel lux-card" data-reveal data-motion="rise-card">
-              <span className="lux-border" aria-hidden="true" />
-              <div className="debrief-next-question">
-                <span>CÂU HỎI 1</span>
-                <strong>Trong công việc chuyên môn, những nhiệm vụ nào có thể giao cho AI hỗ trợ, và những nhiệm vụ nào người giáo viên vẫn cần trực tiếp thực hiện, kiểm tra hoặc ra quyết định?</strong>
-                <p>Đâu là những tiêu chí/dấu hiệu để chúng ta quyết định việc “giao” cho AI hay không?</p>
-              </div>
-
-              <ol className="debrief-next-steps" aria-label="Thứ tự thao tác ở phần 1.2">
-                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>01</b><strong>Mở mục 1.2</strong><small>Trên Google Classroom</small></li>
-                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>02</b><strong>Mở Phiếu học tập số 1</strong><small>Đọc lại yêu cầu</small></li>
-                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>03</b><strong>Ghi câu trả lời</strong><small>Theo suy nghĩ của quý thầy cô</small></li>
-                <li className="lux-card"><span className="lux-border" aria-hidden="true" /><b>04</b><strong>Nộp bài</strong><small>Hoàn tất phần 1.2</small></li>
-              </ol>
-
-              <footer className="debrief-next-actions">
-                <div><span>TRÌNH TỰ</span><strong>Mở mục 1.2 → Trả lời → Nộp bài</strong></div>
-                <button onClick={onReplay}><span>↻</span> Chơi lại</button>
-              </footer>
-            </article>
+            <button className="debrief-finish-replay" type="button" onClick={onReplay}>
+              <span aria-hidden="true">↻</span>
+              Chơi lại
+            </button>
           </div>
         </section>
       </main>
