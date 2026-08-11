@@ -2675,25 +2675,58 @@ button {
 
 .briefing-cursor-aura {
   position: fixed;
-  z-index: 130;
+  z-index: 170;
   top: var(--cursor-y);
   left: var(--cursor-x);
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(1, 201, 141, .38);
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(93, 229, 255, .72);
   border-radius: 50%;
   opacity: 0;
-  box-shadow: 0 0 24px rgba(1, 201, 141, .16), inset 0 0 12px rgba(145, 162, 255, .13);
-  transform: translate(-50%, -50%) scale(.7);
+  background: radial-gradient(circle, rgba(93,229,255,.1), transparent 58%);
+  box-shadow: 0 0 0 4px rgba(1,201,141,.06), 0 0 28px rgba(93,229,255,.3), inset 0 0 14px rgba(145,162,255,.18);
+  filter: drop-shadow(0 4px 7px rgba(0,0,0,.46));
+  transform: translate(-50%, -50%) scale(.74);
   pointer-events: none;
-  transition: opacity .25s ease, transform .18s ease;
+  transition: opacity .2s ease, transform .12s ease, width .18s ease, height .18s ease, border-color .18s ease;
 }
-.briefing-cursor-aura::before, .briefing-cursor-aura::after { content: ''; position: absolute; border-radius: 50%; }
-.briefing-cursor-aura::before { inset: -8px; border: 1px dashed rgba(145,162,255,.22); animation: briefing-orbit 4s linear infinite; }
-.briefing-cursor-aura::after { right: -5px; top: 4px; width: 6px; height: 6px; background: var(--manabie-green); box-shadow: 0 0 12px var(--manabie-green); }
-.briefing-cursor-aura i { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; border-radius: 50%; background: #effffb; transform: translate(-50%, -50%); }
+.briefing-cursor-aura::before, .briefing-cursor-aura::after { content: ''; position: absolute; }
+.briefing-cursor-aura::before {
+  inset: -7px;
+  border: 1px dashed rgba(145,162,255,.58);
+  border-radius: 50%;
+  animation: briefing-orbit 3.2s linear infinite;
+}
+.briefing-cursor-aura::after {
+  left: -7px;
+  top: -8px;
+  width: 22px;
+  height: 28px;
+  background: linear-gradient(145deg, #fff 4%, #78efff 46%, #01c98d 100%);
+  clip-path: polygon(0 0, 0 100%, 29% 75%, 47% 100%, 61% 91%, 44% 66%, 82% 66%);
+  filter: drop-shadow(0 0 3px #06122e) drop-shadow(0 0 9px rgba(93,229,255,.88));
+}
+.briefing-cursor-aura i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #effffb;
+  border-radius: 50%;
+  background: var(--manabie-green);
+  box-shadow: 0 0 0 5px rgba(1,201,141,.12), 0 0 15px rgba(1,201,141,.72);
+  transform: translate(-50%, -50%);
+}
 .app-pointer-stage[data-pointer-active='true'] .briefing-cursor-aura { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.app-pointer-stage:active .briefing-cursor-aura { transform: translate(-50%, -50%) scale(.86); border-color: #fff; }
+.app-pointer-stage:has(.briefing-deck button:hover) .briefing-cursor-aura { width: 54px; height: 54px; border-color: var(--manabie-green); }
 .app-pointer-stage:has(.briefing-deck) .pointer-orbit { z-index: 136; width: 8px; height: 8px; opacity: 0; }
+
+@media (hover: hover) and (pointer: fine) {
+  .app-pointer-stage:has(.briefing-deck),
+  .app-pointer-stage:has(.briefing-deck) button { cursor: none; }
+}
 
 /* The morph occupies one deliberate moment between chapters. */
 .briefing-morph { position: fixed; z-index: 150; inset: 0; display: grid; place-items: center; opacity: 0; visibility: hidden; pointer-events: none; }
