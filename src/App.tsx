@@ -627,7 +627,7 @@ function Intro({
                 <article className="briefing-page briefing-page-question" key="question">
                   <div className="briefing-question-mark" aria-hidden="true">
                     <span>?</span>
-                    <img className="briefing-shared-mascot" src={BRAND_MASCOTS.inspect} alt="" />
+                    <img className="briefing-shared-mascot briefing-animated-mascot" src={BRAND_MASCOTS.inspectAnimated} alt="" />
                   </div>
                   <div className="briefing-question-copy">
                     <p className="briefing-kicker">CÂU HỎI KHỞI ĐỘNG</p>
@@ -649,7 +649,7 @@ function Intro({
                       <p className="briefing-kicker">HƯỚNG DẪN CHƠI</p>
                       <h2 className="briefing-shared-title" id="briefing-page-title">Ba động tác. <em>Một quyết định.</em></h2>
                     </div>
-                    <img className="briefing-shared-mascot" src={BRAND_MASCOTS.action} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
+                    <img className="briefing-shared-mascot briefing-animated-mascot" src={BRAND_MASCOTS.actionAnimated} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
                   </div>
                   <div className="briefing-steps-stage">
                     <ol className="briefing-steps-large">
