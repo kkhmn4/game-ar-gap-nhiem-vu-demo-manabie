@@ -655,7 +655,7 @@ function Intro({
                     <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
                     <li className="briefing-step-grab">
                       <b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small>
-                      <span className="briefing-grab-demo" role="img" aria-label="Minh họa bàn tay chụm lại, gắp và nâng quả cầu">
+                      <span className="briefing-grab-demo" role="img" aria-label="Minh họa ngón cái và ngón trỏ gắp, kéo rồi thả quả cầu vào cổng AI">
                         <img className="briefing-grab-animated" src="/assets/tutorial/grab-sequence/grab-tutorial.webp" alt="" />
                         <img className="briefing-grab-static" src="/assets/tutorial/grab-sequence/grab-frame-04.png" alt="" />
                       </span>
