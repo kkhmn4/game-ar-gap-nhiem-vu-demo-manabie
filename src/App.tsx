@@ -379,9 +379,10 @@ function Intro({
   const [motionCycle, setMotionCycle] = useState(0);
   const [briefingStep, setBriefingStep] = useState(0);
   const [briefingDirection, setBriefingDirection] = useState<'next' | 'prev'>('next');
-  const [briefingMorph, setBriefingMorph] = useState(false);
+  const [briefingMorphPhase, setBriefingMorphPhase] = useState<'idle' | 'cover' | 'reveal'>('idle');
   const briefingDeckRef = useRef<HTMLElement | null>(null);
-  const briefingMorphTimerRef = useRef<number | null>(null);
+  const briefingMorphSwapTimerRef = useRef<number | null>(null);
+  const briefingMorphEndTimerRef = useRef<number | null>(null);
   const briefingMorphLockRef = useRef(false);
 
   useEffect(() => {
@@ -391,7 +392,8 @@ function Intro({
   }, [briefingOpen]);
 
   useEffect(() => () => {
-    if (briefingMorphTimerRef.current !== null) window.clearTimeout(briefingMorphTimerRef.current);
+    if (briefingMorphSwapTimerRef.current !== null) window.clearTimeout(briefingMorphSwapTimerRef.current);
+    if (briefingMorphEndTimerRef.current !== null) window.clearTimeout(briefingMorphEndTimerRef.current);
   }, []);
 
   const goToBriefingStep = (nextStep: number) => {
@@ -399,15 +401,19 @@ function Intro({
     if (target === briefingStep || briefingMorphLockRef.current) return;
     briefingMorphLockRef.current = true;
     setBriefingDirection(target > briefingStep ? 'next' : 'prev');
-    setBriefingStep(target);
-    setBriefingMorph(true);
+    setBriefingMorphPhase('cover');
     audio.init();
     audio.playPower();
-    briefingMorphTimerRef.current = window.setTimeout(() => {
-      setBriefingMorph(false);
+    briefingMorphSwapTimerRef.current = window.setTimeout(() => {
+      setBriefingStep(target);
+      setBriefingMorphPhase('reveal');
+      briefingMorphSwapTimerRef.current = null;
+    }, 500);
+    briefingMorphEndTimerRef.current = window.setTimeout(() => {
+      setBriefingMorphPhase('idle');
       briefingMorphLockRef.current = false;
-      briefingMorphTimerRef.current = null;
-    }, 860);
+      briefingMorphEndTimerRef.current = null;
+    }, 1160);
   };
 
   const advanceBriefing = () => goToBriefingStep(briefingStep + 1);
@@ -534,9 +540,10 @@ function Intro({
       {briefingOpen && (
         <section
           ref={briefingDeckRef}
-          className={`briefing-overlay briefing-deck ${briefingMorph ? 'is-morphing' : ''}`}
+          className={`briefing-overlay briefing-deck ${briefingMorphPhase !== 'idle' ? 'is-morphing' : ''}`}
           data-step={briefingStep + 1}
           data-direction={briefingDirection}
+          data-morph-phase={briefingMorphPhase}
           role="dialog"
           aria-modal="true"
           aria-labelledby="briefing-page-title"
@@ -598,10 +605,10 @@ function Intro({
                   </div>
                   <div className="briefing-page-copy">
                     <p className="briefing-kicker">CHÀO MỪNG QUÝ THẦY CÔ THAM GIA BUỔI TẬP HUẤN</p>
-                    <h2 id="briefing-page-title">Ứng dụng trí tuệ nhân tạo<br /><em>vào công việc chuyên môn</em></h2>
+                    <h2 id="briefing-page-title">Ứng dụng trí tuệ nhân tạo <em>vào công việc chuyên môn</em></h2>
                     <div className="briefing-module-card">
                       <span>MODULE 1</span>
-                      <strong>Prompt và quy trình tạo tài liệu<br />phục vụ hoạt động dạy học</strong>
+                      <strong>Prompt và quy trình tạo tài liệu phục vụ hoạt động dạy học</strong>
                     </div>
                   </div>
                 </article>
@@ -631,7 +638,7 @@ function Intro({
                   <div className="briefing-howto-heading">
                     <div>
                       <p className="briefing-kicker">HƯỚNG DẪN CHƠI</p>
-                      <h2 id="briefing-page-title">Ba động tác.<br /><em>Một quyết định.</em></h2>
+                      <h2 id="briefing-page-title">Ba động tác. <em>Một quyết định.</em></h2>
                     </div>
                     <img src={BRAND_MASCOTS.action} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
                   </div>

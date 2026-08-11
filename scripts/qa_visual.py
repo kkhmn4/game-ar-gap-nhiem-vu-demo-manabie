@@ -33,6 +33,7 @@ assert "workshop-morph-gate" in app_source, "Opening needs a visible AI portal m
 assert "briefing-overlay" in app_source, "Opening must include the Module 1 briefing dialog"
 assert all(name in app_source for name in ("briefing-page-welcome", "briefing-page-question", "briefing-page-howto")), "Briefing must use three distinct pages"
 assert "onWheel" in app_source and "briefing-morph" in app_source, "Briefing needs wheel navigation and morph transitions"
+assert "data-morph-phase" in app_source and "1.16s" in css_source, "Briefing morph must use a timed cover/swap/reveal sequence"
 assert "Đã hiểu nhiệm vụ" in app_source, "Briefing needs one explicit acknowledgement action"
 assert "Một công việc chuyên môn có" in app_source, "Briefing must state the workshop question"
 assert "THCS ĐỒNG KHỞI" not in app_source and "TẬP HUẤN 10/8" not in app_source, "School-specific identity must be removed"
@@ -72,14 +73,20 @@ with sync_playwright() as p:
     page_one_title = page.locator(".briefing-page-welcome h2").inner_text()
     cursor_aura_visible = float(page.locator(".briefing-cursor-aura").evaluate("el => getComputedStyle(el).opacity")) > 0.8
     page.get_by_role("button", name="Tiếp tục").click()
-    page.wait_for_timeout(260)
+    page.wait_for_timeout(240)
+    old_page_held_during_cover = page.locator(".briefing-page-welcome").count() == 1
+    new_page_hidden_during_cover = page.locator(".briefing-page-question").count() == 0
+    morph_cover_phase = briefing.get_attribute("data-morph-phase")
     briefing_morph_animation = page.locator(".briefing-morph").evaluate("el => getComputedStyle(el).animationName")
+    page.wait_for_function("document.querySelector('.briefing-deck')?.dataset.morphPhase === 'reveal'", timeout=1200)
+    morph_reveal_phase_observed = True
     page.screenshot(path=str(out / "briefing-morph-1-2.png"), full_page=False)
-    page.wait_for_timeout(700)
+    page.wait_for_function("document.querySelector('.briefing-deck')?.dataset.morphPhase === 'idle'", timeout=1400)
+    new_page_revealed_after_swap = page.locator(".briefing-page-question").count() == 1
     briefing_question = page.locator(".briefing-question-copy").inner_text()
     page.screenshot(path=str(out / "briefing-question-desktop.png"), full_page=False)
     page.mouse.wheel(0, 620)
-    page.wait_for_timeout(920)
+    page.wait_for_timeout(1220)
     page_three_steps = page.locator(".briefing-steps-large li").count()
     page.screenshot(path=str(out / "briefing-howto-desktop.png"), full_page=False)
     page.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
@@ -116,10 +123,10 @@ with sync_playwright() as p:
     mobile.screenshot(path=str(out / "briefing-mobile.png"), full_page=True)
     mobile_briefing_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     mobile.get_by_role("button", name="Tiếp tục").click()
-    mobile.wait_for_timeout(900)
+    mobile.wait_for_timeout(1220)
     mobile.screenshot(path=str(out / "briefing-question-mobile.png"), full_page=True)
     mobile.get_by_role("button", name="Tiếp tục").click()
-    mobile.wait_for_timeout(900)
+    mobile.wait_for_timeout(1220)
     mobile.screenshot(path=str(out / "briefing-howto-mobile.png"), full_page=True)
     mobile.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
     mobile.wait_for_timeout(3500)
@@ -192,6 +199,9 @@ with sync_playwright() as p:
     assert "người dạy phải giữ lại cho mình" in briefing_question, briefing_question
     assert page_three_steps == 3, f"Expected three large play steps, got {page_three_steps}"
     assert briefing_morph_animation == "briefing-morph-layer", briefing_morph_animation
+    assert old_page_held_during_cover and new_page_hidden_during_cover, "Briefing content swapped before the morph covered the old page"
+    assert morph_cover_phase == "cover", morph_cover_phase
+    assert new_page_revealed_after_swap and morph_reveal_phase_observed, "New briefing page did not reveal from the covered state"
     assert cursor_aura_visible, "Mouse-reactive briefing aura did not appear"
     assert mobile_briefing_overflow, "Mobile briefing has horizontal overflow"
     assert debrief_has_vertical_scroll, "Debrief must contain a deliberate multi-screen scroll story"

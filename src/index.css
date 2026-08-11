@@ -2470,14 +2470,15 @@ button {
 .briefing-progress button[aria-current='step'] { color: #eef2ff; }
 .briefing-progress button[aria-current='step'] i { width: 48px; background: var(--manabie-green); box-shadow: 0 0 14px rgba(1, 201, 141, .5); }
 
-.briefing-page-stage { position: relative; z-index: 3; min-height: 0; overflow: hidden; }
+.briefing-page-stage { position: relative; z-index: 3; min-height: 0; overflow: hidden; transition: filter .48s ease, transform .48s cubic-bezier(.4, 0, .2, 1), opacity .48s ease; }
+.briefing-deck[data-morph-phase='cover'] .briefing-page-stage { filter: blur(3px); opacity: .72; transform: scale(.985); }
 
 .briefing-page {
   position: absolute;
   inset: 0;
   padding: clamp(1.8rem, 4vw, 4.8rem);
   overflow: hidden;
-  animation: briefing-page-reveal .9s cubic-bezier(.16, .86, .28, 1) both;
+  animation: briefing-page-reveal .78s cubic-bezier(.16, .86, .28, 1) both;
 }
 
 .briefing-page::after {
@@ -2497,15 +2498,15 @@ button {
   margin: 0 0 clamp(.8rem, 1.8vh, 1.35rem);
   color: var(--manabie-green);
   font-size: clamp(.65rem, .75vw, .8rem);
-  font-weight: 950;
+  font-weight: 850;
   letter-spacing: .17em;
 }
 
-.briefing-page h2 { margin: 0; color: #f4f6ff; font-weight: 950; letter-spacing: -.055em; text-wrap: balance; }
+.briefing-page h2 { margin: 0; color: #f4f6ff; font-weight: 600; letter-spacing: -.024em; text-wrap: balance; }
 .briefing-page h2 em { color: #96a6ff; font-style: normal; }
 
 /* Page 01 — course welcome */
-.briefing-page-welcome { display: grid; grid-template-columns: minmax(300px, .72fr) minmax(620px, 1.28fr); align-items: center; gap: clamp(2rem, 5vw, 6rem); }
+.briefing-page-welcome { display: grid; grid-template-columns: minmax(280px, .62fr) minmax(660px, 1.38fr); align-items: center; gap: clamp(2rem, 4vw, 4.5rem); }
 .briefing-page-welcome::after { right: -14%; bottom: -54%; }
 .briefing-page-visual { position: relative; align-self: stretch; display: grid; place-items: center; }
 .briefing-page-visual > img {
@@ -2530,10 +2531,10 @@ button {
 .briefing-portal b { position: absolute; right: 5%; top: 18%; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid rgba(1, 201, 141, .45); border-radius: 50%; color: var(--manabie-green); background: #07172d; font: 900 .7rem/1 var(--data); }
 
 .briefing-page-copy { position: relative; z-index: 3; }
-.briefing-page-copy h2 { font-size: clamp(3.4rem, 5.1vw, 6.15rem); line-height: .99; }
+.briefing-page-copy h2 { max-width: 1050px; font-size: clamp(3rem, 4.1vw, 4.65rem); line-height: 1.1; }
 .briefing-module-card { width: fit-content; max-width: 760px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 1rem; margin-top: clamp(1.5rem, 3vh, 2.6rem); padding: .9rem 1.1rem; border: 1px solid rgba(145, 162, 255, .28); border-radius: 14px; background: rgba(26, 43, 101, .32); box-shadow: 0 18px 46px rgba(0,0,0,.18); }
 .briefing-module-card > span { padding: .52rem .72rem; border-radius: 7px; color: #04231a; background: var(--manabie-green); font: 950 .62rem/1 var(--data); }
-.briefing-module-card strong { color: #c8d3f1; font-size: clamp(.8rem, 1.05vw, 1.08rem); line-height: 1.45; }
+.briefing-module-card strong { color: #c8d3f1; font-size: clamp(.8rem, 1vw, 1.04rem); font-weight: 600; line-height: 1.5; text-wrap: pretty; }
 
 /* Page 02 — one large workshop question */
 .briefing-page-question { display: grid; grid-template-columns: minmax(260px, .5fr) minmax(680px, 1.5fr); align-items: center; gap: clamp(2rem, 5vw, 6rem); }
@@ -2542,20 +2543,20 @@ button {
 .briefing-question-mark > span { color: transparent; font-size: clamp(15rem, 24vw, 30rem); font-weight: 950; line-height: .8; -webkit-text-stroke: 1px rgba(145, 162, 255, .26); filter: drop-shadow(0 0 55px rgba(60, 90, 210, .24)); animation: briefing-question-mark 5s ease-in-out infinite; }
 .briefing-question-mark img { position: absolute; z-index: 3; bottom: 2%; width: min(72%, 280px); max-height: 330px; object-fit: contain; filter: drop-shadow(0 28px 34px rgba(0,0,0,.4)); animation: briefing-deck-mascot-pop .9s cubic-bezier(.16,.86,.28,1) .18s both; }
 .briefing-question-copy { position: relative; z-index: 3; }
-.briefing-question-copy h2 { max-width: 1000px; font-size: clamp(2.6rem, 3.7vw, 4.65rem); line-height: 1.08; }
+.briefing-question-copy h2 { max-width: 1050px; font-size: clamp(2.45rem, 3.35vw, 4.15rem); line-height: 1.13; }
 .briefing-question-copy h2 em { color: #f4f6ff; text-decoration: underline; text-decoration-color: var(--manabie-green); text-decoration-thickness: .08em; text-underline-offset: .13em; }
 .briefing-question-divider { display: flex; align-items: center; gap: .85rem; width: min(100%, 820px); margin: clamp(1.2rem, 2.5vh, 2rem) 0; }
 .briefing-question-divider::before, .briefing-question-divider::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(145,162,255,.42)); }
 .briefing-question-divider::after { background: linear-gradient(90deg, rgba(145,162,255,.42), transparent); }
 .briefing-question-divider span { color: var(--mascot-orange); font: 900 .64rem/1 var(--data); }
-.briefing-question-copy > p:last-child { max-width: 980px; margin: 0; color: #bfc9e8; font-size: clamp(1.4rem, 2vw, 2.35rem); font-weight: 750; line-height: 1.35; }
-.briefing-question-copy > p strong { color: #fff; font-weight: 950; }
+.briefing-question-copy > p:last-child { max-width: 1000px; margin: 0; color: #bfc9e8; font-size: clamp(1.35rem, 1.8vw, 2.05rem); font-weight: 600; line-height: 1.42; text-wrap: pretty; }
+.briefing-question-copy > p strong { color: #fff; font-weight: 750; }
 
 /* Page 03 — large, scan-friendly play instructions */
 .briefing-page-howto { display: grid; grid-template-rows: auto 1fr auto; gap: clamp(1rem, 2vh, 1.6rem); }
 .briefing-page-howto::after { right: -17%; top: -48%; }
 .briefing-howto-heading { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; min-height: 170px; }
-.briefing-howto-heading h2 { font-size: clamp(3rem, 4.4vw, 5.35rem); line-height: .95; }
+.briefing-howto-heading h2 { max-width: 940px; font-size: clamp(2.85rem, 3.9vw, 4.65rem); line-height: 1.06; }
 .briefing-howto-heading > img { align-self: end; width: clamp(150px, 15vw, 250px); max-height: 210px; object-fit: contain; filter: drop-shadow(0 22px 30px rgba(0,0,0,.36)); animation: briefing-deck-mascot-pop .9s cubic-bezier(.16,.86,.28,1) .15s both, briefing-deck-mascot-float 5.2s ease-in-out 1.1s infinite; }
 .briefing-steps-large { position: relative; z-index: 3; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(.75rem, 1.4vw, 1.3rem); margin: 0; padding: 0; list-style: none; }
 .briefing-steps-large li { position: relative; min-width: 0; display: grid; grid-template-rows: auto auto auto; align-content: center; padding: clamp(1rem, 1.8vw, 1.6rem); overflow: hidden; border: 1px solid rgba(145, 162, 255, .24); border-radius: 18px; background: linear-gradient(145deg, rgba(35, 55, 126, .34), rgba(4, 12, 34, .72)); box-shadow: 0 18px 44px rgba(0,0,0,.2); transition: transform .3s cubic-bezier(.22,1,.36,1), border-color .3s ease, box-shadow .3s ease; }
@@ -2563,8 +2564,8 @@ button {
 .briefing-steps-large li:hover { border-color: rgba(1, 201, 141, .62); box-shadow: 0 24px 54px rgba(0,0,0,.28), 0 0 30px rgba(1,201,141,.08); transform: translateY(-8px); }
 .briefing-steps-large li:hover::after { border-color: rgba(1, 201, 141, .48); transform: scale(1.2); }
 .briefing-steps-large li b { color: var(--manabie-green); font: 950 clamp(1.2rem, 1.65vw, 1.8rem)/1 var(--data); }
-.briefing-steps-large li span { margin-top: .8rem; color: #f2f5ff; font-size: clamp(1rem, 1.25vw, 1.35rem); font-weight: 950; }
-.briefing-steps-large li small { margin-top: .5rem; color: #98a7cf; font-size: clamp(.7rem, .82vw, .86rem); font-weight: 650; line-height: 1.45; }
+.briefing-steps-large li span { margin-top: .8rem; color: #f2f5ff; font-size: clamp(1rem, 1.2vw, 1.3rem); font-weight: 800; line-height: 1.25; text-wrap: balance; }
+.briefing-steps-large li small { margin-top: .5rem; color: #98a7cf; font-size: clamp(.7rem, .82vw, .86rem); font-weight: 550; line-height: 1.5; text-wrap: pretty; }
 .briefing-objective { position: relative; z-index: 3; margin: 0; padding: .8rem 1rem; border-left: 3px solid var(--mascot-orange); color: #c9d3ef; background: rgba(255, 157, 34, .055); font-size: clamp(.75rem, .92vw, .96rem); font-weight: 700; }
 .briefing-objective > span { margin-right: .75rem; color: var(--mascot-orange); font: 950 .58rem/1 var(--data); letter-spacing: .12em; }
 .briefing-objective b { color: #fff; }
@@ -2599,7 +2600,7 @@ button {
   opacity: 1;
   animation: briefing-accept-arrive .55s cubic-bezier(.16,.86,.28,1) both;
 }
-.briefing-deck-footer .briefing-accept span { font-size: .78rem; font-weight: 950; }
+.briefing-deck-footer .briefing-accept span { font-size: .78rem; font-weight: 800; }
 .briefing-deck-footer .briefing-accept i { font: 950 .9rem/1 var(--data); }
 .briefing-deck-footer .briefing-accept:hover { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 0 18px 42px rgba(1, 201, 141, .32); }
 
@@ -2637,17 +2638,17 @@ button {
 .briefing-morph > span i:nth-child(2) { right: -28px; bottom: 2px; background: #91a2ff; }
 .briefing-morph > span b { font: 950 .72rem/1 var(--data); }
 .briefing-morph > strong { position: relative; z-index: 3; margin-top: 130px; color: #eef2ff; font: 900 .62rem/1 var(--data); letter-spacing: .18em; }
-.briefing-deck.is-morphing .briefing-morph { visibility: visible; animation: briefing-morph-layer .86s cubic-bezier(.68,0,.32,1) both; }
-.briefing-deck.is-morphing .briefing-morph::before { animation: briefing-morph-wipe .86s cubic-bezier(.68,0,.32,1) both; }
-.briefing-deck.is-morphing .briefing-morph > span { animation: briefing-morph-portal .86s cubic-bezier(.68,0,.32,1) both; }
-.briefing-deck.is-morphing .briefing-morph > span::before { animation: briefing-orbit .86s linear both; }
-.briefing-deck.is-morphing .briefing-morph > strong { animation: briefing-morph-label .86s ease both; }
+.briefing-deck.is-morphing .briefing-morph { visibility: visible; animation: briefing-morph-layer 1.16s cubic-bezier(.68,0,.32,1) both; }
+.briefing-deck.is-morphing .briefing-morph::before { animation: briefing-morph-wipe 1.16s cubic-bezier(.68,0,.32,1) both; }
+.briefing-deck.is-morphing .briefing-morph > span { animation: briefing-morph-portal 1.16s cubic-bezier(.68,0,.32,1) both; }
+.briefing-deck.is-morphing .briefing-morph > span::before { animation: briefing-orbit 1.16s linear both; }
+.briefing-deck.is-morphing .briefing-morph > strong { animation: briefing-morph-label 1.16s ease both; }
 
 @keyframes briefing-deck-arrive { from { opacity: 0; clip-path: inset(48% 2% 48% 2% round 30px); transform: translateY(24px) scale(.975); } to { opacity: 1; clip-path: inset(0 round 30px); transform: none; } }
 @keyframes briefing-deck-edge { 0%, 12% { transform: translateX(0); opacity: 0; } 28%, 72% { opacity: 1; } 88%, 100% { transform: translateX(660%); opacity: 0; } }
-@keyframes briefing-page-reveal { from { opacity: 0; filter: blur(8px); transform: translateX(72px) scale(.975); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes briefing-page-reveal { from { opacity: 0; filter: blur(12px); clip-path: circle(12% at 50% 50%); transform: scale(.955); } to { opacity: 1; filter: blur(0); clip-path: circle(78% at 50% 50%); transform: none; } }
 .briefing-deck[data-direction='prev'] .briefing-page { animation-name: briefing-page-reveal-back; }
-@keyframes briefing-page-reveal-back { from { opacity: 0; filter: blur(8px); transform: translateX(-72px) scale(.975); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes briefing-page-reveal-back { from { opacity: 0; filter: blur(12px); clip-path: circle(12% at 50% 50%); transform: scale(1.035); } to { opacity: 1; filter: blur(0); clip-path: circle(78% at 50% 50%); transform: none; } }
 @keyframes briefing-deck-mascot-pop { from { opacity: 0; filter: blur(8px); transform: translateY(35px) scale(.75) rotate(-5deg); } to { opacity: 1; filter: blur(0); transform: none; } }
 @keyframes briefing-deck-mascot-float { 50% { transform: translateY(-9px) rotate(.7deg); } }
 @keyframes briefing-portal-breathe { 50% { transform: scale(1.035); border-color: rgba(1,201,141,.42); box-shadow: inset 0 0 110px rgba(60,90,210,.2), 0 0 85px rgba(1,201,141,.12); } }
@@ -2690,7 +2691,7 @@ button {
   .briefing-page-visual > p { bottom: 0; padding: .45rem .65rem; font-size: .58rem; }
   .briefing-portal { width: min(61%, 220px); }
   .briefing-portal b { width: 32px; height: 32px; font-size: .55rem; }
-  .briefing-page-copy h2 { font-size: clamp(2rem, 9.5vw, 2.85rem); line-height: 1.02; }
+  .briefing-page-copy h2 { font-size: clamp(1.9rem, 8.5vw, 2.45rem); line-height: 1.1; }
   .briefing-module-card { width: 100%; gap: .6rem; margin-top: 1rem; padding: .7rem; }
   .briefing-module-card > span { padding: .42rem .5rem; font-size: .52rem; }
   .briefing-module-card strong { font-size: .68rem; }
@@ -2699,9 +2700,9 @@ button {
   .briefing-question-mark { position: absolute; z-index: 0; right: -1rem; top: -1rem; width: 150px; height: 190px; opacity: .38; }
   .briefing-question-mark > span { font-size: 11rem; }
   .briefing-question-mark img { right: 0; bottom: -1rem; width: 100px; }
-  .briefing-question-copy h2 { font-size: clamp(1.85rem, 8.3vw, 2.45rem); line-height: 1.12; }
+  .briefing-question-copy h2 { font-size: clamp(1.7rem, 7.4vw, 2.15rem); line-height: 1.18; }
   .briefing-question-divider { margin: 1rem 0; }
-  .briefing-question-copy > p:last-child { font-size: clamp(1.15rem, 5.5vw, 1.55rem); }
+  .briefing-question-copy > p:last-child { font-size: clamp(1.05rem, 4.8vw, 1.35rem); line-height: 1.48; }
 
   .briefing-page-howto { gap: .65rem; }
   .briefing-howto-heading { min-height: 105px; }
