@@ -6,6 +6,7 @@ export const MANABIE_MARK = '/assets/brand/manabie-app.svg';
 
 export const BRAND_MASCOTS = {
   phone: '/assets/brand-mascot/mana-phone.png',
+  cameraLoadingAnimated: '/assets/tutorial/popup-mascot-camera/mana-camera-wait-loop.gif',
   explore: '/assets/brand-mascot/mana-explore.png',
   inspect: '/assets/brand-mascot/mana-inspect.png',
   inspectAnimated: '/assets/tutorial/popup-mascot-inspect/mana-inspect-loop.gif',

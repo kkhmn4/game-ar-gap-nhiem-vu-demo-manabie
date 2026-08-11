@@ -654,7 +654,7 @@ function Intro({
                   <div className="briefing-steps-stage">
                     <ol className="briefing-steps-large">
                       <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
-                      <li className="briefing-step-grab"><b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small></li>
+                      <li className="briefing-step-grab"><b>02</b><span>Dùng ngón cái và ngón trỏ</span><small>Gắp, giữ tư thế để di chuyển rồi thả vào kho.</small></li>
                       <li className="briefing-step-drop"><b>03</b><span>Thả vào kho nhiệm vụ</span><small>Khi AI có thể hỗ trợ công việc đó</small></li>
                     </ol>
                     <div className="briefing-transfer-demo" role="img" aria-label="Minh họa ngón cái và ngón trỏ gắp, kéo quả cầu từ trên xuống rồi thả vào kho nhiệm vụ">

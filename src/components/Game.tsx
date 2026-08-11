@@ -320,7 +320,7 @@ export function Game({ onGameOver, onStateUpdate, demoMode, difficulty }: GamePr
       {isLoading && (
         <div className="camera-loading absolute inset-0 z-50 grid place-items-center bg-[var(--ink)]/94 backdrop-blur-sm">
           <div className="max-w-md px-6 text-center">
-            <img className="camera-loading-mascot" src={BRAND_MASCOTS.phone} alt="" />
+            <img className="camera-loading-mascot" src={BRAND_MASCOTS.cameraLoadingAnimated} alt="" />
             <span className="pinch pinch-live text-[2.6rem] text-[var(--mint)]" aria-hidden="true" />
             <p className="t-title mt-7 text-[1.7rem] text-[var(--chalk)]">Đang bật camera</p>
             <p className="mt-3 text-[0.95rem] leading-6 text-[var(--dim)]">
