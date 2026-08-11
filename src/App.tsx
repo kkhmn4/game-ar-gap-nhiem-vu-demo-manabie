@@ -1,4 +1,4 @@
-import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { Game } from './components/Game';
 import { BRAND_MASCOTS, MANABIE_MARK } from './data/brand';
@@ -54,10 +54,6 @@ export default function App() {
   const [state, setState] = useState<GameState>(EMPTY);
   const [final, setFinal] = useState<GameState>(qaDebrief ? QA_DEBRIEF : EMPTY);
   const [runKey, setRunKey] = useState(0);
-  const pointerFrameRef = useRef<number | null>(null);
-  const pointerHostRef = useRef<HTMLDivElement | null>(null);
-  const pointerTargetRef = useRef({ x: 0, y: 0 });
-  const pointerCurrentRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const intensity = state.phase === 'FINAL' ? 1 : state.phase === 'CRISIS' ? 0.72 : state.streak >= 3 ? 0.5 : 0.2;
@@ -79,79 +75,11 @@ export default function App() {
     setScreen('playing');
   };
 
-  const animatePointer = useCallback(function tick() {
-    const stage = pointerHostRef.current;
-    if (!stage) {
-      pointerFrameRef.current = null;
-      return;
-    }
-
-    const target = pointerTargetRef.current;
-    const current = pointerCurrentRef.current;
-    current.x += (target.x - current.x) * 0.16;
-    current.y += (target.y - current.y) * 0.16;
-
-    const width = Math.max(window.innerWidth, 1);
-    const height = Math.max(window.innerHeight, 1);
-    stage.style.setProperty('--cursor-x', `${current.x}px`);
-    stage.style.setProperty('--cursor-y', `${current.y}px`);
-    stage.style.setProperty('--cursor-nx', `${(current.x / width - 0.5) * 2}`);
-    stage.style.setProperty('--cursor-ny', `${(current.y / height - 0.5) * 2}`);
-
-    if (Math.abs(target.x - current.x) + Math.abs(target.y - current.y) > 0.35) {
-      pointerFrameRef.current = requestAnimationFrame(tick);
-      return;
-    }
-
-    current.x = target.x;
-    current.y = target.y;
-    pointerFrameRef.current = null;
-  }, []);
-
-  const onPointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === 'touch') return;
-    const stage = event.currentTarget;
-    const firstMove = stage.dataset.pointerActive !== 'true';
-    const { clientX, clientY } = event;
-
-    pointerHostRef.current = stage;
-    pointerTargetRef.current = { x: clientX, y: clientY };
-    stage.dataset.pointerActive = 'true';
-
-    if (firstMove) {
-      pointerCurrentRef.current = { x: clientX, y: clientY };
-      stage.style.setProperty('--cursor-x', `${clientX}px`);
-      stage.style.setProperty('--cursor-y', `${clientY}px`);
-    }
-
-    if (pointerFrameRef.current === null) {
-      pointerFrameRef.current = requestAnimationFrame(animatePointer);
-    }
-  }, [animatePointer]);
-
-  const onPointerLeave = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
-    delete event.currentTarget.dataset.pointerActive;
-  }, []);
-
-  useEffect(() => () => {
-    if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current);
-    pointerFrameRef.current = null;
-    pointerHostRef.current = null;
-  }, []);
-
   return (
     <div
       className="app-pointer-stage flex h-dvh flex-col overflow-hidden bg-[var(--ink)]"
       data-screen={screen}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
     >
-      <span className="pointer-orbit" aria-hidden="true" />
-      {screen !== 'playing' && (
-        <span className="pointer-mascot" aria-hidden="true">
-          <img src={BRAND_MASCOTS.interact} alt="" />
-        </span>
-      )}
       {screen === 'playing' ? (
         <>
           <Scoreboard
@@ -574,8 +502,6 @@ function Intro({
           }}
         >
           <div className="briefing-backdrop" aria-hidden="true" />
-          <span className="briefing-cursor-aura" aria-hidden="true"><i /></span>
-
           <div className="briefing-deck-shell" onClick={briefingStep < 2 ? advanceBriefing : undefined}>
             <span className="briefing-orbit briefing-orbit-a" aria-hidden="true" />
             <span className="briefing-orbit briefing-orbit-b" aria-hidden="true" />
@@ -632,11 +558,14 @@ function Intro({
                   <div className="briefing-question-copy">
                     <p className="briefing-kicker">CÂU HỎI KHỞI ĐỘNG</p>
                     <h2 className="briefing-shared-title" id="briefing-page-title">
-                      Một công việc chuyên môn có <em>dấu hiệu gì</em> thì giao được cho trí tuệ nhân tạo?
+                      Trong công việc chuyên môn, những nhiệm vụ nào có thể <em>giao cho AI hỗ trợ</em>?
                     </h2>
                     <div className="briefing-question-divider"><span>VÀ</span></div>
-                    <p>
-                      Có dấu hiệu gì thì <strong>người dạy phải giữ lại cho mình?</strong>
+                    <p className="briefing-question-teacher">
+                      Những nhiệm vụ nào người giáo viên vẫn cần <strong>trực tiếp thực hiện, kiểm tra hoặc ra quyết định?</strong>
+                    </p>
+                    <p className="briefing-question-criteria">
+                      Đâu là những tiêu chí/dấu hiệu để chúng ta quyết định việc <strong>“giao” cho AI</strong> hay không?
                     </p>
                   </div>
                 </article>
@@ -735,12 +664,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
   const missed = CORE_TASKS.filter((task) => !collectedIds.has(task.id));
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [hasScrolled, setHasScrolled] = useState(false);
-  const [morphTarget, setMorphTarget] = useState<string | null>('KẾT QUẢ → THÔNG ĐIỆP');
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setMorphTarget(null), 1180);
-    return () => window.clearTimeout(timer);
-  }, []);
+  const [morphTarget, setMorphTarget] = useState<string | null>(null);
 
   useEffect(() => {
     const root = scrollerRef.current;
@@ -847,9 +771,22 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
 
       <main className="debrief-story">
         <section className="debrief-chapter debrief-result" id="debrief-result">
+          {state.isWin && (
+            <div className="debrief-victory" role="status" aria-live="polite">
+              <span className="debrief-victory-rays" aria-hidden="true" />
+              <span className="debrief-victory-particles" aria-hidden="true">
+                {Array.from({ length: 18 }, (_, index) => <i key={index} />)}
+              </span>
+              <div>
+                <small>HOÀN THÀNH THỬ THÁCH</small>
+                <strong>CHÚC MỪNG CHIẾN THẮNG!</strong>
+                <p>Quý thầy cô đã nhận diện đúng 06 nhiệm vụ AI có thể hỗ trợ tạo bản nháp.</p>
+              </div>
+            </div>
+          )}
           <div className="debrief-result-copy">
             <p className={state.isWin ? 'debrief-kicker is-win' : 'debrief-kicker is-partial'}>
-              CHỐT LẦN 1 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC
+              {state.isWin ? 'CHIẾN THẮNG · ĐÃ PHÂN LOẠI ĐỦ 06 NHIỆM VỤ' : 'KẾT QUẢ · CẦN HOÀN THIỆN PHÂN LOẠI'}
             </p>
 
             <div className="debrief-missions" aria-label="Sáu việc AI có thể hỗ trợ dựng bản nháp">
@@ -916,8 +853,8 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <img className="lux-image" src={BRAND_MASCOTS.inspect} alt="Mascot Manabie dùng kính lúp để kiểm tra căn cứ phân loại" />
             <div>
               <span>PHẦN CHỐT 01 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC</span>
-              <h2>Ranh giới nằm ở <em>trách nhiệm về kết quả cuối cùng</em></h2>
-              <p>Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</p>
+              <h2>Quyết định bằng <em>mức độ kiểm soát và trách nhiệm</em></h2>
+              <p>Không “giao” toàn bộ công việc cho AI. Hãy xác định phần AI hỗ trợ và điểm giáo viên phải trực tiếp kiểm tra hoặc quyết định.</p>
             </div>
           </header>
 
@@ -925,12 +862,12 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
             <figure className="is-ai lux-card" data-reveal data-motion="image-left">
               <span className="lux-border" aria-hidden="true" />
               <img src="/assets/debrief_ai_assistant_3d.png" alt="Trí tuệ nhân tạo hỗ trợ dựng bản nháp học liệu" />
-              <figcaption><span>GIAO ĐƯỢC CHO TRÍ TUỆ NHÂN TẠO</span><strong>Sản phẩm là bản nháp bằng chữ</strong><p>Quý thầy cô cần đọc lại và quyết định bản cuối.</p></figcaption>
+              <figcaption><span>CÓ THỂ GIAO AI HỖ TRỢ</span><strong>Đầu vào và tiêu chí có thể mô tả rõ</strong><p>Đầu ra là bản nháp, phương án hoặc gợi ý mà giáo viên có thể kiểm tra.</p></figcaption>
             </figure>
             <figure className="is-teacher lux-card" data-reveal data-motion="image-right" style={{ transitionDelay: '140ms' }}>
               <span className="lux-border" aria-hidden="true" />
               <img src="/assets/debrief_teacher_inspiring_3d.png" alt="Quý thầy cô trực tiếp dẫn dắt lớp học" />
-              <figcaption><span>QUÝ THẦY CÔ GIỮ LẠI</span><strong>Việc cần hiện diện, cần thấu cảm</strong><p>Hoặc cần thao tác vật lí.</p></figcaption>
+              <figcaption><span>GIÁO VIÊN TRỰC TIẾP THỰC HIỆN</span><strong>Việc cần hiện diện, thấu cảm hoặc phán đoán sư phạm</strong><p>Đặc biệt khi có dữ liệu nhạy cảm, ảnh hưởng đến người học hoặc cần chịu trách nhiệm cuối cùng.</p></figcaption>
             </figure>
           </div>
 
@@ -955,30 +892,30 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               className="debrief-close-kinetic lux-card"
               data-reveal
               data-motion="close-kinetic"
-              aria-label="Việc khó chưa chắc là việc quý thầy cô giữ lại. Ranh giới không nằm ở việc khó hay dễ. Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng. Trí tuệ nhân tạo dựng bản nháp. Quý thầy cô quyết định bản cuối và cần chịu trách nhiệm về kết quả cuối cùng."
+              aria-label="Giao AI hỗ trợ khi yêu cầu và tiêu chí có thể mô tả rõ, đầu ra có thể kiểm tra. Giáo viên trực tiếp thực hiện khi công việc cần hiện diện, thấu cảm, phán đoán sư phạm hoặc liên quan dữ liệu nhạy cảm. Mọi sản phẩm của AI phải được giáo viên kiểm tra, quyết định và chịu trách nhiệm trước khi sử dụng."
             >
               <span className="lux-border" aria-hidden="true" />
               <div className="close-beat close-beat-one" aria-hidden="true">
-                VIỆC KHÓ CHƯA CHẮC LÀ<br /><strong>VIỆC QUÝ THẦY CÔ GIỮ LẠI</strong>
+                ĐỪNG CHỈ HỎI<br /><strong>VIỆC NÀY KHÓ HAY DỄ?</strong>
               </div>
               <div className="close-beat close-beat-two" aria-hidden="true">
-                RANH GIỚI KHÔNG NẰM Ở VIỆC<br /><strong><i>KHÓ</i> HAY <i>DỄ</i></strong>
+                HÃY HỎI<br /><strong><i>ĐẦU VÀO CÓ RÕ?</i> <i>ĐẦU RA CÓ KIỂM TRA ĐƯỢC?</i></strong>
               </div>
               <div className="close-beat close-beat-three" aria-hidden="true">
-                AI CHỊU TRÁCH NHIỆM VỀ<br /><strong>KẾT QUẢ CUỐI CÙNG?</strong>
+                CÔNG VIỆC CÓ CẦN<br /><strong>HIỆN DIỆN · THẤU CẢM · PHÁN ĐOÁN?</strong>
               </div>
               <div className="close-beat close-beat-four" aria-hidden="true">
-                <strong>TRÍ TUỆ NHÂN TẠO DỰNG BẢN NHÁP</strong>
+                <strong>AI HỖ TRỢ TẠO BẢN NHÁP</strong>
                 <i>→</i>
-                <b>QUÝ THẦY CÔ QUYẾT ĐỊNH BẢN CUỐI</b>
+                <b>GIÁO VIÊN KIỂM TRA VÀ QUYẾT ĐỊNH</b>
               </div>
               <blockquote className="debrief-quote close-lock">
                 <span>LỜI CHỐT CỦA BÁO CÁO VIÊN</span>
-                <p>“Ranh giới nằm ở chỗ ai chịu trách nhiệm về kết quả cuối cùng.”</p>
+                <p>“Giao AI hỗ trợ không có nghĩa là giao trách nhiệm chuyên môn.”</p>
                 <div className="close-lock-points">
-                  <strong className="is-ai">Trí tuệ nhân tạo dựng bản nháp.</strong>
-                  <strong className="is-teacher">Quý thầy cô quyết định bản cuối.</strong>
-                  <strong className="is-responsibility">Quý thầy cô cần chịu trách nhiệm về kết quả cuối cùng.</strong>
+                  <strong className="is-ai">Giao AI hỗ trợ khi yêu cầu, dữ liệu đầu vào và tiêu chí kiểm tra có thể mô tả rõ.</strong>
+                  <strong className="is-teacher">Giáo viên trực tiếp thực hiện khi cần hiện diện, thấu cảm, phán đoán sư phạm hoặc xử lý dữ liệu nhạy cảm.</strong>
+                  <strong className="is-responsibility">Mọi đầu ra của AI phải được giáo viên kiểm tra, quyết định và chịu trách nhiệm trước khi sử dụng.</strong>
                 </div>
               </blockquote>
             </div>
@@ -1016,8 +953,8 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
               <span className="lux-border" aria-hidden="true" />
               <div className="debrief-next-question">
                 <span>CÂU HỎI 1</span>
-                <strong>Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?</strong>
-                <p>Ghi câu trả lời theo suy nghĩ của quý thầy cô, sau đó đối chiếu với phần chốt của báo cáo viên.</p>
+                <strong>Trong công việc chuyên môn, những nhiệm vụ nào có thể giao cho AI hỗ trợ, và những nhiệm vụ nào người giáo viên vẫn cần trực tiếp thực hiện, kiểm tra hoặc ra quyết định?</strong>
+                <p>Đâu là những tiêu chí/dấu hiệu để chúng ta quyết định việc “giao” cho AI hay không?</p>
               </div>
 
               <ol className="debrief-next-steps" aria-label="Thứ tự thao tác ở phần 1.2">

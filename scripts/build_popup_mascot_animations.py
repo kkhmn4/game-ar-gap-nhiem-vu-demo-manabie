@@ -10,8 +10,8 @@ from PIL import Image, ImageChops, ImageDraw
 
 
 CANVAS_SIZE = (460, 460)
-FRAME_COUNT = 20
-FRAME_DURATION_MS = 120
+FRAME_COUNT = 28
+FRAME_DURATION_MS = 100
 
 
 def prepare_subject(master_path: Path, max_width: int, max_height: int) -> Image.Image:
@@ -29,20 +29,25 @@ def prepare_subject(master_path: Path, max_width: int, max_height: int) -> Image
 
 def place_subject(subject: Image.Image, phase: float, *, welcome: bool) -> Image.Image:
     if welcome:
-        lift = round(-4 * (0.5 - 0.5 * math.cos(phase)))
-        scale = 1 + 0.012 * (0.5 - 0.5 * math.cos(phase))
-        angle = 0.45 * math.sin(phase)
+        gesture = 0.5 - 0.5 * math.cos(phase)
+        lift = round(-6 * gesture)
+        scale_x = 1 + 0.013 * gesture
+        scale_y = 1 - 0.008 * gesture
+        angle = 0.85 * math.sin(phase)
+        shift_x = round(2.5 * math.sin(phase))
     else:
         lift = round(-2.5 * math.sin(phase) ** 2)
-        scale = 1 + 0.005 * math.sin(phase) ** 2
-        angle = 0.16 * math.sin(phase)
+        scale_x = 1 + 0.003 * math.sin(phase) ** 2
+        scale_y = 1 + 0.004 * math.sin(phase) ** 2
+        angle = 0.1 * math.sin(phase)
+        shift_x = 0
 
     posed = subject.resize(
-        (round(subject.width * scale), round(subject.height * scale)),
+        (round(subject.width * scale_x), round(subject.height * scale_y)),
         Image.Resampling.LANCZOS,
     ).rotate(angle, resample=Image.Resampling.BICUBIC, expand=True)
     frame = Image.new("RGBA", CANVAS_SIZE)
-    x = round((CANVAS_SIZE[0] - posed.width) / 2)
+    x = round((CANVAS_SIZE[0] - posed.width) / 2) + shift_x
     y = CANVAS_SIZE[1] - 14 - posed.height + lift
     frame.alpha_composite(posed, (x, y))
     return frame
@@ -61,8 +66,8 @@ def diamond(draw: ImageDraw.ImageDraw, center: tuple[int, int], radius: int, alp
 
 def add_welcome_accents(frame: Image.Image, phase: float) -> None:
     draw = ImageDraw.Draw(frame, "RGBA")
-    pulse = max(0.0, math.sin(phase))
-    pulse_two = max(0.0, math.sin(phase - 0.75))
+    pulse = max(0.0, math.sin(phase * 1.35))
+    pulse_two = max(0.0, math.sin(phase * 1.35 - 0.72))
     if pulse > 0.04:
         diamond(draw, (67, 167), 14, round(225 * pulse))
     if pulse_two > 0.04:
@@ -70,6 +75,23 @@ def add_welcome_accents(frame: Image.Image, phase: float) -> None:
     dot_alpha = round(150 * max(0.0, math.sin(phase - 1.25)))
     if dot_alpha:
         draw.ellipse((44, 207, 52, 215), fill=(1, 201, 141, dot_alpha))
+    wave = max(0.0, math.sin(phase * 1.35 - 0.18))
+    if wave > 0.06:
+        for index, box in enumerate(((34, 177, 91, 239), (22, 164, 98, 249), (10, 151, 106, 260))):
+            alpha = round((170 - index * 38) * wave)
+            draw.arc(box, 126, 236, fill=(93, 229, 255, alpha), width=3 - min(index, 1))
+
+
+def add_search_beam(frame: Image.Image, phase: float) -> None:
+    draw = ImageDraw.Draw(frame, "RGBA")
+    swing = math.sin(phase)
+    end_y = round(270 + swing * 44)
+    draw.polygon(((337, 265), (459, end_y - 48), (459, end_y + 48)), fill=(93, 229, 255, 18))
+    draw.line(((344, 265), (459, end_y)), fill=(93, 229, 255, 76), width=2)
+    for offset, radius in ((-31, 4), (0, 5), (31, 3)):
+        alpha = round(95 + 75 * max(0.0, math.sin(phase + offset / 34)))
+        y = end_y + offset
+        draw.ellipse((450 - radius, y - radius, 450 + radius, y + radius), fill=(1, 201, 141, alpha))
 
 
 def add_lens_scan(frame: Image.Image, phase: float) -> None:
@@ -80,7 +102,7 @@ def add_lens_scan(frame: Image.Image, phase: float) -> None:
 
     sweep = Image.new("RGBA", CANVAS_SIZE)
     sweep_draw = ImageDraw.Draw(sweep, "RGBA")
-    progress = (phase % (2 * math.pi)) / (2 * math.pi)
+    progress = 0.5 - 0.5 * math.cos(phase)
     x = round(255 + progress * 155)
     sweep_draw.polygon(
         ((x - 22, 218), (x + 3, 218), (x - 30, 321), (x - 55, 321)),
@@ -159,6 +181,7 @@ def build(master_path: Path, kind: str) -> list[Image.Image]:
         if kind == "welcome":
             add_welcome_accents(frame, phase)
         else:
+            add_search_beam(frame, phase)
             add_lens_scan(frame, phase)
         frames.append(frame)
     return frames
