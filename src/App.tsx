@@ -657,9 +657,10 @@ function Intro({
                       <li className="briefing-step-grab"><b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small></li>
                       <li className="briefing-step-drop"><b>03</b><span>Thả vào kho nhiệm vụ</span><small>Khi AI có thể hỗ trợ công việc đó</small></li>
                     </ol>
-                    <div className="briefing-transfer-demo" role="img" aria-label="Minh họa ngón cái và ngón trỏ gắp, kéo rồi thả quả cầu vào kho nhiệm vụ">
+                    <div className="briefing-transfer-demo" role="img" aria-label="Minh họa ngón cái và ngón trỏ gắp, kéo quả cầu từ trên xuống rồi thả vào kho nhiệm vụ">
+                      <span className="briefing-transfer-start" aria-hidden="true"><i /> NHIỆM VỤ ĐANG RƠI</span>
                       <span className="briefing-transfer-route" aria-hidden="true"><i /></span>
-                      <span className="briefing-transfer-caption" aria-hidden="true">GẮP · KÉO · THẢ</span>
+                      <span className="briefing-transfer-caption" aria-hidden="true">CHỤM → KÉO XUỐNG → THẢ</span>
                       <video className="briefing-grab-animated" autoPlay loop muted playsInline preload="auto" poster="/assets/tutorial/grab-sequence/grab-tutorial.webp" aria-hidden="true">
                         <source src="/assets/tutorial/grab-sequence/grab-tutorial.webm" type="video/webm" />
                       </video>

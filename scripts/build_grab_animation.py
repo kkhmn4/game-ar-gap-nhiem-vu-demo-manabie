@@ -11,8 +11,10 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageChops
 
 
-SPRITE_SCALE = 0.38
-TARGET_CENTER = (820, 220)
+SPRITE_SCALE = 0.42
+CANVAS_SIZE = (900, 440)
+START_CENTER = (450, 100)
+TARGET_CENTER = (450, 325)
 
 
 def repair_magenta_key(source: Path, output: Path) -> None:
@@ -146,10 +148,10 @@ def compose_release_frames(frames_dir: Path) -> None:
 
 
 def align_for_transfer(frame: Image.Image) -> Image.Image:
-    """Remove the temporary ring and align the action with the DOM task warehouse."""
-    target_bounds = find_colored_bounds(frame, "mint")
-    target_center_x = (target_bounds[0] + target_bounds[2]) / 2
-    target_center_y = (target_bounds[1] + target_bounds[3]) / 2
+    """Remove the temporary ring and align the orb at the top of the game lane."""
+    orb_bounds = find_colored_bounds(frame, "orb")
+    orb_center_x = (orb_bounds[0] + orb_bounds[2]) / 2
+    orb_center_y = (orb_bounds[1] + orb_bounds[3]) / 2
 
     rgba = np.array(frame)
     red, green, blue, alpha = (rgba[:, :, index] for index in range(4))
@@ -168,24 +170,13 @@ def align_for_transfer(frame: Image.Image) -> Image.Image:
         (round(frame.width * scale), round(frame.height * scale)),
         Image.Resampling.LANCZOS,
     )
-    canvas = Image.new("RGBA", (960, 320))
+    canvas = Image.new("RGBA", CANVAS_SIZE)
     offset = (
-        round(TARGET_CENTER[0] - target_center_x * scale),
-        round(TARGET_CENTER[1] - target_center_y * scale),
+        round(START_CENTER[0] - orb_center_x * scale),
+        round(START_CENTER[1] - orb_center_y * scale),
     )
     canvas.alpha_composite(resized, offset)
     return canvas
-
-
-def drag_delta(frame: Image.Image) -> tuple[int, int]:
-    ring_bounds = find_colored_bounds(frame, "mint")
-    orb_bounds = find_colored_bounds(frame, "orb")
-    ring_center = ((ring_bounds[0] + ring_bounds[2]) / 2, (ring_bounds[1] + ring_bounds[3]) / 2)
-    orb_center = ((orb_bounds[0] + orb_bounds[2]) / 2, (orb_bounds[1] + orb_bounds[3]) / 2)
-    return (
-        round((ring_center[0] - orb_center[0]) * SPRITE_SCALE),
-        round((ring_center[1] - orb_center[1]) * SPRITE_SCALE),
-    )
 
 
 def translated(frame: Image.Image, offset: tuple[int, int]) -> Image.Image:
@@ -273,10 +264,12 @@ def build_animation(frames_dir: Path, output: Path) -> None:
 
     aligned_open = align_for_transfer(source_frames[0])
     aligned_pinch = align_for_transfer(source_frames[1])
-    open_delta = drag_delta(source_frames[0])
-    pinch_delta = drag_delta(source_frames[1])
-    placed_open = translated(aligned_open, open_delta)
-    placed_pinch = translated(aligned_pinch, pinch_delta)
+    drag_offset = (
+        TARGET_CENTER[0] - START_CENTER[0],
+        TARGET_CENTER[1] - START_CENTER[1],
+    )
+    placed_open = translated(aligned_open, drag_offset)
+    placed_pinch = translated(aligned_pinch, drag_offset)
 
     # Slow, one-way instructional rhythm: open -> pinch -> drag -> release -> retract.
     sequence = [aligned_open]
@@ -292,7 +285,7 @@ def build_animation(frames_dir: Path, output: Path) -> None:
         sequence.append(
             translated(
                 aligned_pinch,
-                (round(pinch_delta[0] * progress), round(pinch_delta[1] * progress)),
+                (round(drag_offset[0] * progress), round(drag_offset[1] * progress)),
             )
         )
         durations.append(60)
@@ -326,7 +319,7 @@ def build_animation(frames_dir: Path, output: Path) -> None:
         progress = smoothstep(step / 12)
         retracted = Image.new("RGBA", placed_open.size)
         retracted.alpha_composite(orb_layer)
-        retracted.alpha_composite(hand_layer, (round(-180 * progress), round(8 * progress)))
+        retracted.alpha_composite(hand_layer, (round(-115 * progress), round(-92 * progress)))
         sequence.append(retracted)
         durations.append(60)
     durations[-1] = 1000
