@@ -653,7 +653,13 @@ function Intro({
                   </div>
                   <ol className="briefing-steps-large">
                     <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
-                    <li><b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small></li>
+                    <li className="briefing-step-grab">
+                      <b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small>
+                      <span className="briefing-grab-demo" role="img" aria-label="Minh họa bàn tay chụm lại, gắp và nâng quả cầu">
+                        <img className="briefing-grab-animated" src="/assets/tutorial/grab-sequence/grab-tutorial.webp" alt="" />
+                        <img className="briefing-grab-static" src="/assets/tutorial/grab-sequence/grab-frame-04.png" alt="" />
+                      </span>
+                    </li>
                     <li><b>03</b><span>Thả vào cổng AI</span><small>Chỉ khi AI có thể hỗ trợ việc đó</small></li>
                   </ol>
                   <p className="briefing-objective"><span>ĐÍCH ĐẾN</span> Tìm đúng <b>06 công việc</b> AI có thể hỗ trợ quý thầy cô dựng bản nháp.</p>

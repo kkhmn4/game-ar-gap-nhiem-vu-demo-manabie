@@ -5,6 +5,8 @@ dist-ssr
 .vite
 .DS_Store
 *.log
+__pycache__/
+*.pyc
 
 tmp/
 .DS_Store

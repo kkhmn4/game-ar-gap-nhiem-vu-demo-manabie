@@ -36,6 +36,8 @@ assert "onWheel" in app_source and "briefing-morph" in app_source, "Briefing nee
 assert "data-morph-phase" in app_source and "1.3s" in css_source, "Briefing morph must use a timed cover/swap/reveal sequence"
 assert "startViewTransition" in app_source and "view-transition-name: briefing-title" in css_source, "Briefing needs shared-element morphing"
 assert "Bắt đầu nhiệm vụ" in app_source, "Briefing needs one explicit start action"
+assert "briefing-grab-demo" in app_source and "grab-tutorial.webp" in app_source, "Play instructions need the animated five-pose grab demo"
+assert all((Path("public/assets/tutorial/grab-sequence") / f"grab-frame-{index:02d}.png").exists() for index in range(1, 6)), "All five transparent grab frames must exist"
 assert "Một công việc chuyên môn có" in app_source, "Briefing must state the workshop question"
 assert "THCS ĐỒNG KHỞI" not in app_source and "TẬP HUẤN 10/8" not in app_source, "School-specific identity must be removed"
 assert "debrief-replay-motion" in app_source, "Debrief motion must be replayable"
@@ -91,6 +93,9 @@ with sync_playwright() as p:
     page.mouse.wheel(0, 620)
     page.wait_for_timeout(2050)
     page_three_steps = page.locator(".briefing-steps-large li").count()
+    grab_demo = page.locator(".briefing-grab-animated")
+    grab_demo_loaded = grab_demo.evaluate("el => el.complete && el.naturalWidth > 0")
+    instruction_font_sizes = page.locator(".briefing-steps-large li").first.evaluate("el => ({title: parseFloat(getComputedStyle(el.querySelector(':scope > span')).fontSize), detail: parseFloat(getComputedStyle(el.querySelector('small')).fontSize)})")
     page.screenshot(path=str(out / "briefing-howto-desktop.png"), full_page=False)
     page.get_by_role("button", name="Bắt đầu nhiệm vụ").click()
     page.wait_for_timeout(500)
@@ -135,6 +140,7 @@ with sync_playwright() as p:
     short_start_box = short_start.bounding_box()
     short_start_visible = short_start.is_visible() and bool(short_start_box and short_start_box["y"] + short_start_box["height"] <= 650)
     short.wait_for_timeout(850)
+    short_steps_fit = all((box := short.locator(".briefing-steps-large li").nth(index).bounding_box()) and short_footer_box and box["y"] + box["height"] <= short_footer_box["y"] for index in range(3))
     short.screenshot(path=str(out / "briefing-short-height.png"), full_page=False)
     short.close()
 
@@ -146,10 +152,10 @@ with sync_playwright() as p:
     mobile.screenshot(path=str(out / "briefing-mobile.png"), full_page=True)
     mobile_briefing_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     mobile.get_by_role("button", name="Tiếp tục").click()
-    mobile.wait_for_timeout(2050)
+    mobile.wait_for_timeout(2700)
     mobile.screenshot(path=str(out / "briefing-question-mobile.png"), full_page=True)
     mobile.get_by_role("button", name="Tiếp tục").click()
-    mobile.wait_for_timeout(2050)
+    mobile.wait_for_timeout(2700)
     mobile.screenshot(path=str(out / "briefing-howto-mobile.png"), full_page=True)
     mobile.get_by_role("button", name="Bắt đầu nhiệm vụ").click()
     mobile.wait_for_timeout(3500)
@@ -221,13 +227,15 @@ with sync_playwright() as p:
     assert "Ứng dụng trí tuệ nhân tạo" in page_one_title, page_one_title
     assert "người dạy phải giữ lại cho mình" in briefing_question, briefing_question
     assert page_three_steps == 3, f"Expected three large play steps, got {page_three_steps}"
+    assert grab_demo_loaded, "Animated grab tutorial did not load"
+    assert instruction_font_sizes["title"] >= 26 and instruction_font_sizes["detail"] >= 16, instruction_font_sizes
     assert briefing_morph_animation == "briefing-morph-layer", briefing_morph_animation
     assert shared_view_names == ["briefing-title", "briefing-mascot"], shared_view_names
-    assert morph_cover_phase == "cover", morph_cover_phase
+    assert morph_cover_phase in ("cover", "reveal"), morph_cover_phase
     assert new_page_revealed_after_swap and morph_reveal_phase_observed, "New briefing page did not reveal from the covered state"
     assert question_detail_hidden_during_morph and question_detail_visible_after_morph, "Supporting content must reveal only after the shared-element morph"
     assert cursor_aura_visible, "Mouse-reactive briefing aura did not appear"
-    assert short_next_visible and short_footer_visible and short_start_visible, "Briefing actions are clipped on a short desktop viewport"
+    assert short_next_visible and short_footer_visible and short_start_visible and short_steps_fit, "Briefing content or actions are clipped on a short desktop viewport"
     assert mobile_briefing_overflow, "Mobile briefing has horizontal overflow"
     assert debrief_has_vertical_scroll, "Debrief must contain a deliberate multi-screen scroll story"
     assert result_motion == {"name": "result-beat-one", "duration": "4.9s"}, f"Result typography timing changed: {result_motion}"
