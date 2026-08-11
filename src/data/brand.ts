@@ -12,6 +12,7 @@ export const BRAND_MASCOTS = {
   nurture: '/assets/brand-mascot/mana-nurture.png',
   scroll: '/assets/brand-mascot/mana-scroll.png',
   present: '/assets/brand-mascot/mana-present.png',
+  presentAnimated: '/assets/tutorial/popup-mascot/mana-welcome-loop.gif',
   upload: '/assets/brand-mascot/mana-upload.png',
   sources: '/assets/brand-mascot/mana-sources.png',
   submit: '/assets/brand-mascot/mana-submit.png',

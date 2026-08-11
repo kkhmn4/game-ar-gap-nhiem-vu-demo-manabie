@@ -609,7 +609,7 @@ function Intro({
                 <article className="briefing-page briefing-page-welcome" key="welcome">
                   <div className="briefing-page-visual" aria-hidden="true">
                     <span className="briefing-portal"><i /><i /><b>AI</b></span>
-                    <img className="briefing-shared-mascot" src={BRAND_MASCOTS.present} alt="" />
+                    <img className="briefing-shared-mascot briefing-animated-mascot" src={BRAND_MASCOTS.presentAnimated} alt="" />
                     <p><b>Mana</b> chào đón quý thầy cô!</p>
                   </div>
                   <div className="briefing-page-copy">
