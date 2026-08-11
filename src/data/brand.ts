@@ -9,7 +9,7 @@ export const BRAND_MASCOTS = {
   cameraLoadingAnimated: '/assets/tutorial/popup-mascot-camera/mana-camera-wait-loop.gif',
   explore: '/assets/brand-mascot/mana-explore.png',
   inspect: '/assets/brand-mascot/mana-inspect.png',
-  inspectAnimated: '/assets/tutorial/popup-mascot-inspect-v2/mana-inspect-loop-v2.gif',
+  inspectAnimated: '/assets/tutorial/popup-mascot-inspect-v3/mana-inspect-loop-v3.gif',
   action: '/assets/brand-mascot/mana-action.png',
   actionAnimated: '/assets/tutorial/popup-mascot-action/mana-action-loop.gif',
   nurture: '/assets/brand-mascot/mana-nurture.png',
