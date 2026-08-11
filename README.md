@@ -1,7 +1,8 @@
 # Gắp nhiệm vụ — Game AR khởi động
 
-Trò chơi AR điều khiển bằng cử chỉ tay cho **hoạt động 1** của buổi demo Manabie
-*"GẮP VIỆC – GIAO AI"*. Quả cầu nhiệm vụ rơi từ trên xuống, người chơi chụm ngón
+Trò chơi AR điều khiển bằng cử chỉ tay cho phần khởi động của **Module 1 — Prompt
+và quy trình tạo tài liệu phục vụ hoạt động dạy học**, thuộc khóa tập huấn Manabie
+*"Ứng dụng trí tuệ nhân tạo vào công việc chuyên môn"*. Quả cầu nhiệm vụ rơi từ trên xuống, người chơi chụm ngón
 tay để **gắp** và thả vào **giỏ nhiệm vụ** ở đáy màn hình.
 
 Clone từ [`earth-defender-ar`](../../../game%20AR/earth-defender-ar) — giữ nguyên lớp
@@ -18,8 +19,7 @@ ván có 12 quả, chia đều hai nhóm:
 - **06 quả xanh — việc trí tuệ nhân tạo dựng được bản nháp:** xây khung ma trận đặc tả cho môn, soạn dự thảo kế hoạch bài dạy, soạn kịch bản trình chiếu, soạn phiếu học tập, gợi ý bài tập về nhà, tóm tắt bài học thành infographic.
 - **06 quả cam — việc nhà giáo giữ lại:** đều cần hiện diện, cần thấu cảm hoặc cần thao tác vật lí. Trí tuệ nhân tạo không làm thay và không chịu trách nhiệm thay nhà giáo.
 
-Sáu nhãn quả xanh chép đúng Phụ lục 2 của kế hoạch bài dạy ngày 10/8, trùng từng
-chữ với **06 việc của hoạt động 2**. Nhờ vậy báo cáo viên nối được hai hoạt động
+Sáu nhãn quả xanh là **06 việc tạo tài liệu dạy học của Module 1**. Nhờ vậy báo cáo viên nối được hai hoạt động
 mà không cần thêm lời dẫn. Ma trận đặc tả theo đặc trưng môn học là nguồn chuẩn;
 năm sản phẩm sau phải truy vết được về cùng yêu cầu cần đạt.
 
@@ -29,6 +29,10 @@ phần tiếp theo; nội dung xuất hiện dần bằng các nhịp **Wipe · 
 giống một bản trình chiếu, có thứ tự rõ ràng sau mỗi lần bấm. `IntersectionObserver`
 vẫn kích hoạt các nhịp đó khi người xem tự cuộn. Nhịp cuối chỉ dẫn mở **Phiếu học
 tập số 1 — Câu hỏi 1** trước khi chuyển sang hoạt động 2.
+
+Trước màn mở đầu là popup chào mừng dùng mascot Manabie chính thức, nêu tên khóa
+tập huấn, tên Module 1, câu hỏi khởi động và ba bước chơi. Popup chỉ xuất hiện
+trong lần vào đầu tiên và đóng khi người dùng chọn **Đã hiểu nhiệm vụ**.
 
 Màn mở đầu dùng cùng ngôn ngữ chuyển động: một **cổng AI hình cầu morph thành
 khung đấu trường**, tiêu đề vào từ hai phía, mascot bật vào rồi trôi nhẹ, sáu ô

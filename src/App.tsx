@@ -49,6 +49,7 @@ export default function App() {
   const [demoMode, setDemoMode] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [muted, setMuted] = useState(false);
+  const [briefingAcknowledged, setBriefingAcknowledged] = useState(false);
   const [state, setState] = useState<GameState>(EMPTY);
   const [final, setFinal] = useState<GameState>(qaDebrief ? QA_DEBRIEF : EMPTY);
   const [runKey, setRunKey] = useState(0);
@@ -177,7 +178,13 @@ export default function App() {
           </main>
         </>
       ) : screen === 'intro' ? (
-        <Intro difficulty={difficulty} onDifficulty={setDifficulty} onStart={start} />
+        <Intro
+          briefingOpen={!briefingAcknowledged}
+          difficulty={difficulty}
+          onAcknowledgeBriefing={() => setBriefingAcknowledged(true)}
+          onDifficulty={setDifficulty}
+          onStart={start}
+        />
       ) : (
         <Debrief state={final} onReplay={() => setScreen('intro')} />
       )}
@@ -356,16 +363,27 @@ function Scoreboard({
 /* ------------------------------------------------------------------ */
 
 function Intro({
+  briefingOpen,
   difficulty,
+  onAcknowledgeBriefing,
   onDifficulty,
   onStart,
 }: {
+  briefingOpen: boolean;
   difficulty: Difficulty;
+  onAcknowledgeBriefing: () => void;
   onDifficulty: (d: Difficulty) => void;
   onStart: (mouse: boolean) => void;
 }) {
   const [launching, setLaunching] = useState(false);
   const [motionCycle, setMotionCycle] = useState(0);
+  const briefingButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!briefingOpen) return;
+    const timer = window.setTimeout(() => briefingButtonRef.current?.focus({ preventScroll: true }), 900);
+    return () => window.clearTimeout(timer);
+  }, [briefingOpen]);
 
   const launch = (mouse: boolean) => {
     if (launching) return;
@@ -401,11 +419,11 @@ function Intro({
         <header className="workshop-header">
           <div className="workshop-brand">
             <img className="manabie-brand-mark" src={MANABIE_MARK} alt="" />
-            <span>THCS ĐỒNG KHỞI</span>
+            <span>TẬP HUẤN ỨNG DỤNG AI</span>
             <i>MANABIE AI LAB</i>
           </div>
           <div className="workshop-status"><b /> SẴN SÀNG TRẢI NGHIỆM</div>
-          <div className="workshop-code">TẬP HUẤN 10/8 · HĐ 01/03</div>
+          <div className="workshop-code">MODULE 1 · KHỞI ĐỘNG</div>
         </header>
 
         <section className="workshop-hero">
@@ -485,6 +503,75 @@ function Intro({
           <em>Quý thầy cô quan sát và cùng gọi tên nhóm việc</em>
         </footer>
       </main>
+
+      {briefingOpen && (
+        <section
+          className="briefing-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="briefing-title"
+          aria-describedby="briefing-question"
+        >
+          <div className="briefing-backdrop" aria-hidden="true" />
+          <div className="briefing-card">
+            <span className="briefing-orbit briefing-orbit-a" aria-hidden="true" />
+            <span className="briefing-orbit briefing-orbit-b" aria-hidden="true" />
+
+            <aside className="briefing-mascot" aria-hidden="true">
+              <span className="briefing-signal">AI</span>
+              <img src={BRAND_MASCOTS.present} alt="" />
+              <p><b>Mana</b> đã sẵn sàng<br />đồng hành cùng quý thầy cô!</p>
+            </aside>
+
+            <div className="briefing-content">
+              <header className="briefing-header">
+                <div className="briefing-brand">
+                  <img src={MANABIE_MARK} alt="" />
+                  <span>MANABIE AI LAB</span>
+                </div>
+                <span className="briefing-step">MODULE 1 · PROMPT</span>
+              </header>
+
+              <p className="briefing-welcome">Chào mừng quý thầy cô tham gia buổi tập huấn</p>
+              <h2 id="briefing-title">Ứng dụng trí tuệ nhân tạo<br />vào công việc chuyên môn</h2>
+              <p className="briefing-module">
+                <span>Module 1</span>
+                Prompt và quy trình tạo tài liệu phục vụ hoạt động dạy học
+              </p>
+
+              <div className="briefing-question" id="briefing-question">
+                <span className="briefing-question-label">CÂU HỎI KHỞI ĐỘNG</span>
+                <p>
+                  Một công việc chuyên môn có <strong>dấu hiệu gì</strong> thì giao được cho trí tuệ nhân tạo,
+                  và có dấu hiệu gì thì <strong>người dạy phải giữ lại cho mình?</strong>
+                </p>
+              </div>
+
+              <div className="briefing-howto" aria-label="Hướng dẫn chơi">
+                <div className="briefing-howto-title">
+                  <img src={BRAND_MASCOTS.inspect} alt="" aria-hidden="true" />
+                  <span><b>Hướng dẫn chơi</b> Chọn đúng việc AI có thể hỗ trợ dựng bản nháp</span>
+                </div>
+                <ol>
+                  <li><b>01</b><span>Đọc công việc<br /><small>xuất hiện trên quả cầu</small></span></li>
+                  <li><b>02</b><span>Chụm tay để gắp<br /><small>hoặc kéo bằng chuột</small></span></li>
+                  <li><b>03</b><span>Thả vào cổng AI<br /><small>nếu việc phù hợp</small></span></li>
+                </ol>
+              </div>
+
+              <button
+                ref={briefingButtonRef}
+                className="briefing-accept"
+                type="button"
+                onClick={onAcknowledgeBriefing}
+              >
+                <span>Đã hiểu nhiệm vụ</span>
+                <i aria-hidden="true">BẮT ĐẦU KHỞI ĐỘNG&nbsp; →</i>
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -593,7 +680,7 @@ function Debrief({ state, onReplay }: { state: GameState; onReplay: () => void }
         </div>
       )}
       <header className="debrief-header">
-          <div className="debrief-brand"><img className="manabie-brand-mark" src={MANABIE_MARK} alt="" /> THCS ĐỒNG KHỞI <i>MANABIE AI LAB</i></div>
+          <div className="debrief-brand"><img className="manabie-brand-mark" src={MANABIE_MARK} alt="" /> TẬP HUẤN ỨNG DỤNG AI <i>MODULE 1 · PROMPT</i></div>
           <div className="debrief-header-tools">
             <button className="debrief-replay-motion" type="button" onClick={replayVisibleMotion}>
               <span>↻</span> XEM LẠI CHUYỂN ĐỘNG
