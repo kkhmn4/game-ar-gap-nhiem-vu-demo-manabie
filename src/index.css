@@ -2391,7 +2391,8 @@ button {
   z-index: 2;
   width: min(1560px, 100%);
   height: min(900px, calc(100dvh - clamp(1.6rem, 4vw, 4.5rem)));
-  min-height: 620px;
+  min-height: 0;
+  max-height: calc(100dvh - .75rem);
   display: grid;
   grid-template-rows: 72px minmax(0, 1fr) 76px;
   overflow: hidden;
@@ -2473,12 +2474,32 @@ button {
 .briefing-page-stage { position: relative; z-index: 3; min-height: 0; overflow: hidden; transition: filter .48s ease, transform .48s cubic-bezier(.4, 0, .2, 1), opacity .48s ease; }
 .briefing-deck[data-morph-phase='cover'] .briefing-page-stage { filter: blur(3px); opacity: .72; transform: scale(.985); }
 
+.briefing-shared-title { view-transition-name: briefing-title; }
+.briefing-shared-mascot { view-transition-name: briefing-mascot; }
+
+::view-transition-group(briefing-title) {
+  z-index: 220;
+  animation-duration: .92s;
+  animation-timing-function: cubic-bezier(.16, .86, .28, 1);
+}
+::view-transition-group(briefing-mascot) {
+  z-index: 221;
+  animation-duration: 1.02s;
+  animation-timing-function: cubic-bezier(.16, .86, .28, 1);
+}
+::view-transition-old(briefing-title),
+::view-transition-old(briefing-mascot) { animation: briefing-shared-old .92s cubic-bezier(.4, 0, .2, 1) both; }
+::view-transition-new(briefing-title),
+::view-transition-new(briefing-mascot) { animation: briefing-shared-new .92s cubic-bezier(.16, .86, .28, 1) both; }
+::view-transition-old(root) { animation: briefing-root-old .92s ease both; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: briefing-root-new .92s ease both; mix-blend-mode: normal; }
+
 .briefing-page {
   position: absolute;
   inset: 0;
   padding: clamp(1.8rem, 4vw, 4.8rem);
   overflow: hidden;
-  animation: briefing-page-reveal .78s cubic-bezier(.16, .86, .28, 1) both;
+  animation: none;
 }
 
 .briefing-page::after {
@@ -2504,6 +2525,30 @@ button {
 
 .briefing-page h2 { margin: 0; color: #f4f6ff; font-weight: 600; letter-spacing: -.024em; text-wrap: balance; }
 .briefing-page h2 em { color: #96a6ff; font-style: normal; }
+
+.briefing-page-visual > p,
+.briefing-module-card,
+.briefing-question-divider,
+.briefing-question-copy > p:last-child,
+.briefing-steps-large li,
+.briefing-objective { opacity: 0; }
+
+.briefing-deck[data-morph-phase='idle'] .briefing-page-visual > p,
+.briefing-deck[data-morph-phase='idle'] .briefing-module-card,
+.briefing-deck[data-morph-phase='idle'] .briefing-question-divider,
+.briefing-deck[data-morph-phase='idle'] .briefing-question-copy > p:last-child,
+.briefing-deck[data-morph-phase='idle'] .briefing-steps-large li,
+.briefing-deck[data-morph-phase='idle'] .briefing-objective {
+  animation: briefing-detail-in .62s cubic-bezier(.16, .86, .28, 1) both;
+}
+.briefing-deck[data-morph-phase='idle'] .briefing-page-visual > p,
+.briefing-deck[data-morph-phase='idle'] .briefing-module-card,
+.briefing-deck[data-morph-phase='idle'] .briefing-question-divider { animation-delay: .12s; }
+.briefing-deck[data-morph-phase='idle'] .briefing-question-copy > p:last-child,
+.briefing-deck[data-morph-phase='idle'] .briefing-steps-large li:nth-child(1) { animation-delay: .24s; }
+.briefing-deck[data-morph-phase='idle'] .briefing-steps-large li:nth-child(2) { animation-delay: .36s; }
+.briefing-deck[data-morph-phase='idle'] .briefing-steps-large li:nth-child(3) { animation-delay: .48s; }
+.briefing-deck[data-morph-phase='idle'] .briefing-objective { animation-delay: .62s; }
 
 /* Page 01 — course welcome */
 .briefing-page-welcome { display: grid; grid-template-columns: minmax(280px, .62fr) minmax(660px, 1.38fr); align-items: center; gap: clamp(2rem, 4vw, 4.5rem); }
@@ -2638,14 +2683,19 @@ button {
 .briefing-morph > span i:nth-child(2) { right: -28px; bottom: 2px; background: #91a2ff; }
 .briefing-morph > span b { font: 950 .72rem/1 var(--data); }
 .briefing-morph > strong { position: relative; z-index: 3; margin-top: 130px; color: #eef2ff; font: 900 .62rem/1 var(--data); letter-spacing: .18em; }
-.briefing-deck.is-morphing .briefing-morph { visibility: visible; animation: briefing-morph-layer 1.16s cubic-bezier(.68,0,.32,1) both; }
-.briefing-deck.is-morphing .briefing-morph::before { animation: briefing-morph-wipe 1.16s cubic-bezier(.68,0,.32,1) both; }
-.briefing-deck.is-morphing .briefing-morph > span { animation: briefing-morph-portal 1.16s cubic-bezier(.68,0,.32,1) both; }
-.briefing-deck.is-morphing .briefing-morph > span::before { animation: briefing-orbit 1.16s linear both; }
-.briefing-deck.is-morphing .briefing-morph > strong { animation: briefing-morph-label 1.16s ease both; }
+.briefing-deck.is-morphing .briefing-morph { visibility: visible; animation: briefing-morph-layer 1.3s cubic-bezier(.68,0,.32,1) both; }
+.briefing-deck.is-morphing .briefing-morph::before { animation: briefing-morph-wipe 1.3s cubic-bezier(.68,0,.32,1) both; }
+.briefing-deck.is-morphing .briefing-morph > span { animation: briefing-morph-portal 1.3s cubic-bezier(.68,0,.32,1) both; }
+.briefing-deck.is-morphing .briefing-morph > span::before { animation: briefing-orbit 1.3s linear both; }
+.briefing-deck.is-morphing .briefing-morph > strong { animation: briefing-morph-label 1.3s ease both; }
 
 @keyframes briefing-deck-arrive { from { opacity: 0; clip-path: inset(48% 2% 48% 2% round 30px); transform: translateY(24px) scale(.975); } to { opacity: 1; clip-path: inset(0 round 30px); transform: none; } }
 @keyframes briefing-deck-edge { 0%, 12% { transform: translateX(0); opacity: 0; } 28%, 72% { opacity: 1; } 88%, 100% { transform: translateX(660%); opacity: 0; } }
+@keyframes briefing-shared-old { 0%, 34% { opacity: 1; filter: blur(0); } 100% { opacity: 0; filter: blur(8px); } }
+@keyframes briefing-shared-new { 0%, 24% { opacity: 0; filter: blur(10px); } 100% { opacity: 1; filter: blur(0); } }
+@keyframes briefing-root-old { 0%, 32% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes briefing-root-new { 0%, 22% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes briefing-detail-in { from { opacity: 0; filter: blur(8px); transform: translateY(20px) scale(.985); } to { opacity: 1; filter: blur(0); transform: none; } }
 @keyframes briefing-page-reveal { from { opacity: 0; filter: blur(12px); clip-path: circle(12% at 50% 50%); transform: scale(.955); } to { opacity: 1; filter: blur(0); clip-path: circle(78% at 50% 50%); transform: none; } }
 .briefing-deck[data-direction='prev'] .briefing-page { animation-name: briefing-page-reveal-back; }
 @keyframes briefing-page-reveal-back { from { opacity: 0; filter: blur(12px); clip-path: circle(12% at 50% 50%); transform: scale(1.035); } to { opacity: 1; filter: blur(0); clip-path: circle(78% at 50% 50%); transform: none; } }
@@ -2659,6 +2709,27 @@ button {
 @keyframes briefing-morph-wipe { 0%, 100% { clip-path: inset(49.85% 0 49.85% 0); } 42%, 60% { clip-path: inset(0); } }
 @keyframes briefing-morph-portal { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.2) rotate(-40deg); } 40% { opacity: 1; transform: translate(-50%,-50%) scale(2.2) rotate(0); } 62% { opacity: 1; transform: translate(-50%,-50%) scale(22) rotate(35deg); } 100% { opacity: 0; transform: translate(-50%,-50%) scale(31) rotate(55deg); } }
 @keyframes briefing-morph-label { 0%, 22%, 78%, 100% { opacity: 0; transform: translateY(12px); } 42%, 64% { opacity: 1; transform: none; } }
+
+@media (max-height: 820px) and (min-width: 721px) {
+  .briefing-deck { padding: .5rem; }
+  .briefing-deck-shell { height: calc(100dvh - 1rem); grid-template-rows: 56px minmax(0, 1fr) 60px; border-radius: 22px; }
+  .briefing-deck-shell::after { inset: 56px 0 60px; }
+  .briefing-deck-header, .briefing-deck-footer { padding-inline: clamp(1rem, 2.4vw, 2.4rem); }
+  .briefing-page { padding: clamp(1rem, 2.3vw, 2.25rem); }
+  .briefing-page-visual > img { width: min(75%, 320px); max-height: 330px; }
+  .briefing-page-visual > p { bottom: 0; }
+  .briefing-page-copy h2 { font-size: clamp(2.7rem, 4vw, 4.15rem); }
+  .briefing-module-card { margin-top: 1.2rem; padding-block: .7rem; }
+  .briefing-question-copy h2 { font-size: clamp(2.2rem, 3.25vw, 3.65rem); }
+  .briefing-question-copy > p:last-child { font-size: clamp(1.15rem, 1.65vw, 1.7rem); }
+  .briefing-question-divider { margin-block: .85rem; }
+  .briefing-howto-heading { min-height: 105px; }
+  .briefing-howto-heading h2 { font-size: clamp(2.35rem, 3.35vw, 3.8rem); }
+  .briefing-howto-heading > img { width: clamp(110px, 11vw, 165px); max-height: 125px; }
+  .briefing-steps-large li { padding: clamp(.75rem, 1.25vw, 1.1rem); }
+  .briefing-steps-large li span { margin-top: .5rem; }
+  .briefing-objective { padding-block: .6rem; }
+}
 
 @media (max-width: 1100px) {
   .briefing-deck-shell { min-height: 600px; grid-template-rows: 64px minmax(0, 1fr) 68px; }

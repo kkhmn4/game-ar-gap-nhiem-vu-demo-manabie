@@ -33,8 +33,9 @@ assert "workshop-morph-gate" in app_source, "Opening needs a visible AI portal m
 assert "briefing-overlay" in app_source, "Opening must include the Module 1 briefing dialog"
 assert all(name in app_source for name in ("briefing-page-welcome", "briefing-page-question", "briefing-page-howto")), "Briefing must use three distinct pages"
 assert "onWheel" in app_source and "briefing-morph" in app_source, "Briefing needs wheel navigation and morph transitions"
-assert "data-morph-phase" in app_source and "1.16s" in css_source, "Briefing morph must use a timed cover/swap/reveal sequence"
-assert "Đã hiểu nhiệm vụ" in app_source, "Briefing needs one explicit acknowledgement action"
+assert "data-morph-phase" in app_source and "1.3s" in css_source, "Briefing morph must use a timed cover/swap/reveal sequence"
+assert "startViewTransition" in app_source and "view-transition-name: briefing-title" in css_source, "Briefing needs shared-element morphing"
+assert "Bắt đầu nhiệm vụ" in app_source, "Briefing needs one explicit start action"
 assert "Một công việc chuyên môn có" in app_source, "Briefing must state the workshop question"
 assert "THCS ĐỒNG KHỞI" not in app_source and "TẬP HUẤN 10/8" not in app_source, "School-specific identity must be removed"
 assert "debrief-replay-motion" in app_source, "Debrief motion must be replayable"
@@ -72,24 +73,26 @@ with sync_playwright() as p:
     briefing_visible = briefing.is_visible()
     page_one_title = page.locator(".briefing-page-welcome h2").inner_text()
     cursor_aura_visible = float(page.locator(".briefing-cursor-aura").evaluate("el => getComputedStyle(el).opacity")) > 0.8
+    shared_view_names = page.evaluate("[getComputedStyle(document.querySelector('.briefing-shared-title')).viewTransitionName, getComputedStyle(document.querySelector('.briefing-shared-mascot')).viewTransitionName]")
     page.get_by_role("button", name="Tiếp tục").click()
-    page.wait_for_timeout(240)
-    old_page_held_during_cover = page.locator(".briefing-page-welcome").count() == 1
-    new_page_hidden_during_cover = page.locator(".briefing-page-question").count() == 0
+    page.wait_for_timeout(60)
     morph_cover_phase = briefing.get_attribute("data-morph-phase")
     briefing_morph_animation = page.locator(".briefing-morph").evaluate("el => getComputedStyle(el).animationName")
     page.wait_for_function("document.querySelector('.briefing-deck')?.dataset.morphPhase === 'reveal'", timeout=1200)
     morph_reveal_phase_observed = True
+    question_detail_hidden_during_morph = float(page.locator(".briefing-question-copy > p:last-child").evaluate("el => getComputedStyle(el).opacity")) < 0.1
     page.screenshot(path=str(out / "briefing-morph-1-2.png"), full_page=False)
     page.wait_for_function("document.querySelector('.briefing-deck')?.dataset.morphPhase === 'idle'", timeout=1400)
+    page.wait_for_timeout(850)
     new_page_revealed_after_swap = page.locator(".briefing-page-question").count() == 1
+    question_detail_visible_after_morph = float(page.locator(".briefing-question-copy > p:last-child").evaluate("el => getComputedStyle(el).opacity")) > 0.95
     briefing_question = page.locator(".briefing-question-copy").inner_text()
     page.screenshot(path=str(out / "briefing-question-desktop.png"), full_page=False)
     page.mouse.wheel(0, 620)
-    page.wait_for_timeout(1220)
+    page.wait_for_timeout(2050)
     page_three_steps = page.locator(".briefing-steps-large li").count()
     page.screenshot(path=str(out / "briefing-howto-desktop.png"), full_page=False)
-    page.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
+    page.get_by_role("button", name="Bắt đầu nhiệm vụ").click()
     page.wait_for_timeout(500)
     page.screenshot(path=str(out / "intro-motion-frame.png"), full_page=False)
     motion = page.locator(".workshop-scanline").evaluate("el => getComputedStyle(el).animationName")
@@ -115,6 +118,26 @@ with sync_playwright() as p:
         button.click()
         selected_modes.append((mode, button.get_attribute("aria-pressed")))
 
+    short = browser.new_page(viewport={"width": 1440, "height": 650}, device_scale_factor=1)
+    short.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
+    short.get_by_role("dialog").wait_for()
+    short.wait_for_timeout(950)
+    short_next = short.get_by_role("button", name="Tiếp tục")
+    short_next_box = short_next.bounding_box()
+    short_footer_box = short.locator(".briefing-deck-footer").bounding_box()
+    short_next_visible = short_next.is_visible() and bool(short_next_box and short_next_box["y"] + short_next_box["height"] <= 650)
+    short_footer_visible = bool(short_footer_box and short_footer_box["y"] + short_footer_box["height"] <= 650)
+    short_next.click()
+    short.wait_for_timeout(1400)
+    short.get_by_role("button", name="Tiếp tục").click()
+    short.wait_for_timeout(1400)
+    short_start = short.get_by_role("button", name="Bắt đầu nhiệm vụ")
+    short_start_box = short_start.bounding_box()
+    short_start_visible = short_start.is_visible() and bool(short_start_box and short_start_box["y"] + short_start_box["height"] <= 650)
+    short.wait_for_timeout(850)
+    short.screenshot(path=str(out / "briefing-short-height.png"), full_page=False)
+    short.close()
+
     mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
     mobile.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
     mobile.locator(".workshop-stage").wait_for()
@@ -123,12 +146,12 @@ with sync_playwright() as p:
     mobile.screenshot(path=str(out / "briefing-mobile.png"), full_page=True)
     mobile_briefing_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     mobile.get_by_role("button", name="Tiếp tục").click()
-    mobile.wait_for_timeout(1220)
+    mobile.wait_for_timeout(2050)
     mobile.screenshot(path=str(out / "briefing-question-mobile.png"), full_page=True)
     mobile.get_by_role("button", name="Tiếp tục").click()
-    mobile.wait_for_timeout(1220)
+    mobile.wait_for_timeout(2050)
     mobile.screenshot(path=str(out / "briefing-howto-mobile.png"), full_page=True)
-    mobile.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
+    mobile.get_by_role("button", name="Bắt đầu nhiệm vụ").click()
     mobile.wait_for_timeout(3500)
     mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
     mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
@@ -199,10 +222,12 @@ with sync_playwright() as p:
     assert "người dạy phải giữ lại cho mình" in briefing_question, briefing_question
     assert page_three_steps == 3, f"Expected three large play steps, got {page_three_steps}"
     assert briefing_morph_animation == "briefing-morph-layer", briefing_morph_animation
-    assert old_page_held_during_cover and new_page_hidden_during_cover, "Briefing content swapped before the morph covered the old page"
+    assert shared_view_names == ["briefing-title", "briefing-mascot"], shared_view_names
     assert morph_cover_phase == "cover", morph_cover_phase
     assert new_page_revealed_after_swap and morph_reveal_phase_observed, "New briefing page did not reveal from the covered state"
+    assert question_detail_hidden_during_morph and question_detail_visible_after_morph, "Supporting content must reveal only after the shared-element morph"
     assert cursor_aura_visible, "Mouse-reactive briefing aura did not appear"
+    assert short_next_visible and short_footer_visible and short_start_visible, "Briefing actions are clipped on a short desktop viewport"
     assert mobile_briefing_overflow, "Mobile briefing has horizontal overflow"
     assert debrief_has_vertical_scroll, "Debrief must contain a deliberate multi-screen scroll story"
     assert result_motion == {"name": "result-beat-one", "duration": "4.9s"}, f"Result typography timing changed: {result_motion}"

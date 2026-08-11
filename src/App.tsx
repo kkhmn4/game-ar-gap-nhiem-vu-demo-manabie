@@ -1,4 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { Game } from './components/Game';
 import { BRAND_MASCOTS, MANABIE_MARK } from './data/brand';
 import { audio } from './utils/audio';
@@ -405,15 +406,23 @@ function Intro({
     audio.init();
     audio.playPower();
     briefingMorphSwapTimerRef.current = window.setTimeout(() => {
-      setBriefingStep(target);
+      const updatePage = () => flushSync(() => setBriefingStep(target));
+      const documentWithTransitions = document as Document & {
+        startViewTransition?: (update: () => void) => { finished: Promise<void> };
+      };
+      if (documentWithTransitions.startViewTransition) {
+        documentWithTransitions.startViewTransition(updatePage).finished.catch(() => undefined);
+      } else {
+        updatePage();
+      }
       setBriefingMorphPhase('reveal');
       briefingMorphSwapTimerRef.current = null;
-    }, 500);
+    }, 320);
     briefingMorphEndTimerRef.current = window.setTimeout(() => {
       setBriefingMorphPhase('idle');
       briefingMorphLockRef.current = false;
       briefingMorphEndTimerRef.current = null;
-    }, 1160);
+    }, 1300);
   };
 
   const advanceBriefing = () => goToBriefingStep(briefingStep + 1);
@@ -600,12 +609,12 @@ function Intro({
                 <article className="briefing-page briefing-page-welcome" key="welcome">
                   <div className="briefing-page-visual" aria-hidden="true">
                     <span className="briefing-portal"><i /><i /><b>AI</b></span>
-                    <img src={BRAND_MASCOTS.present} alt="" />
+                    <img className="briefing-shared-mascot" src={BRAND_MASCOTS.present} alt="" />
                     <p><b>Mana</b> chào đón quý thầy cô!</p>
                   </div>
                   <div className="briefing-page-copy">
                     <p className="briefing-kicker">CHÀO MỪNG QUÝ THẦY CÔ THAM GIA BUỔI TẬP HUẤN</p>
-                    <h2 id="briefing-page-title">Ứng dụng trí tuệ nhân tạo <em>vào công việc chuyên môn</em></h2>
+                    <h2 className="briefing-shared-title" id="briefing-page-title">Ứng dụng trí tuệ nhân tạo <em>vào công việc chuyên môn</em></h2>
                     <div className="briefing-module-card">
                       <span>MODULE 1</span>
                       <strong>Prompt và quy trình tạo tài liệu phục vụ hoạt động dạy học</strong>
@@ -618,11 +627,11 @@ function Intro({
                 <article className="briefing-page briefing-page-question" key="question">
                   <div className="briefing-question-mark" aria-hidden="true">
                     <span>?</span>
-                    <img src={BRAND_MASCOTS.inspect} alt="" />
+                    <img className="briefing-shared-mascot" src={BRAND_MASCOTS.inspect} alt="" />
                   </div>
                   <div className="briefing-question-copy">
                     <p className="briefing-kicker">CÂU HỎI KHỞI ĐỘNG</p>
-                    <h2 id="briefing-page-title">
+                    <h2 className="briefing-shared-title" id="briefing-page-title">
                       Một công việc chuyên môn có <em>dấu hiệu gì</em> thì giao được cho trí tuệ nhân tạo?
                     </h2>
                     <div className="briefing-question-divider"><span>VÀ</span></div>
@@ -638,9 +647,9 @@ function Intro({
                   <div className="briefing-howto-heading">
                     <div>
                       <p className="briefing-kicker">HƯỚNG DẪN CHƠI</p>
-                      <h2 id="briefing-page-title">Ba động tác. <em>Một quyết định.</em></h2>
+                      <h2 className="briefing-shared-title" id="briefing-page-title">Ba động tác. <em>Một quyết định.</em></h2>
                     </div>
-                    <img src={BRAND_MASCOTS.action} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
+                    <img className="briefing-shared-mascot" src={BRAND_MASCOTS.action} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
                   </div>
                   <ol className="briefing-steps-large">
                     <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
@@ -689,7 +698,7 @@ function Intro({
                     onAcknowledgeBriefing();
                   }}
                 >
-                  <span>Đã hiểu nhiệm vụ</span><i>→</i>
+                  <span>Bắt đầu nhiệm vụ</span><i>→</i>
                 </button>
               )}
             </footer>
