@@ -517,7 +517,7 @@ function Intro({
               <span className="is-ring-one" />
               <span className="is-ring-two" />
               <i>AI</i>
-              <b>CỔNG HỌC LIỆU</b>
+              <b>KHO NHIỆM VỤ</b>
             </div>
             <div className="workshop-coach" aria-hidden="true">
               <img className="lux-image" src={BRAND_MASCOTS.explore} alt="" />
@@ -525,7 +525,7 @@ function Intro({
             </div>
             <figure className="workshop-arena lux-card">
               <span className="lux-border" aria-hidden="true" />
-              <img src="/assets/mission-arena-v2.png" alt="Không gian lớp học số với cổng nhiệm vụ và sáu học liệu" />
+              <img src="/assets/mission-arena-v2.png" alt="Không gian lớp học số với kho nhiệm vụ và sáu học liệu" />
               <span className="workshop-arena-shade" aria-hidden="true" />
               <figcaption>
                 <b>06</b>
@@ -541,7 +541,7 @@ function Intro({
           <i />
           <span><b>02</b> Chụm để gắp</span>
           <i />
-          <span><b>03</b> Thả đúng cổng AI</span>
+          <span><b>03</b> Thả vào kho nhiệm vụ</span>
           <em>Quý thầy cô quan sát và cùng gọi tên nhóm việc</em>
         </footer>
       </main>
@@ -651,17 +651,24 @@ function Intro({
                     </div>
                     <img className="briefing-shared-mascot" src={BRAND_MASCOTS.action} alt="Mascot Manabie hướng dẫn bắt đầu nhiệm vụ" />
                   </div>
-                  <ol className="briefing-steps-large">
-                    <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
-                    <li className="briefing-step-grab">
-                      <b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small>
-                      <span className="briefing-grab-demo" role="img" aria-label="Minh họa ngón cái và ngón trỏ gắp, kéo rồi thả quả cầu vào cổng AI">
-                        <img className="briefing-grab-animated" src="/assets/tutorial/grab-sequence/grab-tutorial.webp" alt="" />
-                        <img className="briefing-grab-static" src="/assets/tutorial/grab-sequence/grab-frame-04.png" alt="" />
+                  <div className="briefing-steps-stage">
+                    <ol className="briefing-steps-large">
+                      <li><b>01</b><span>Đọc công việc</span><small>Quan sát nội dung trên quả cầu</small></li>
+                      <li className="briefing-step-grab"><b>02</b><span>Chụm tay để gắp</span><small>Hoặc giữ và kéo bằng chuột</small></li>
+                      <li className="briefing-step-drop"><b>03</b><span>Thả vào kho nhiệm vụ</span><small>Khi AI có thể hỗ trợ công việc đó</small></li>
+                    </ol>
+                    <div className="briefing-transfer-demo" role="img" aria-label="Minh họa ngón cái và ngón trỏ gắp, kéo rồi thả quả cầu vào kho nhiệm vụ">
+                      <span className="briefing-transfer-route" aria-hidden="true"><i /></span>
+                      <span className="briefing-transfer-caption" aria-hidden="true">GẮP · KÉO · THẢ</span>
+                      <video className="briefing-grab-animated" autoPlay loop muted playsInline preload="auto" poster="/assets/tutorial/grab-sequence/grab-tutorial.webp" aria-hidden="true">
+                        <source src="/assets/tutorial/grab-sequence/grab-tutorial.webm" type="video/webm" />
+                      </video>
+                      <span className="briefing-drop-target" aria-hidden="true">
+                        <img src="/assets/mission-collector-v1.png" alt="" />
+                        <strong>KHO NHIỆM VỤ</strong>
                       </span>
-                    </li>
-                    <li><b>03</b><span>Thả vào cổng AI</span><small>Chỉ khi AI có thể hỗ trợ việc đó</small></li>
-                  </ol>
+                    </div>
+                  </div>
                   <p className="briefing-objective"><span>ĐÍCH ĐẾN</span> Tìm đúng <b>06 công việc</b> AI có thể hỗ trợ quý thầy cô dựng bản nháp.</p>
                 </article>
               )}

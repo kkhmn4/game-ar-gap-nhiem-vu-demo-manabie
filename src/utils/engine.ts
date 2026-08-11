@@ -850,7 +850,7 @@ export class GameEngine {
     ctx.fillStyle = PALETTE.mint;
     ctx.font = `800 ${Math.round(b.h * 0.12)}px ${FONT}`;
     ctx.letterSpacing = '0.18em';
-    ctx.fillText('CỔNG THU NHIỆM VỤ', cx, b.y + b.h * 0.36);
+    ctx.fillText('KHO NHIỆM VỤ', cx, b.y + b.h * 0.36);
     ctx.letterSpacing = '0px';
 
     ctx.fillStyle = PALETTE.white;

@@ -36,8 +36,9 @@ assert "onWheel" in app_source and "briefing-morph" in app_source, "Briefing nee
 assert "data-morph-phase" in app_source and "1.3s" in css_source, "Briefing morph must use a timed cover/swap/reveal sequence"
 assert "startViewTransition" in app_source and "view-transition-name: briefing-title" in css_source, "Briefing needs shared-element morphing"
 assert "Bắt đầu nhiệm vụ" in app_source, "Briefing needs one explicit start action"
-assert "briefing-grab-demo" in app_source and "grab-tutorial.webp" in app_source, "Play instructions need the animated five-pose grab demo"
+assert "briefing-transfer-demo" in app_source and "grab-tutorial.webm" in app_source, "Play instructions need the animated grab-to-warehouse demo"
 assert all((Path("public/assets/tutorial/grab-sequence") / f"grab-frame-{index:02d}.png").exists() for index in range(1, 6)), "All five transparent grab frames must exist"
+assert (Path("public/assets/tutorial/grab-sequence") / "grab-tutorial.webm").exists(), "Transparent grab tutorial video must exist"
 assert "Một công việc chuyên môn có" in app_source, "Briefing must state the workshop question"
 assert "THCS ĐỒNG KHỞI" not in app_source and "TẬP HUẤN 10/8" not in app_source, "School-specific identity must be removed"
 assert "debrief-replay-motion" in app_source, "Debrief motion must be replayable"
@@ -94,7 +95,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(2050)
     page_three_steps = page.locator(".briefing-steps-large li").count()
     grab_demo = page.locator(".briefing-grab-animated")
-    grab_demo_loaded = grab_demo.evaluate("el => el.complete && el.naturalWidth > 0")
+    grab_demo_loaded = grab_demo.evaluate("el => el.readyState >= 2 && el.videoWidth > 0 && !el.paused")
     instruction_font_sizes = page.locator(".briefing-steps-large li").first.evaluate("el => ({title: parseFloat(getComputedStyle(el.querySelector(':scope > span')).fontSize), detail: parseFloat(getComputedStyle(el.querySelector('small')).fontSize)})")
     page.screenshot(path=str(out / "briefing-howto-desktop.png"), full_page=False)
     page.get_by_role("button", name="Bắt đầu nhiệm vụ").click()

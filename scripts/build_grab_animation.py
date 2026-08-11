@@ -4,8 +4,15 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import subprocess
 
+import cv2
+import numpy as np
 from PIL import Image, ImageDraw, ImageChops
+
+
+SPRITE_SCALE = 0.38
+TARGET_CENTER = (820, 220)
 
 
 def repair_magenta_key(source: Path, output: Path) -> None:
@@ -138,33 +145,121 @@ def compose_release_frames(frames_dir: Path) -> None:
     final_pose.save(frames_dir / "grab-frame-05.png", optimize=True)
 
 
-def align_to_drop_zone(frame: Image.Image) -> Image.Image:
-    """Place the mint target at a fixed point while preserving authored motion."""
-    mask = Image.new("L", frame.size)
-    mask.putdata(
-        [
-            255 if alpha > 80 and green > 165 and green > red * 1.12 and green > blue * 1.03 else 0
-            for red, green, blue, alpha in frame.get_flattened_data()
-        ]
-    )
-    target_bounds = mask.getbbox()
-    if not target_bounds:
-        raise ValueError("Could not locate the mint drop-zone ring")
-
+def align_for_transfer(frame: Image.Image) -> Image.Image:
+    """Remove the temporary ring and align the action with the DOM task warehouse."""
+    target_bounds = find_colored_bounds(frame, "mint")
     target_center_x = (target_bounds[0] + target_bounds[2]) / 2
     target_center_y = (target_bounds[1] + target_bounds[3]) / 2
-    scale = 450 / frame.width
+
+    rgba = np.array(frame)
+    red, green, blue, alpha = (rgba[:, :, index] for index in range(4))
+    mint = (
+        (alpha > 40)
+        & (green > 150)
+        & (green > red * 1.08)
+        & (green > blue * 1.01)
+    ).astype(np.uint8) * 255
+    mint = cv2.dilate(mint, np.ones((7, 7), np.uint8), iterations=2)
+    rgba[mint > 0] = 0
+    frame = Image.fromarray(rgba, "RGBA")
+
+    scale = SPRITE_SCALE
     resized = frame.resize(
         (round(frame.width * scale), round(frame.height * scale)),
         Image.Resampling.LANCZOS,
     )
-    canvas = Image.new("RGBA", (480, 480))
+    canvas = Image.new("RGBA", (960, 320))
     offset = (
-        round(360 - target_center_x * scale),
-        round(240 - target_center_y * scale),
+        round(TARGET_CENTER[0] - target_center_x * scale),
+        round(TARGET_CENTER[1] - target_center_y * scale),
     )
     canvas.alpha_composite(resized, offset)
     return canvas
+
+
+def drag_delta(frame: Image.Image) -> tuple[int, int]:
+    ring_bounds = find_colored_bounds(frame, "mint")
+    orb_bounds = find_colored_bounds(frame, "orb")
+    ring_center = ((ring_bounds[0] + ring_bounds[2]) / 2, (ring_bounds[1] + ring_bounds[3]) / 2)
+    orb_center = ((orb_bounds[0] + orb_bounds[2]) / 2, (orb_bounds[1] + orb_bounds[3]) / 2)
+    return (
+        round((ring_center[0] - orb_center[0]) * SPRITE_SCALE),
+        round((ring_center[1] - orb_center[1]) * SPRITE_SCALE),
+    )
+
+
+def translated(frame: Image.Image, offset: tuple[int, int]) -> Image.Image:
+    canvas = Image.new("RGBA", frame.size)
+    canvas.alpha_composite(frame, offset)
+    return canvas
+
+
+def smoothstep(progress: float) -> float:
+    return progress * progress * (3 - 2 * progress)
+
+
+def optical_tween(start: Image.Image, end: Image.Image, count: int) -> list[Image.Image]:
+    """Morph two transparent poses with forward/backward optical flow."""
+    start_rgba = np.array(start, dtype=np.uint8)
+    end_rgba = np.array(end, dtype=np.uint8)
+    start_gray = cv2.cvtColor(start_rgba, cv2.COLOR_RGBA2GRAY)
+    end_gray = cv2.cvtColor(end_rgba, cv2.COLOR_RGBA2GRAY)
+    forward = cv2.calcOpticalFlowFarneback(start_gray, end_gray, None, 0.5, 4, 25, 4, 7, 1.5, 0)
+    backward = cv2.calcOpticalFlowFarneback(end_gray, start_gray, None, 0.5, 4, 25, 4, 7, 1.5, 0)
+    grid_x, grid_y = np.meshgrid(
+        np.arange(start.width, dtype=np.float32),
+        np.arange(start.height, dtype=np.float32),
+    )
+    frames = []
+    for index in range(1, count + 1):
+        progress = index / (count + 1)
+        warped_start = cv2.remap(
+            start_rgba,
+            grid_x - forward[:, :, 0] * progress,
+            grid_y - forward[:, :, 1] * progress,
+            cv2.INTER_CUBIC,
+            borderMode=cv2.BORDER_CONSTANT,
+        )
+        warped_end = cv2.remap(
+            end_rgba,
+            grid_x - backward[:, :, 0] * (1 - progress),
+            grid_y - backward[:, :, 1] * (1 - progress),
+            cv2.INTER_CUBIC,
+            borderMode=cv2.BORDER_CONSTANT,
+        )
+        blended = cv2.addWeighted(warped_start, 1 - progress, warped_end, progress, 0)
+        frames.append(Image.fromarray(blended, "RGBA"))
+    return frames
+
+
+def write_transparent_video(sequence: list[Image.Image], durations: list[int], output: Path) -> None:
+    """Encode a muted-loop-friendly VP9 video that keeps moving in reduced-motion mode."""
+    command = [
+        "ffmpeg", "-y",
+        "-f", "rawvideo",
+        "-pix_fmt", "rgba",
+        "-s", f"{sequence[0].width}x{sequence[0].height}",
+        "-r", "20",
+        "-i", "-",
+        "-an",
+        "-c:v", "libvpx-vp9",
+        "-pix_fmt", "yuva420p",
+        "-auto-alt-ref", "0",
+        "-crf", "30",
+        "-b:v", "0",
+        str(output),
+    ]
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert process.stdin is not None
+    for frame, duration in zip(sequence, durations):
+        raw_frame = np.asarray(frame.convert("RGBA"), dtype=np.uint8).tobytes()
+        for _ in range(max(1, round(duration / 50))):
+            process.stdin.write(raw_frame)
+    process.stdin.close()
+    stderr = process.stderr.read().decode("utf-8", errors="replace") if process.stderr else ""
+    return_code = process.wait()
+    if return_code != 0:
+        raise RuntimeError(f"ffmpeg failed with exit code {return_code}:\n{stderr}")
 
 
 def build_animation(frames_dir: Path, output: Path) -> None:
@@ -176,21 +271,83 @@ def build_animation(frames_dir: Path, output: Path) -> None:
         validate_alpha(frame, path.name)
         source_frames.append(frame)
 
-    source_frames = [align_to_drop_zone(frame) for frame in source_frames]
+    aligned_open = align_for_transfer(source_frames[0])
+    aligned_pinch = align_for_transfer(source_frames[1])
+    open_delta = drag_delta(source_frames[0])
+    pinch_delta = drag_delta(source_frames[1])
+    placed_open = translated(aligned_open, open_delta)
+    placed_pinch = translated(aligned_pinch, pinch_delta)
 
-    # Keep the tutorial semantically one-way: open, pinch, drag, place, release.
-    # The final success pose pauses before the loop restarts at the open pose.
-    sequence = source_frames
-    durations = [360, 240, 260, 300, 900]
+    # Slow, one-way instructional rhythm: open -> pinch -> drag -> release -> retract.
+    sequence = [aligned_open]
+    durations = [600]
+    pinch_tweens = optical_tween(aligned_open, aligned_pinch, 9)
+    sequence.extend(pinch_tweens)
+    durations.extend([60] * len(pinch_tweens))
+    sequence.append(aligned_pinch)
+    durations.append(300)
+
+    for step in range(1, 25):
+        progress = smoothstep(step / 24)
+        sequence.append(
+            translated(
+                aligned_pinch,
+                (round(pinch_delta[0] * progress), round(pinch_delta[1] * progress)),
+            )
+        )
+        durations.append(60)
+    durations[-1] = 300
+
+    release_tweens = optical_tween(placed_pinch, placed_open, 9)
+    sequence.extend(release_tweens)
+    durations.extend([60] * len(release_tweens))
+    sequence.append(placed_open)
+    durations.append(240)
+
+    target_radius = round(max(
+        find_colored_bounds(source_frames[0], "orb")[2] - find_colored_bounds(source_frames[0], "orb")[0],
+        find_colored_bounds(source_frames[0], "orb")[3] - find_colored_bounds(source_frames[0], "orb")[1],
+    ) * SPRITE_SCALE * .54)
+    orb_mask = Image.new("L", placed_open.size)
+    ImageDraw.Draw(orb_mask).ellipse(
+        (
+            TARGET_CENTER[0] - target_radius,
+            TARGET_CENTER[1] - target_radius,
+            TARGET_CENTER[0] + target_radius,
+            TARGET_CENTER[1] + target_radius,
+        ),
+        fill=255,
+    )
+    orb_layer = placed_open.copy()
+    orb_layer.putalpha(ImageChops.multiply(placed_open.getchannel("A"), orb_mask))
+    hand_layer = placed_open.copy()
+    hand_layer.putalpha(ImageChops.subtract(placed_open.getchannel("A"), orb_mask))
+    for step in range(1, 13):
+        progress = smoothstep(step / 12)
+        retracted = Image.new("RGBA", placed_open.size)
+        retracted.alpha_composite(orb_layer)
+        retracted.alpha_composite(hand_layer, (round(-180 * progress), round(8 * progress)))
+        sequence.append(retracted)
+        durations.append(60)
+    durations[-1] = 1000
+
+    transparent = Image.new("RGBA", aligned_open.size)
+    for fade_step in range(1, 6):
+        sequence.append(Image.blend(sequence[-1], transparent, fade_step / 5))
+        durations.append(60)
+    sequence.append(transparent)
+    durations.append(120)
     sequence[0].save(
         output,
         save_all=True,
         append_images=sequence[1:],
         duration=durations,
         loop=0,
-        lossless=True,
-        method=6,
+        lossless=False,
+        quality=90,
+        method=4,
     )
+    write_transparent_video(sequence, durations, output.with_suffix(".webm"))
 
 
 def main() -> None:
