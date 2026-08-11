@@ -11,7 +11,7 @@ export interface TaskDef {
 }
 
 /**
- * Sáu nhiệm vụ cốt lõi — chép đúng Phụ lục 2 của kế hoạch bài dạy ngày 10/8.
+ * Sáu nhiệm vụ cốt lõi của Module 1 — tạo tài liệu phục vụ hoạt động dạy học.
  * Sáu nhãn này phải trùng từng chữ với 06 việc của hoạt động 2; báo cáo viên nối
  * hai hoạt động bằng chính sáu nhãn ấy nên mọi sửa đổi cần sửa đồng thời ở hai nơi.
  * Nhãn ngắn lấy theo quy ước đặt tên tệp ở Phụ lục 5 để người học nhận ra sản phẩm.

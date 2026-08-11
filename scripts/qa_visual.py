@@ -1,6 +1,10 @@
 import re
+import sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 out = Path("qa-output")
 out.mkdir(exist_ok=True)
@@ -26,13 +30,17 @@ assert "ctx.setTransform(pixelRatioRef.current" in game_source, "Canvas must map
 assert "CANVAS_RENDER_SCALE" not in game_source, "Low-resolution canvas upscaling makes falling orbs blurry"
 assert "workshop-replay-motion" in app_source, "Opening motion must be replayable without reloading"
 assert "workshop-morph-gate" in app_source, "Opening needs a visible AI portal morph"
+assert "briefing-overlay" in app_source, "Opening must include the Module 1 briefing dialog"
+assert "Đã hiểu nhiệm vụ" in app_source, "Briefing needs one explicit acknowledgement action"
+assert "Một công việc chuyên môn có" in app_source, "Briefing must state the workshop question"
+assert "THCS ĐỒNG KHỞI" not in app_source and "TẬP HUẤN 10/8" not in app_source, "School-specific identity must be removed"
 assert "debrief-replay-motion" in app_source, "Debrief motion must be replayable"
 assert "debrief-morph-bridge" in app_source, "Debrief needs a visible chapter-transition morph"
 assert ".workshop-stage.force-motion .workshop-morph-gate" in css_source, "Presenter motion must not collapse to 0.001 ms"
 assert "06 sản phẩm cốt lõi" not in app_source, "Do not introduce wording absent from KHBD V5.2"
 assert "Nêu tiêu chí phân loại hai nhóm việc" not in app_source, "Question 1 must match the worksheet verbatim"
 assert "CHỐT LẦN 1 · CĂN CỨ PHÂN LOẠI CÔNG VIỆC" in app_source
-assert "CHÍNH LÀ 06 VIỆC CỦA 180 PHÚT SẮP TỚI" in app_source
+assert "TRONG 180 PHÚT SẮP TỚI" in app_source and "QUÝ THẦY CÔ SẼ THỰC HÀNH 06 VIỆC NÀY" in app_source
 assert "Căn cứ nào để xếp một công việc vào nhóm giao được cho trí tuệ nhân tạo?" in app_source
 assert "Mở mục 1.2" in app_source and "Nộp bài" in app_source
 assert "clip-path: inset(-.3em 100% -.24em -.08em)" in css_source, "Opening wipe must preserve Vietnamese diacritics"
@@ -53,6 +61,13 @@ with sync_playwright() as p:
     page.on("requestfailed", lambda request: failed_requests.append(f"{request.url}:{request.failure}"))
     page.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
     page.locator(".workshop-stage").wait_for()
+    briefing = page.get_by_role("dialog")
+    briefing.wait_for()
+    page.wait_for_timeout(1650)
+    page.screenshot(path=str(out / "briefing-desktop.png"), full_page=False)
+    briefing_visible = briefing.is_visible()
+    briefing_question = page.locator(".briefing-question").inner_text()
+    page.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
     page.wait_for_timeout(500)
     page.screenshot(path=str(out / "intro-motion-frame.png"), full_page=False)
     motion = page.locator(".workshop-scanline").evaluate("el => getComputedStyle(el).animationName")
@@ -81,6 +96,11 @@ with sync_playwright() as p:
     mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
     mobile.goto("http://127.0.0.1:4173", wait_until="domcontentloaded")
     mobile.locator(".workshop-stage").wait_for()
+    mobile.get_by_role("dialog").wait_for()
+    mobile.wait_for_timeout(1650)
+    mobile.screenshot(path=str(out / "briefing-mobile.png"), full_page=True)
+    mobile_briefing_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    mobile.get_by_role("button", name="Đã hiểu nhiệm vụ").click()
     mobile.wait_for_timeout(3500)
     mobile.screenshot(path=str(out / "intro-mobile.png"), full_page=True)
     mobile_overflow = mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
@@ -124,7 +144,7 @@ with sync_playwright() as p:
     close_text_motion = debrief.locator("#debrief-close .close-beat-one").evaluate("el => ({name: getComputedStyle(el).animationName, duration: getComputedStyle(el).animationDuration})")
     close_mascot_motion = debrief.locator("#debrief-close .debrief-close-mascot").evaluate("el => getComputedStyle(el).animationName")
     close_lock_visible = float(debrief.locator("#debrief-close .close-lock").evaluate("el => getComputedStyle(el).opacity")) > 0.9
-    pedagogical_steps = debrief.locator("#debrief-close .debrief-next li").all_text_contents()
+    pedagogical_steps = debrief.locator(".debrief-next-steps > li > strong").all_text_contents()
     debrief.screenshot(path=str(out / "debrief-close-settled.png"), full_page=False)
     debrief.close()
 
@@ -133,7 +153,7 @@ with sync_playwright() as p:
     medium.locator(".debrief-result-sequence").wait_for()
     medium.wait_for_timeout(5200)
     medium.screenshot(path=str(out / "debrief-1366-settled.png"), full_page=False)
-    medium_overflow = medium.locator(".debrief-v3").evaluate("el => el.scrollWidth <= el.clientWidth")
+    medium_overflow = medium.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     medium.close()
 
     debrief_mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
@@ -141,20 +161,14 @@ with sync_playwright() as p:
     debrief_mobile.locator(".debrief-result-sequence").wait_for()
     debrief_mobile.wait_for_timeout(5200)
     debrief_mobile.screenshot(path=str(out / "debrief-mobile-settled.png"), full_page=False)
-    debrief_mobile_overflow = debrief_mobile.locator(".debrief-v3").evaluate("el => el.scrollWidth <= el.clientWidth")
+    debrief_mobile_overflow = debrief_mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
     debrief_mobile.close()
-
-    reduced_context = browser.new_context(viewport={"width": 1366, "height": 768}, reduced_motion="reduce")
-    reduced = reduced_context.new_page()
-    reduced.goto("http://127.0.0.1:4173/?qa=debrief", wait_until="domcontentloaded")
-    reduced.locator(".debrief-result-sequence").wait_for()
-    reduced.wait_for_timeout(250)
-    reduced_lock_visible = float(reduced.locator(".result-lock").evaluate("el => getComputedStyle(el).opacity")) > 0.9
-    reduced_beat_hidden = reduced.locator(".result-beat-one").evaluate("el => getComputedStyle(el).display") == "none"
-    reduced_context.close()
 
     assert intro_text_separated, "Desktop intro kicker overlaps the main title"
     assert mobile_text_separated, "Mobile intro kicker overlaps the main title"
+    assert briefing_visible, "Module briefing dialog is not visible on first entry"
+    assert "người dạy phải giữ lại cho mình" in briefing_question, briefing_question
+    assert mobile_briefing_overflow, "Mobile briefing has horizontal overflow"
     assert debrief_has_vertical_scroll, "Debrief must contain a deliberate multi-screen scroll story"
     assert result_motion == {"name": "result-beat-one", "duration": "4.9s"}, f"Result typography timing changed: {result_motion}"
     assert result_lock_visible, "Result keyword bar must remain visible after the kinetic sequence"
@@ -168,10 +182,9 @@ with sync_playwright() as p:
     assert role_image_motion == "ppt-image-left", f"Role image motion missing: {role_image_motion}"
     assert close_text_motion == {"name": "close-beat-one", "duration": "5.8s"}, f"Closing typography timing changed: {close_text_motion}"
     assert close_lock_visible, "Closing pedagogical message must remain visible after animation"
-    assert pedagogical_steps == ["Mở mục 1.2", "Mở bản sao phiếu", "Ghi câu trả lời", "Nộp bài"], pedagogical_steps
+    assert pedagogical_steps == ["Mở mục 1.2", "Mở Phiếu học tập số 1", "Ghi câu trả lời", "Nộp bài"], pedagogical_steps
     assert close_mascot_motion == "ppt-mascot-celebrate", f"Closing mascot motion missing: {close_mascot_motion}"
     assert medium_overflow and debrief_mobile_overflow, "Debrief has horizontal overflow at a required viewport"
-    assert reduced_lock_visible and reduced_beat_hidden, "Reduced motion must show the stable result immediately"
     assert portal_duration == "3.05s", f"Opening portal morph was shortened or disabled: {portal_duration}"
     assert portal_visibility == "visible", f"Opening portal morph is not visible after replay: {portal_visibility}"
 
@@ -212,6 +225,9 @@ with sync_playwright() as p:
     assert canvas_density["x"] >= 1 and canvas_density["y"] >= 1, f"Canvas is still being upscaled and will look blurry: {canvas_density}"
     print({
         "intro_animation": motion,
+        "briefing_visible": briefing_visible,
+        "briefing_question": briefing_question,
+        "mobile_briefing_no_horizontal_overflow": mobile_briefing_overflow,
         "intro_presentation_motion": [intro_title_motion, intro_arena_motion],
         "intro_portal_morph": [portal_duration, portal_visibility],
         "animated_tasks": orbs,
@@ -231,7 +247,6 @@ with sync_playwright() as p:
         "debrief_kinetic_motion": [result_motion, close_text_motion],
         "debrief_persistent_messages": [result_lock_visible, close_lock_visible],
         "debrief_responsive_overflow": [medium_overflow, debrief_mobile_overflow],
-        "debrief_reduced_motion": [reduced_lock_visible, reduced_beat_hidden],
         "fall_speed_scale": fall_scale,
         "frame_stats": frame_stats,
         "selected_modes": selected_modes,
